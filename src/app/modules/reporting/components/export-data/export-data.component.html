@@ -1,0 +1,111 @@
+<div class="export-container">
+  <div class="export-header">
+    <h1>📤 Export de Données</h1>
+    <p>Exportez vos données aux formats Excel, CSV, JSON ou PDF</p>
+  </div>
+
+  <!-- Stats Cards - Version corrigée -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>Événements</h3>
+        <p class="stat-value">{{stats.events || 0}}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-info">
+        <h3>Formations</h3>
+        <p class="stat-value">{{stats.formations || 0}}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>Participants</h3>
+        <p class="stat-value">{{stats.participants || 0}}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-info">
+        <h3>Inscriptions</h3>
+        <p class="stat-value">{{stats.inscriptions || 0}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reste du HTML identique -->
+  <div class="export-card">
+
+  <div class="export-card">
+    <div class="export-options">
+      <!-- Type de données -->
+      <div class="option-group">
+        <label>📊 Type de données</label>
+        <div class="data-types">
+          <button class="data-btn" [class.active]="dataType === 'events'" (click)="dataType = 'events'">
+            📅 Événements
+          </button>
+          <button class="data-btn" [class.active]="dataType === 'formations'" (click)="dataType = 'formations'">
+            🎓 Formations
+          </button>
+          <button class="data-btn" [class.active]="dataType === 'participants'" (click)="dataType = 'participants'">
+            👥 Participants
+          </button>
+          <button class="data-btn" [class.active]="dataType === 'inscriptions'" (click)="dataType = 'inscriptions'">
+            📝 Inscriptions
+          </button>
+          <button class="data-btn" [class.active]="dataType === 'formateurs'" (click)="dataType = 'formateurs'">
+            👨‍🏫 Formateurs
+          </button>
+        </div>
+      </div>
+
+      <!-- Format d'export -->
+      <div class="option-group">
+        <label>📁 Format d'export</label>
+        <div class="export-formats">
+          <button class="format-btn" [class.active]="exportType === 'excel'" (click)="exportType = 'excel'">
+            📊 Excel
+          </button>
+          <button class="format-btn" [class.active]="exportType === 'csv'" (click)="exportType = 'csv'">
+            📄 CSV
+          </button>
+          <button class="format-btn" [class.active]="exportType === 'json'" (click)="exportType = 'json'">
+            🔧 JSON
+          </button>
+          <button class="format-btn" [class.active]="exportType === 'pdf'" (click)="exportType = 'pdf'">
+            📑 HTML
+          </button>
+        </div>
+      </div>
+
+      <!-- Bouton d'export -->
+      <div class="export-action">
+        <button class="btn-export" (click)="exportData()" [disabled]="loading">
+          <span *ngIf="!loading">🚀 Exporter maintenant</span>
+          <span *ngIf="loading" class="spinner-small"></span>
+          <span *ngIf="loading">Export en cours...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Informations -->
+    <div class="export-info">
+      <div class="info-item">
+        <span class="info-icon">💡</span>
+        <div class="info-text">
+          <strong>Astuce :</strong> Les fichiers exportés sont sauvegardés automatiquement dans votre dossier de téléchargements.
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">📌</span>
+        <div class="info-text">
+          <strong>Formats disponibles :</strong> Excel (.xlsx), CSV (.csv), JSON (.json), HTML (.html)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

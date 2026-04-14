@@ -1,0 +1,139 @@
+<div class="report-container" *ngIf="stats">
+
+  <div class="report-header">
+    <h1>⭐ Évaluations Post-formation</h1>
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>Note Moyenne</h3>
+        <p class="stat-value">{{stats.noteMoyenne}}/20</p>
+        <div class="stars">{{getStars(stats.noteMoyenne)}}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-content">
+        <h3>Total Évaluations</h3>
+        <p class="stat-value">{{stats.totalEvaluations}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">😊</div>
+      <div class="stat-content">
+        <h3>Satisfaction Globale</h3>
+        <p class="stat-value">{{stats.satisfactionGlobale}}/5</p>
+        <div class="stars">{{getStars(stats.satisfactionGlobale * 4)}}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">👍</div>
+      <div class="stat-content">
+        <h3>Taux de Recommandation</h3>
+        <p class="stat-value">{{stats.recommandation}}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill"
+               [style.width.%]="stats.recommandation"
+               style="background: #27ae60">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="charts-section">
+
+    <!-- Répartition des notes -->
+    <div class="chart-card">
+      <h3>Répartition des notes</h3>
+
+      <div class="grade-distribution">
+        <div *ngFor="let grade of repartitionList" class="grade-item">
+
+          <span class="grade-range">{{grade.key}}/20</span>
+
+          <div class="grade-bar-container">
+            <div class="grade-bar"
+                 [style.width.%]="getPercentage(grade.value)"
+                 [style.background]="getNoteColor(grade.key)">
+            </div>
+
+            <span class="grade-count">{{grade.value}}</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Compétences -->
+    <div class="chart-card">
+      <h3>Top compétences acquises</h3>
+
+      <div class="skills-list">
+        <div *ngFor="let skill of stats.competencesLesPlusAcquises" class="skill-item">
+
+          <div class="skill-info">
+            <span class="skill-name">{{skill.competence}}</span>
+            <span class="skill-percent">{{skill.pourcentage}}%</span>
+          </div>
+
+          <div class="skill-bar-container">
+            <div class="skill-bar"
+                 [style.width.%]="skill.pourcentage"
+                 [style.background]="getSkillColor(skill.pourcentage)">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Commentaires -->
+  <div class="chart-card full-width">
+    <h3>Commentaires récents</h3>
+
+    <div class="comments-list">
+
+      <div class="comment-card">
+        <div class="comment-header">
+          <strong>Participant #123</strong>
+          <span class="comment-note">★★★★☆</span>
+        </div>
+        <p class="comment-text">
+          "Très bonne formation, formateur excellent et contenu de qualité."
+        </p>
+      </div>
+
+      <div class="comment-card">
+        <div class="comment-header">
+          <strong>Participant #456</strong>
+          <span class="comment-note">★★★★★</span>
+        </div>
+        <p class="comment-text">
+          "Formation complète et bien structurée, je recommande vivement."
+        </p>
+      </div>
+
+      <div class="comment-card">
+        <div class="comment-header">
+          <strong>Participant #789</strong>
+          <span class="comment-note">★★★☆☆</span>
+        </div>
+        <p class="comment-text">
+          "Bonne formation mais certains modules pourraient être approfondis."
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>

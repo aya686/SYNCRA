@@ -1,0 +1,188 @@
+<div class="formations-app">
+    <!-- Bouton de bascule du thème -->
+  <div class="theme-toggle-wrapper">
+    <button class="theme-toggle-btn" (click)="toggleTheme()">
+      <span *ngIf="!isDarkMode">🌙 Mode sombre</span>
+      <span *ngIf="isDarkMode">☀️ Mode clair</span>
+    </button>
+  </div>
+  <!-- Header Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="resolvo-logo">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+            <defs>
+              <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4f46e5"/>
+                <stop offset="1" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Resolvo</span>
+      </div>
+      <nav class="main-nav">
+        <a routerLink="/" class="nav-link">Accueil</a>
+        <a routerLink="/events" routerLinkActive="active" class="nav-link">Événements</a>
+        <a routerLink="/formations" routerLinkActive="active" class="nav-link active">Formations</a>
+        <a href="#" class="nav-link">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn">👤</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Hero Wave Section -->
+    <section class="hero-wave">
+      <div class="wave-bg"></div>
+      <div class="hero-container">
+        <div class="hero-left">
+          <span class="trend-badge">🎓 Excellence</span>
+          <h1>Formations <span class="gradient-text">Professionnelles</span></h1>
+          <p>Développez vos compétences avec nos experts et certifiez-vous</p>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{formations.length}}+</span>
+              <span class="hero-stat-label">Formations</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{getCertifiedCount()}}</span>
+              <span class="hero-stat-label">Certifiantes</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">100%</span>
+              <span class="hero-stat-label">Satisfaction</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="floating-card card-1">
+            <span>🎓</span>
+            <p>+500 certifiés</p>
+          </div>
+          <div class="floating-card card-2">
+            <span>🏅</span>
+            <p>Experts reconnus</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-container">
+        <div class="filter-controls">
+          <div class="search-field">
+            <i>🔍</i>
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (ngModelChange)="filterFormations()"
+              placeholder="Rechercher une formation...">
+          </div>
+          <div class="sort-field">
+            <select [(ngModel)]="niveauFilter" (ngModelChange)="filterFormations()">
+              <option value="">Tous les niveaux</option>
+              <option value="debutant">🎓 Débutant</option>
+              <option value="intermediaire">📚 Intermédiaire</option>
+              <option value="avance">🚀 Avancé</option>
+            </select>
+          </div>
+          <button class="reset-filter" (click)="resetFilters()" *ngIf="searchTerm || niveauFilter">
+            ✕ Réinitialiser
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formations Grid -->
+    <section class="formations-section">
+      <div class="formations-container">
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-grid">
+          <div class="loading-card" *ngFor="let _ of [1,2,3,4,5,6]">
+            <div class="loading-shimmer"></div>
+          </div>
+        </div>
+
+        <!-- Formations -->
+        <div *ngIf="!loading" class="formations-masonry">
+          <div *ngFor="let formation of filteredFormations" class="formation-item">
+            <div class="formation-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (formation.imageUrl || '') + ')'" 
+                 [style.backgroundSize]="'cover'" [style.backgroundPosition]="'center'">
+              <div class="formation-level" [class]="formation.niveau">
+                {{formation.niveau}}
+              </div>
+              <div class="formation-title-overlay">{{formation.titre}}</div>
+              <div class="formation-overlay"></div>
+            </div>
+            
+            <div class="formation-details">
+              <h3>{{formation.titre}}</h3>
+              <p>{{formation.description | slice:0:80}}...</p>
+              <div class="formation-meta-row">
+                <span>⏱️ {{formation.dureeTotale}} heures</span>
+                <span>💰 {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
+                <span *ngIf="formation.certificate">🎓 Certifiante</span>
+              </div>
+              <div class="formation-footer-row">
+                <a [routerLink]="['/formations', formation.id]" class="formation-link">
+                  Découvrir
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && filteredFormations.length === 0" class="empty-state">
+          <div class="empty-illustration">📚</div>
+          <h3>Aucune formation trouvée</h3>
+          <p>Essayez d'autres critères de recherche</p>
+          <button class="empty-btn" (click)="resetFilters()">Explorer toutes</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Minimal -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">🎯 Resolvo</div>
+        <p>La plateforme qui connecte les talents aux opportunités</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorer</h4>
+          <a href="#">Événements</a>
+          <a href="#">Formations</a>
+          <a href="#">Conférences</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Aide</a>
+          <a href="#">Contact</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Légal</h4>
+          <a href="#">Mentions</a>
+          <a href="#">CGU</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Resolvo - Tous droits réservés</p>
+    </div>
+  </footer>
+</div>

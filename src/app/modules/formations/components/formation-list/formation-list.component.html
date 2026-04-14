@@ -1,0 +1,97 @@
+<div class="formation-list-container">
+  <div class="header">
+    <h1>Gestion des Formations</h1>
+    <button class="btn-primary" routerLink="/admin/formations/new">+ Nouvelle Formation</button>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-info">
+        <h3>{{totalFormations}}</h3>
+        <p>Total Formations</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-info">
+        <h3>{{avanceCount}}</h3>
+        <p>Niveau Avancé</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-info">
+        <h3>{{certifieCount}}</h3>
+        <p>Avec Certification</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Rechercher une formation..." [(ngModel)]="searchTerm" (input)="filterFormations()" class="search-input">
+    </div>
+    <select [(ngModel)]="niveauFilter" (change)="filterFormations()" class="filter-select">
+      <option value="">Tous les niveaux</option>
+      <option value="debutant">Débutant</option>
+      <option value="intermediaire">Intermédiaire</option>
+      <option value="avance">Avancé</option>
+    </select>
+  </div>
+
+    <div class="formations-grid">
+    <div *ngFor="let formation of filteredFormations" class="formation-card">
+      <!-- ... -->
+
+      <div class="sessions-section">
+        <div class="sessions-header">
+          <h4>📅 Sessions disponibles</h4>
+          <button class="btn-add-session" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+            + Ajouter
+          </button>
+        </div>
+        
+        <div *ngIf="formationSessions[formation.id] && formationSessions[formation.id].length > 0" class="sessions-list">
+          <div *ngFor="let session of formationSessions[formation.id]" class="session-item">
+            <div class="session-info">
+              <span class="session-date">{{session.dateDebut | date:'dd/MM/yyyy'}}</span>
+              <span class="session-lieu">{{session.lieu}}</span>
+              <span class="session-formateur">{{session.formateur}}</span>
+            </div>
+            <div class="session-actions">
+              <span class="session-status" [class]="session.statut">{{session.statut}}</span>
+              <button class="btn-view-session" [routerLink]="['/admin/formations/sessions', session.id]">
+                Voir
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="!formationSessions[formation.id] || formationSessions[formation.id].length === 0" class="no-sessions">
+          <p class="text-muted">Aucune session planifiée</p>
+          <button class="btn-add-session-small" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+            + Planifier une session
+          </button>
+        </div>
+      </div>
+
+      <div class="formation-actions">
+        <button class="btn-secondary" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+          + Ajouter session
+        </button>
+        <button class="btn-primary" [routerLink]="['/admin/formations', formation.id, 'edit']">
+          Modifier
+        </button>
+        <button class="btn-danger" (click)="deleteFormation(formation.id)">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div *ngIf="filteredFormations.length === 0" class="no-results">
+    <p>Aucune formation trouvée</p>
+  </div>

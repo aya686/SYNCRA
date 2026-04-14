@@ -1,0 +1,82 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo" *ngIf="!isSidebarCollapsed">
+        <h2>RESOLVO</h2>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        ☰
+      </button>
+    </div>
+    
+    <ul class="nav-menu">
+    <li class="nav-section" *ngIf="!isSidebarCollapsed">
+  <div class="section-header">
+    <div class="section-line"></div>
+    <span class="section-text">
+      <span class="section-dot">‎ ‎ ‎ </span>
+      ADMINISTRATION
+    </span>
+  </div>
+</li>
+      
+      <li>
+        <a routerLink="/admin/events" routerLinkActive="active">
+          <span class="icon">📅</span>
+          <span *ngIf="!isSidebarCollapsed">Événements</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/formations" routerLinkActive="active">
+          <span class="icon">🎓</span>
+          <span *ngIf="!isSidebarCollapsed">Formations</span>
+        </a>
+      </li>
+      <li>
+  <a routerLink="/admin/formateurs" routerLinkActive="active">
+    <span class="icon">👨‍🏫</span>
+    <span *ngIf="!isSidebarCollapsed">Formateurs</span>
+  </a>
+</li>
+   <li>
+        <a routerLink="/admin/reporting/evaluation" routerLinkActive="active">
+          <span class="icon">⭐</span>
+          <span *ngIf="!isSidebarCollapsed">Évaluations</span>
+        </a>
+      </li>
+      <li class="nav-divider" *ngIf="!isSidebarCollapsed"></li>
+      <li>
+        <a routerLink="/" routerLinkActive="active">
+          <span class="icon">🌐</span>
+          <span *ngIf="!isSidebarCollapsed">Voir le site</span>
+        </a>
+      </li>
+      <li>
+  <a routerLink="/admin/reporting/analytics" routerLinkActive="active">
+    <span class="icon">📊</span>
+    <span *ngIf="!isSidebarCollapsed">Analytique</span>
+  </a>
+</li>
+<li>
+  <a routerLink="/admin/reporting/heatmap" routerLinkActive="active">
+    <span class="icon">🔥</span>
+    <span *ngIf="!isSidebarCollapsed">Heatmap</span>
+  </a>
+</li>
+<li>
+  <a routerLink="/admin/reporting/export" routerLinkActive="active">
+    <span class="icon">📤</span>
+    <span *ngIf="!isSidebarCollapsed">Export données</span>
+  </a>
+</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

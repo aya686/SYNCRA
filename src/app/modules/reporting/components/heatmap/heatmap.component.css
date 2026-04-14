@@ -1,0 +1,140 @@
+.heatmap-container {
+  padding: 24px;
+  background: var(--bg-secondary);
+  min-height: 100vh;
+}
+
+.heatmap-header {
+  margin-bottom: 32px;
+}
+
+.heatmap-header h1 {
+  font-size: 28px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.heatmap-header p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.period-selector {
+  display: flex;
+  gap: 12px;
+}
+
+.period-selector button {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 8px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s;
+}
+
+.period-selector button.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.legend {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.legend h4 {
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.legend-colors {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.chart-wrapper {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  min-height: 500px;
+}
+
+.heatmap-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.stat-card h3 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 80px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .heatmap-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .legend-colors {
+    gap: 12px;
+  }
+  
+  .period-selector {
+    flex-wrap: wrap;
+  }
+}

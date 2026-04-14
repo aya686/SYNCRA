@@ -1,0 +1,179 @@
+<div class="formation-form-container">
+  <div class="form-header">
+    <h1>{{isEditMode ? 'Modifier' : 'Créer'}} une Formation</h1>
+    <p class="form-subtitle">Tous les champs marqués d'un * sont obligatoires</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <form #formationForm="ngForm" (ngSubmit)="onSubmit(formationForm)" class="formation-form">
+    
+    <!-- Champ Titre -->
+    <div class="form-group" [class.has-error]="isInvalid('titre', formationForm)">
+      <label for="titre">
+        Titre de la formation <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        id="titre" 
+        name="titre"
+        [(ngModel)]="formation.titre" 
+        #titre="ngModel"
+        required
+        minlength="3"
+        maxlength="100"
+        placeholder="Ex: Angular Avancé"
+        class="form-control">
+      <div class="error-message" *ngIf="isInvalid('titre', formationForm)">
+        {{getErrorMessage('titre', formationForm)}}
+      </div>
+      <small class="helper-text">Minimum 3 caractères, maximum 100 caractères</small>
+    </div>
+
+    <!-- Champ Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        name="description"
+        [(ngModel)]="formation.description" 
+        #description="ngModel"
+        rows="4"
+        maxlength="500"
+        placeholder="Décrivez la formation..."
+        class="form-control"></textarea>
+      <div class="char-count" *ngIf="formation.description?.length">
+        {{formation.description.length}} / 500 caractères
+      </div>
+      <small class="helper-text">Décrivez le contenu, les prérequis et les objectifs de la formation</small>
+    </div>
+
+    <div class="form-row">
+      <!-- Champ Durée -->
+      <div class="form-group" [class.has-error]="isInvalid('dureeTotale', formationForm)">
+        <label for="dureeTotale">
+          Durée totale (heures) <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="dureeTotale" 
+          name="dureeTotale"
+          [(ngModel)]="formation.dureeTotale" 
+          #dureeTotale="ngModel"
+          required
+          min="1"
+          max="500"
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('dureeTotale', formationForm)">
+          {{getErrorMessage('dureeTotale', formationForm)}}
+        </div>
+        <small class="helper-text">Entre 1 et 500 heures</small>
+      </div>
+
+      <!-- Champ Prix -->
+      <div class="form-group" [class.has-error]="isInvalid('prix', formationForm)">
+        <label for="prix">
+          Prix (€) <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="prix" 
+          name="prix"
+          [(ngModel)]="formation.prix" 
+          #prix="ngModel"
+          required
+          min="0"
+          step="0.01"
+          placeholder="0"
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('prix', formationForm)">
+          {{getErrorMessage('prix', formationForm)}}
+        </div>
+        <small class="helper-text">Laissez 0 pour une formation gratuite</small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Champ Niveau -->
+      <div class="form-group" [class.has-error]="isInvalid('niveau', formationForm)">
+        <label for="niveau">
+          Niveau <span class="required">*</span>
+        </label>
+        <select 
+          id="niveau" 
+          name="niveau"
+          [(ngModel)]="formation.niveau" 
+          #niveau="ngModel"
+          required 
+          class="form-control">
+          <option value="debutant">🎓 Débutant</option>
+          <option value="intermediaire">📚 Intermédiaire</option>
+          <option value="avance">🚀 Avancé</option>
+        </select>
+        <div class="error-message" *ngIf="isInvalid('niveau', formationForm)">
+          {{getErrorMessage('niveau', formationForm)}}
+        </div>
+        <small class="helper-text">Sélectionnez le niveau approprié pour les participants</small>
+      </div>
+<!-- Champ Formateur -->
+<div class="form-group">
+  <label for="formateur">Formateur</label>
+  <select id="formateur" name="formateur" [(ngModel)]="formation.formateurId" class="form-control">
+    <option [ngValue]="null">-- Sélectionnez un formateur --</option>
+    <option *ngFor="let formateur of formateurs" [ngValue]="formateur.formateurId">
+      {{formateur.expertise}} - {{formateur.prenom}} {{formateur.nom}}
+      <span *ngIf="formateur.noteMoyenne"> ({{formateur.noteMoyenne}}⭐)</span>
+    </option>
+  </select>
+  <small class="helper-text">Choisissez le formateur qui animera cette formation</small>
+</div>
+  
+      <!-- Champ Certification -->
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            name="certificate"
+            [(ngModel)]="formation.certificate">
+          <span class="checkbox-text">
+            <i class="ti ti-certificate"></i>
+            Avec certification officielle
+          </span>
+        </label>
+        <small class="helper-text">Une certification sera délivrée à la fin de la formation</small>
+      </div>
+    </div>
+
+    <!-- Résumé des erreurs -->
+    <div class="error-summary" *ngIf="submitted && formationForm.invalid">
+      <i class="error-icon">⚠️</i>
+      <p>Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.</p>
+      <ul>
+        <li *ngIf="titre.invalid && (titre.dirty || titre.touched)">• Titre : {{getErrorMessage('titre', formationForm)}}</li>
+        <li *ngIf="dureeTotale.invalid && (dureeTotale.dirty || dureeTotale.touched)">• Durée : {{getErrorMessage('dureeTotale', formationForm)}}</li>
+        <li *ngIf="prix.invalid && (prix.dirty || prix.touched)">• Prix : {{getErrorMessage('prix', formationForm)}}</li>
+      </ul>
+    </div>
+
+    <!-- Informations supplémentaires -->
+    <div class="info-box" *ngIf="formation.certificate">
+      <i class="info-icon">🎓</i>
+      <div class="info-content">
+        <strong>Certification incluse</strong>
+        <p>Les participants recevront un certificat officiel après validation de la formation.</p>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-small"></span>
+        {{loading ? 'Enregistrement...' : 'Enregistrer'}}
+      </button>
+    </div>
+  </form>
+</div>

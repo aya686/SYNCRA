@@ -1,0 +1,79 @@
+<div class="report-container">
+  <div class="report-header">
+    <h1>📈 Suivi de Progression</h1>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>Progression Moyenne</h3>
+        <p class="stat-value">{{stats.moyenneProgression || 0}}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="stats.moyenneProgression" style="background: #667eea"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <h3>Taux de Complétion</h3>
+        <p class="stat-value">{{stats.tauxCompletion || 0}}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="stats.tauxCompletion" style="background: #27ae60"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-content">
+        <h3>Temps moyen de complétion</h3>
+        <p class="stat-value">{{stats.tempsMoyenCompletion || 0}}h</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-content">
+        <h3>Taux de Réussite</h3>
+        <p class="stat-value">{{stats.tauxReussite || 0}}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="stats.tauxReussite" style="background: #f39c12"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>Répartition par niveau</h3>
+      <div class="level-distribution">
+        <div *ngFor="let level of getRepartitionNiveauxEntries()" class="level-item">
+          <span class="level-name">{{level.key}}</span>
+          <div class="level-bar-container">
+            <div class="level-bar" [style.width.%]="level.value"></div>
+            <span class="level-percent">{{level.value}}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Progression par session</h3>
+      <div class="session-progression">
+        <div *ngFor="let session of stats.progressionParSession" class="session-item">
+          <div class="session-info">
+            <span class="session-name">{{session.session}}</span>
+            <span class="session-participants">{{session.participants}} participants</span>
+          </div>
+          <div class="progression-bar-container">
+           
+            <span class="progression-percent">{{session.progression}}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

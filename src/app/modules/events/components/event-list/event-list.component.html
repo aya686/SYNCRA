@@ -1,0 +1,92 @@
+<div class="event-list-container">
+  <div class="header">
+    <h1>Gestion des Événements</h1>
+    <button class="btn-primary" routerLink="/admin/events/new">+ Nouvel Événement</button>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>{{totalEvents}}</h3>
+        <p>Total Événements</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{planifieCount}}</h3>
+        <p>À venir</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-info">
+        <h3>{{termineCount}}</h3>
+        <p>Terminés</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Rechercher un événement..." 
+        [(ngModel)]="searchTerm" 
+        (input)="filterEvents()" 
+        class="search-input">
+    </div>
+    <select 
+      [(ngModel)]="statusFilter" 
+      (change)="filterEvents()" 
+      class="filter-select">
+      <option value="">Tous les statuts</option>
+      <option value="planifie">Planifié</option>
+      <option value="en_cours">En cours</option>
+      <option value="termine">Terminé</option>
+      <option value="annule">Annulé</option>
+    </select>
+  </div>
+
+  <div class="events-grid">
+    <div *ngFor="let event of filteredEvents" class="event-card">
+      <div class="event-header">
+        <h3>{{event.titre}}</h3>
+        <span class="status-badge" [class]="event.statut">{{getStatusLabel(event.statut)}}</span>
+      </div>
+      <div class="event-body">
+        <p class="description">{{event.description}}</p>
+        <div class="details">
+          <div class="detail-item">
+            <span class="label">📅 Date:</span>
+            <span>{{event.dateDebut | date:'dd/MM/yyyy'}} - {{event.dateFin | date:'dd/MM/yyyy'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">📍 Lieu:</span>
+            <span>{{event.lieu}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">👥 Capacité:</span>
+            <span>{{event.capaciteMax}} personnes</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🏷️ Type:</span>
+            <span>{{event.type}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="event-actions">
+        <button class="btn-secondary" [routerLink]="['/admin/events', event.id]">Voir détails</button>
+        <button class="btn-primary" [routerLink]="['/admin/events', event.id, 'edit']">Modifier</button>
+        <button class="btn-danger" (click)="deleteEvent(event.id)">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="filteredEvents.length === 0" class="no-results">
+    <p>Aucun événement trouvé</p>
+  </div>
+  
+</div>

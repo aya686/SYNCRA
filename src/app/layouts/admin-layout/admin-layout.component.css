@@ -1,0 +1,215 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Wrapper principal */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Sidebar - flottante au-dessus de tout */
+.sidebar {
+  width: 290px;  
+  background: linear-gradient(180deg, #ffffff 0%, #FFFFFF 100%);
+  transition: width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 1001;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar.collapsed {
+  width: 80px;  /* Largeur réduite quand collapse */
+}
+
+.sidebar-header {
+  padding: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0);
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.logo p {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.6;
+  color: #666;
+}
+
+/* Styles du bouton toggle */
+.toggle-btn {
+  background: #E1D8F1;
+  border-radius: 10px;
+  border-color: #ffffff;
+  font-size: 19px;
+  cursor: pointer;
+  padding: 10px;
+  color: #8e57b3;
+  
+  /* Couleur par défaut */
+  color: #8e57b3;
+}
+
+/* État au survol (souris dessus) */
+.toggle-btn:hover {
+  background: #693DB8;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* État actif (quand on clique) */
+.toggle-btn:active {
+  transform: scale(0.95);
+  background: #693DB8;
+  color: white;
+  font-size: 10px;
+}
+
+/* État focus (après clic) */
+.toggle-btn:focus {
+  outline: none;
+}
+
+/* Version avec animation de pulsation */
+.toggle-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.toggle-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+
+}
+
+.toggle-btn:active::after {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 20px 0;
+  margin: 0;
+  flex: 1;
+}
+
+.nav-menu li {
+  margin-bottom: 5px;
+}
+
+.nav-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #6F6F6F;
+  text-decoration: none;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.nav-menu a:hover {
+  background: #E1D8F1;
+  color: #693DB8;
+  border-left: 3px solid #693DB8;
+}
+
+.nav-menu a.active {
+  background: #E1D8F1;
+  color: #693DB8;
+  border-left: 3px solid #693DB8;
+  font-weight: 500;
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.nav-menu a.active .icon {
+  color: #693DB8;
+}
+
+.nav-menu .icon {
+  font-size: 20px;
+  min-width: 30px;
+  text-align: center;
+  color: #6F6F6F;
+}
+
+.nav-divider {
+  padding: 10px 20px;
+  font-size: 15px;
+  text-transform: uppercase;
+
+  margin-top: 10px;
+  color: #000000;
+}
+
+/* Main Content - marge à gauche égale à la largeur de la sidebar */
+.main-content {
+  flex: 1;
+  margin-left: 320px;  /* DOIT ÊTRE ÉGAL À LA LARGEUR DE LA SIDEBAR */
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  background: #f5f7fa;
+  width: calc(100% - 320px);
+}
+
+/* Quand la sidebar est réduite */
+.main-content.sidebar-collapsed {
+  margin-left: 80px;  /* ÉGAL À LA LARGEUR DE LA SIDEBAR COLLAPSED */
+  width: calc(100% - 80px);
+}
+
+.content-wrapper {
+  padding: 20px;
+}
+
+/* Section Title Style (comme Reporting & Analyse) */
+.nav-section-title {
+  padding: 15px 20px 8px 20px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.section-icon {
+  font-size: 14px;
+  opacity: 0.7;
+  color: #693DB8;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #693DB8;
+  background: linear-gradient(135deg, #693DB8, #693DB8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+

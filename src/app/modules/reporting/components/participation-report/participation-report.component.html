@@ -1,0 +1,37 @@
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-content">
+      <h3>Total Inscrits</h3>
+      <p class="stat-value">{{stats.totalInscrits | number}}</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">✅</div>
+    <div class="stat-content">
+      <h3>Inscriptions confirmées</h3>
+      <p class="stat-value">{{stats.confirmedInscrits | number}}</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-content">
+      <h3>En attente</h3>
+      <p class="stat-value">{{stats.pendingInscrits | number}}</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">📈</div>
+    <div class="stat-content">
+      <h3>Taux de confirmation</h3>
+      <p class="stat-value">{{stats.tauxConfirmation}}%</p>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="stats.tauxConfirmation" 
+             [style.background-color]="getProgressColor(stats.tauxConfirmation)"></div>
+      </div>
+    </div>
+  </div>
+</div>

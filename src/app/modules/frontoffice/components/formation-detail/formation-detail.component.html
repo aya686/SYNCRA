@@ -1,0 +1,271 @@
+<div class="formation-detail-page">
+  <div class="container">
+    <!-- Bouton retour -->
+    <a routerLink="/formations" class="btn-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Retour aux formations
+    </a>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement de la formation...</p>
+    </div>
+    
+    <!-- Formation trouvée -->
+    <div *ngIf="!loading && formation" class="formation-detail">
+      <!-- Hero Section -->
+      <div class="formation-hero">
+        <div class="hero-badge">
+          <span class="badge-certification" *ngIf="formation.certificate">
+            🎓 Certifiante
+          </span>
+          <span class="formation-level" [class]="formation.niveau">
+            {{formation.niveau}}
+          </span>
+        </div>
+        <h1 class="formation-title">{{formation.titre}}</h1>
+        <p class="formation-subtitle">{{formation.description}}</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-info">
+            <span class="stat-value">{{formation.dureeTotale}}</span>
+            <span class="stat-label">heures</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value">{{formation.prix === 0 ? 'Gratuit' : (formation.prix + '€')}}</span>
+            <span class="stat-label" *ngIf="formation.prix > 0">TTC</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{sessions.length}}</span>
+            <span class="stat-label">sessions</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📜</div>
+          <div class="stat-info">
+            <span class="stat-value">{{formation.certificate ? 'Oui' : 'Non'}}</span>
+            <span class="stat-label">certification</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description détaillée -->
+      <div class="description-section">
+        <h2>📖 Description de la formation</h2>
+        <div class="description-content">
+          <p>{{formation.description}}</p>
+        </div>
+      </div>
+
+      <!-- Prérequis (optionnel) -->
+      <div class="prerequisites-section" *ngIf="formation.prerequis">
+        <h2>✅ Prérequis</h2>
+        <div class="prerequisites-content">
+          <p>{{formation.prerequis}}</p>
+        </div>
+      </div>
+
+      <!-- Sessions disponibles -->
+      <div class="sessions-section" *ngIf="sessions.length > 0">
+        <div class="section-header">
+          <h2>📅 Sessions disponibles</h2>
+          <p>Choisissez la session qui vous convient</p>
+        </div>
+        
+        <div class="sessions-grid">
+          <div *ngFor="let session of sessions" class="session-card">
+            <div class="session-header">
+              <div class="session-date-icon">
+                <span class="day">{{session.dateDebut | date:'dd'}}</span>
+                <span class="month">{{session.dateDebut | date:'MMM' | uppercase}}</span>
+              </div>
+              <div class="session-info">
+                <h3>Session du {{session.dateDebut | date:'dd/MM/yyyy'}}</h3>
+                <div class="session-meta">
+                  <span>🕐 {{session.dateDebut | date:'HH:mm'}} - {{session.dateFin | date:'HH:mm'}}</span>
+                  <span>👨‍🏫 {{session.formateur || 'Formateur expert'}}</span>
+                  <span>📍 {{session.lieu || 'En ligne'}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="session-footer">
+              <div class="places-info">
+                <div class="places-bar">
+                  <div class="places-fill" [style.width.%]="((session.capaciteMax - session.nbInscrits) / session.capaciteMax) * 100"></div>
+                </div>
+                <span class="places-text">
+                  <strong>{{session.capaciteMax - session.nbInscrits}}</strong> / {{session.capaciteMax}} places disponibles
+                </span>
+              </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Programme de la formation -->
+      <div class="program-section">
+        <h2>📚 Programme de la formation</h2>
+        <div class="program-list">
+          <div class="program-item" *ngFor="let module of formation.modules; let i = index">
+            <div class="program-number">{{i + 1}}</div>
+            <div class="program-content">
+              <h4>{{module.titre}}</h4>
+              <p>{{module.description || 'Module en cours de préparation'}}</p>
+              <span class="program-duration">⏱️ {{module.duree}} heures</span>
+            </div>
+          </div>
+          <div class="program-item" *ngIf="!formation.modules?.length">
+            <div class="program-number">1</div>
+            <div class="program-content">
+              <h4>Programme complet</h4>
+              <p>Cette formation couvre tous les aspects essentiels du sujet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objectifs -->
+      <div class="objectives-section">
+        <h2>🎯 Objectifs de la formation</h2>
+        <div class="objectives-grid">
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Maîtriser les concepts fondamentaux</p>
+          </div>
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Acquérir des compétences pratiques</p>
+          </div>
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Obtenir une certification reconnue</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Final -->
+      <div class="cta-section">
+        <div class="cta-content">
+          <h3>Prêt à commencer votre formation ?</h3>
+          <p>Rejoignez les {{sessions.length}} sessions disponibles</p>
+          <a [routerLink]="['/inscription/formation', formation.id]" class="btn-inscription">
+            S'inscrire maintenant
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Formation non trouvée -->
+    <div *ngIf="!loading && !formation" class="not-found">
+      <div class="not-found-icon">🔍</div>
+      <h2>Formation non trouvée</h2>
+      <p>La formation que vous recherchez n'existe pas ou a été supprimée.</p>
+      <a routerLink="/formations" class="btn-back-outline">Explorer les formations</a>
+    </div>
+  </div>
+  
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-wrapper">
+      
+      <div class="footer-brand-section">
+        <div class="brand-header">
+          <div class="resolvo-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              <defs>
+                <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4f46e5"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h3>RESOLVO</h3>
+        </div>
+        <p class="brand-desc">
+          Propulsez votre carrière grâce à des formations certifiantes et un réseau professionnel dynamique. <br>
+          Développez vos compétences et connectez-vous aux opportunités de demain.
+        </p>
+      </div>
+
+      <div class="footer-links-section">
+        <div class="footer-grid">
+          
+          <div class="footer-column">
+            <h4>HELP</h4>
+            <ul>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">Change Log</a></li>
+              <li><a href="#">Support</a></li>
+              <li><a href="#">Discord</a></li>
+              <li><a href="#">License</a></li>
+              <li><a href="#">Refund Policy</a></li>
+              <li><a href="#">Submit a Request</a></li>
+
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Écosystème Berry</h4>
+            <ul>
+              <li><a href="#">Angular Bundle</a></li>
+              <li><a href="#">Berry Figma</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Technologies</h4>
+            <ul>
+              <li><a href="#">.Net</a></li>
+              <li><a href="#">CodeIgniter</a></li>
+              <li><a href="#">Django</a></li>
+              <li><a href="#" class="badge-link">Shopify <small>Bientôt</small></a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Gratuit</h4>
+            <ul>
+              <li><a href="#">React MUI</a></li>
+              <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">Angular</a></li>
+              <li><a href="#">Figma</a></li>
+               <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">React</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+      
+    </div> <div class="footer-bottom">
+      <p>&copy; 2026 RESOLVO. Tous droits réservés.</p>
+      <div class="footer-legal">
+        <a href="#">Licence</a>
+        <a href="#">Politique de remboursement</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</div>

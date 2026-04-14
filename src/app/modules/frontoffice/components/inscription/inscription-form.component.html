@@ -1,0 +1,230 @@
+<div class="inscription-page">
+  <div class="container">
+    <!-- Bouton retour -->
+    <div class="back-button-wrapper">
+      <a [routerLink]="['/events', eventId]" class="btn-back">
+        ← Retour à l'événement
+      </a>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading && !event" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de l'événement...</p>
+    </div>
+
+    <!-- Succès -->
+    <div *ngIf="inscriptionSuccess" class="success-card">
+      <div class="success-icon">✅</div>
+      <h2>Inscription confirmée !</h2>
+      <p>Vous recevrez un email de confirmation dans les plus brefs délais.</p>
+      <p class="small">Redirection vers l'événement...</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div *ngIf="!loading && event && !inscriptionSuccess" class="inscription-card">
+      <!-- En-tête -->
+      <div class="inscription-header">
+        <div class="header-icon">📝</div>
+        <h1>Inscription à l'événement</h1>
+        <p>Complétez le formulaire ci-dessous</p>
+      </div>
+
+      <!-- Informations événement -->
+      <div class="event-summary">
+        <div class="event-title">{{event.titre}}</div>
+        <div class="event-details">
+          <div class="detail">
+            <span class="detail-icon">📅</span>
+            <span>{{event.dateHeure | date:'dd/MM/yyyy à HH:mm'}}</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon">📍</span>
+            <span>{{event.lieu}}</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon">👥</span>
+            <span [class.low-stock]="getPlacesDisponibles() <= 5">
+              {{getPlacesDisponibles()}} places disponibles
+            </span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon">💰</span>
+            <span>{{event.prix === 0 ? 'Gratuit' : event.prix + '€'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire -->
+      <form #inscriptionForm="ngForm" (ngSubmit)="onSubmit(inscriptionForm)" class="inscription-form">
+        <div class="form-section">
+          <h3>Vos informations</h3>
+
+          <div class="form-group" [class.has-error]="submitted && inscriptionForm.controls['nom'].invalid">
+            <label for="nom">Nom complet <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="nom" 
+              name="nom"
+              [(ngModel)]="inscription.participant.nom"
+              #nom="ngModel"
+              required
+              minlength="2"
+              class="form-control"
+              placeholder="Votre nom et prénom">
+            <div class="error-message" *ngIf="submitted && nom?.invalid">
+              <span *ngIf="nom?.errors?.['required']">Le nom est obligatoire</span>
+              <span *ngIf="nom?.errors?.['minlength']">Minimum 2 caractères</span>
+            </div>
+          </div>
+
+          <div class="form-group" [class.has-error]="submitted && inscriptionForm.controls['email'].invalid">
+            <label for="email">Email <span class="required">*</span></label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              [(ngModel)]="inscription.participant.email"
+              #email="ngModel"
+              required
+              email
+              class="form-control"
+              placeholder="votre@email.com">
+            <div class="error-message" *ngIf="submitted && email?.invalid">
+              <span *ngIf="email?.errors?.['required']">L'email est obligatoire</span>
+              <span *ngIf="email?.errors?.['email']">Email invalide</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Résumé -->
+        <div class="form-summary">
+          <h3>Résumé de votre inscription</h3>
+          <div class="summary-item">
+            <span>Événement :</span>
+            <strong>{{event.titre}}</strong>
+          </div>
+          <div class="summary-item">
+            <span>Date :</span>
+            <strong>{{event.dateHeure | date:'dd/MM/yyyy à HH:mm'}}</strong>
+          </div>
+          <div class="summary-item">
+            <span>Lieu :</span>
+            <strong>{{event.lieu}}</strong>
+          </div>
+          <div class="summary-item">
+            <span>Prix :</span>
+            <strong>{{event.prix === 0 ? 'Gratuit' : event.prix + '€'}}</strong>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" [routerLink]="['/events', eventId]">
+            Annuler
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-small"></span>
+            {{loading ? 'Inscription en cours...' : 'Confirmer mon inscription'}}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Événement complet -->
+    <div *ngIf="!loading && event && getPlacesDisponibles() === 0 && !inscriptionSuccess" class="event-full">
+      <div class="full-icon">⚠️</div>
+      <h2>Événement complet</h2>
+      <p>Désolé, toutes les places pour cet événement sont déjà réservées.</p>
+      <a routerLink="/events" class="btn-back">← Voir d'autres événements</a>
+    </div>
+  </div>
+  
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-wrapper">
+      
+      <div class="footer-brand-section">
+        <div class="brand-header">
+          <div class="resolvo-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              <defs>
+                <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4f46e5"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h3>RESOLVO</h3>
+        </div>
+        <p class="brand-desc">
+          Propulsez votre carrière grâce à des formations certifiantes et un réseau professionnel dynamique. <br>
+          Développez vos compétences et connectez-vous aux opportunités de demain.
+        </p>
+      </div>
+
+      <div class="footer-links-section">
+        <div class="footer-grid">
+          
+          <div class="footer-column">
+            <h4>HELP</h4>
+            <ul>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">Change Log</a></li>
+              <li><a href="#">Support</a></li>
+              <li><a href="#">Discord</a></li>
+              <li><a href="#">License</a></li>
+              <li><a href="#">Refund Policy</a></li>
+              <li><a href="#">Submit a Request</a></li>
+
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Écosystème Berry</h4>
+            <ul>
+              <li><a href="#">Angular Bundle</a></li>
+              <li><a href="#">Berry Figma</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Technologies</h4>
+            <ul>
+              <li><a href="#">.Net</a></li>
+              <li><a href="#">CodeIgniter</a></li>
+              <li><a href="#">Django</a></li>
+              <li><a href="#" class="badge-link">Shopify <small>Bientôt</small></a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Gratuit</h4>
+            <ul>
+              <li><a href="#">React MUI</a></li>
+              <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">Angular</a></li>
+              <li><a href="#">Figma</a></li>
+               <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">React</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+      
+    </div> <div class="footer-bottom">
+      <p>&copy; 2026 RESOLVO. Tous droits réservés.</p>
+      <div class="footer-legal">
+        <a href="#">Licence</a>
+        <a href="#">Politique de remboursement</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</div>

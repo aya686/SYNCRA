@@ -1,0 +1,135 @@
+<div class="session-detail-container" *ngIf="session">
+  <div class="detail-header">
+    <button class="back-btn" routerLink="/admin/formations">← Retour</button>
+    <div class="header-actions">
+      <button class="btn-primary" [routerLink]="['/admin/formations/sessions', session.id, 'edit']">
+        Modifier
+      </button>
+      <button class="btn-danger" (click)="deleteSession()">Supprimer</button>
+    </div>
+  </div>
+
+  <div class="detail-content">
+    <div class="main-info">
+      <h1>Session de formation</h1>
+      <span class="status-badge" [class]="session.statut">{{session.statut}}</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">📅</div>
+        <div class="info-text">
+          <h4>Dates</h4>
+          <p>Du {{session.dateDebut | date:'dd/MM/yyyy à HH:mm'}}</p>
+          <p>Au {{session.dateFin | date:'dd/MM/yyyy à HH:mm'}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          <h4>Lieu</h4>
+          <p>{{session.lieu}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">👨‍🏫</div>
+        <div class="info-text">
+          <h4>Formateur</h4>
+          <p>{{session.formateur}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">👥</div>
+        <div class="info-text">
+          <h4>Capacité</h4>
+          <p>{{session.capaciteMax}} places</p>
+          <p>{{participations.length}} inscrits</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="competences-section" *ngIf="competences.length > 0">
+      <h2>Compétences à acquérir</h2>
+      <div class="competences-list">
+        <div class="competence-card" *ngFor="let competence of competences">
+          <strong>{{competence.nom}}</strong>
+          <p>{{competence.description}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="participations-section">
+      <div class="section-header">
+        <h2>Participants</h2>
+        <button class="btn-primary" (click)="showInscriptionForm = !showInscriptionForm">
+          + Inscrire un participant
+        </button>
+      </div>
+
+      <div class="inscription-form" *ngIf="showInscriptionForm">
+        <h3>Ajouter un participant</h3>
+        <div class="form-group">
+          <label>ID Participant</label>
+          <input type="number" [(ngModel)]="newParticipation.participantId" placeholder="ID du participant">
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" (click)="showInscriptionForm = false">Annuler</button>
+          <button class="btn-primary" (click)="inscrire()">Confirmer</button>
+        </div>
+      </div>
+
+      <div class="participations-list">
+        <div class="participation-card" *ngFor="let participation of participations">
+          <div class="participation-info">
+            <strong>Participant #{{participation.participantId}}</strong>
+            <span class="status" [class]="participation.statut">
+              {{getStatutLabel(participation.statut)}}
+            </span>
+            <span class="progression">Progression: {{participation.progression}}%</span>
+          </div>
+          <div class="participation-actions">
+            <input 
+              type="range" 
+              [value]="participation.progression" 
+              (change)="updateProgression(participation.id, $any($event.target).value)"
+              min="0" 
+              max="100"
+              step="10">
+            <span>{{participation.progression}}%</span>
+          </div>
+        </div>
+
+        <div *ngIf="participations.length === 0" class="no-data">
+          <p>Aucun participant inscrit</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="evaluation-section">
+      <div class="section-header">
+        <h2>Évaluation post-formation</h2>
+        <button class="btn-primary" (click)="showEvaluationForm = !showEvaluationForm">
+          + Donner mon avis
+        </button>
+      </div>
+
+      <div class="evaluation-form" *ngIf="showEvaluationForm">
+        <div class="form-group">
+          <label>Note (0-20)</label>
+          <input type="number" [(ngModel)]="evaluation.note" min="0" max="20">
+        </div>
+        <div class="form-group">
+          <label>Commentaire</label>
+          <textarea [(ngModel)]="evaluation.commentaire" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" (click)="showEvaluationForm = false">Annuler</button>
+          <button class="btn-primary" (click)="submitEvaluation()">Soumettre</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

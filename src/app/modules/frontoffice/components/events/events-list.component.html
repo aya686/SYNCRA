@@ -1,0 +1,221 @@
+<div class="events-app" [class.dark-mode]="isDarkMode">
+  <!-- Bouton de bascule du thème -->
+  <div class="theme-toggle-wrapper">
+    <button class="theme-toggle-btn" (click)="toggleTheme()">
+      <span *ngIf="!isDarkMode">🌙 Mode sombre</span>
+      <span *ngIf="isDarkMode">☀️ Mode clair</span>
+    </button>
+  </div>
+  <!-- Header Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="resolvo-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              <defs>
+                <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4f46e5"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        <span class="logo-text">Resolvo</span>
+      </div>
+      <nav class="main-nav">
+        <a routerLink="/" class="nav-link ">Accueil</a>
+        <a routerLink="/events" class="nav-link active">Événements</a>
+        <a routerLink="/formations" class="nav-link">Formations</a>
+        <a href="#" class="nav-link">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn">👤</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Hero Wave Section -->
+    <section class="hero-wave">
+      <div class="wave-bg"></div>
+      <div class="hero-container">
+        <div class="hero-left">
+          <span class="trend-badge">🔥 Tendance</span>
+          <h1>Événements <span class="gradient-text">Inspirants</span></h1>
+          <p>Découvrez des expériences uniques qui transformeront votre vision</p>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{totalEvents}}+</span>
+              <span class="hero-stat-label">Événements</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{upcomingEvents}}</span>
+              <span class="hero-stat-label">À venir</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{pastEvents}}</span>
+              <span class="hero-stat-label">Réalisés</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="floating-card card-1">
+            <span>🎉</span>
+            <p>+150 participants</p>
+          </div>
+          <div class="floating-card card-2">
+            <span>🏆</span>
+            <p>Top événement</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-container">
+        <div class="filter-tabs">
+          <button class="filter-tab" [class.active]="activeType === ''" (click)="filterByType('')">
+            <span>📅</span> Tous
+          </button>
+          <button class="filter-tab" *ngFor="let type of eventTypes" [class.active]="activeType === type" (click)="filterByType(type)">
+            <span>🎯</span> {{type}}
+          </button>
+        </div>
+        
+        <div class="filter-controls">
+          <div class="search-field">
+            <i>🔍</i>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              (ngModelChange)="applyFilters()"
+              placeholder="Rechercher un événement...">
+          </div>
+          
+          <div class="sort-field">
+            <select [(ngModel)]="sortKey" (ngModelChange)="applyFilters()">
+              <option value="date">📅 Date</option>
+              <option value="titre">🔤 Titre</option>
+              <option value="places">👥 Places</option>
+              <option value="prix">💰 Prix</option>
+            </select>
+            <button class="sort-direction" (click)="toggleSortOrder()">
+              {{sortOrder === 'asc' ? '↑' : '↓'}}
+            </button>
+          </div>
+          
+          <button class="reset-filter" (click)="resetFilters()" *ngIf="searchQuery || activeType">
+            ✕ Réinitialiser
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Events Grid -->
+    <section class="events-section">
+      <div class="events-container">
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-grid">
+          <div class="loading-card" *ngFor="let _ of [1,2,3,4,5,6]">
+            <div class="loading-shimmer"></div>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div *ngIf="!loading" class="events-masonry">
+          <div *ngFor="let event of getPaginatedEvents()" class="event-item">
+            <div class="event-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (event.imageUrl || '') + ')'" 
+                 [style.backgroundSize]="'cover'" [style.backgroundPosition]="'center'">
+              <div class="event-category">{{event.type}}</div>
+              <div class="event-title-overlay">{{event.titre}}</div>
+              <div class="event-overlay"></div>
+            </div>
+            
+            <div class="event-details">
+              <h3>{{event.titre}}</h3>
+              <div class="event-meta-row">
+                <span>📅 {{event.dateDebut | date:'dd MMM yyyy'}}</span>
+                <span>⏰ {{event.dateDebut | date:'HH:mm'}}</span>
+                <span>📍 {{event.lieu}}</span>
+              </div>
+              <p>{{(event.description || 'Découvrez cet événement') | slice:0:80}}...</p>
+              <div class="event-footer-row">
+                <div class="event-price">
+                  <span class="price-tag" [class.free]="event.prix === 0">
+                    {{event.prix === 0 ? 'GRATUIT' : event.prix + ' €'}}
+                  </span>
+                  <span class="places-left">{{event.placesDisponibles}} places</span>
+                </div>
+                <a [routerLink]="['/events', event.id]" class="event-link">
+                  Explorer
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && filteredEvents.length === 0" class="empty-state">
+          <div class="empty-illustration">🔍</div>
+          <h3>Aucun résultat trouvé</h3>
+          <p>Essayez d'autres critères de recherche</p>
+          <button class="empty-btn" (click)="resetFilters()">Explorer tous</button>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="!loading && totalPages > 1" class="pagination-modern">
+          <button class="page-prev" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+            ← Précédent
+          </button>
+          <div class="pages-list">
+            <button *ngFor="let page of getPages()" class="page-number" [class.current]="page === currentPage" (click)="goToPage(page)">
+              {{page}}
+            </button>
+          </div>
+          <button class="page-next" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+            Suivant →
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Minimal -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">🎯 EventHub</div>
+        <p>La plateforme qui connecte les talents aux opportunités</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorer</h4>
+          <a href="#">Événements</a>
+          <a href="#">Formations</a>
+          <a href="#">Conférences</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Aide</a>
+          <a href="#">Contact</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Légal</h4>
+          <a href="#">Mentions</a>
+          <a href="#">CGU</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Resolvo - Tous droits réservés</p>
+    </div>
+  </footer>
+</div>
