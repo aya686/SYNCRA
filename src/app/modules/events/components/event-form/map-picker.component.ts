@@ -1,12 +1,9 @@
 import { Component, Output, EventEmitter, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 declare var L: any;
 
 @Component({
   selector: 'app-map-picker',
-  standalone: true,
-  imports: [CommonModule],
   template: `
     <div class="map-container">
       <button type="button" class="btn-open-map" (click)="openMapModal()">

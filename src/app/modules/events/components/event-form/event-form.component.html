@@ -33,7 +33,7 @@
       <small class="helper-text">Minimum 3 caractères, maximum 100 caractères</small>
     </div>
 
-    <!-- Champ Description -->
+    <!-- Champ Description (optionnel mais recommandé) -->
     <div class="form-group">
       <label for="description">Description</label>
       <textarea 
@@ -75,29 +75,34 @@
         </div>
       </div>
 
-<!-- Champ Lieu -->
-<div class="form-group">
-  <label for="lieu">
-    Lieu <span class="required">*</span>
-  </label>
-  <input 
-    type="text" 
-    id="lieu" 
-    name="lieu"
-    [(ngModel)]="event.lieu" 
-    #lieu="ngModel"
-    required
-    placeholder="Ex: Paris, France"
-    class="form-control">
-</div>
+      <!-- Champ Lieu -->
+      <div class="form-group" [class.has-error]="isInvalid('lieu', eventForm)">
+        <label for="lieu">
+          Lieu <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="lieu" 
+          name="lieu"
+          [(ngModel)]="event.lieu" 
+          #lieu="ngModel"
+          required
+          minlength="2"
+          maxlength="200"
+          placeholder="Ex: Paris, France"
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('lieu', eventForm)">
+          {{getErrorMessage('lieu', eventForm)}}
+        </div>
+      </div>
+    </div>
 
-<!-- Carte interactive pour choisir le lieu -->
-<div class="form-group">
-  <label>Ou choisissez l'emplacement sur la carte :</label>
-  <app-map-picker 
-    (locationSelected)="onLocationSelected($event)">
-  </app-map-picker>
-</div>
+    <!-- Carte interactive pour choisir le lieu -->
+    <div class="form-group">
+      <label>Ou choisissez l'emplacement sur la carte :</label>
+      <app-map-picker 
+        (locationSelected)="onLocationSelected($event)">
+      </app-map-picker>
     </div>
 
     <div class="form-row">
@@ -122,15 +127,22 @@
 
       <!-- Champ Date Fin -->
       <div class="form-group" [class.has-error]="event.dateFin && !validateDateOrder()">
-        <label for="dateFin">Date et heure de fin</label>
+        <label for="dateFin">
+          Date et heure de fin <span class="required">*</span>
+        </label>
         <input 
           type="datetime-local" 
           id="dateFin" 
           name="dateFin"
           [(ngModel)]="event.dateFin" 
+          #dateFin="ngModel"
+          required
           class="form-control">
         <div class="error-message" *ngIf="event.dateFin && !validateDateOrder()">
           La date de fin doit être après la date de début
+        </div>
+        <div class="error-message" *ngIf="isInvalid('dateFin', eventForm) && !event.dateFin">
+          La date de fin est obligatoire
         </div>
       </div>
     </div>
@@ -177,54 +189,48 @@
       </div>
     </div>
 
-    <!-- Champ Statut -->
+
+
+    <!-- Champ Image -->
     <div class="form-group">
-      <label for="statut">Statut</label>
-      <select id="statut" name="statut" [(ngModel)]="event.statut" class="form-control">
-        <option value="planifie">Planifié</option>
-        <option value="en_cours">En cours</option>
-        <option value="termine">Terminé</option>
-        <option value="annule">Annulé</option>
-      </select>
+      <label for="image">Image de l'événement</label>
+      <input 
+        type="file" 
+        id="image" 
+        name="image"
+        (change)="onFileSelected($event)"
+        accept="image/*"
+        class="form-control-file">
+      <small class="helper-text">Format acceptés: JPG, PNG, GIF (max 5MB)</small>
+      
+      <!-- Aperçu -->
+      <div *ngIf="imagePreview" class="image-preview">
+        <img [src]="imagePreview" alt="Aperçu" class="preview-img">
+        <button type="button" class="remove-image" (click)="imagePreview = null; selectedFile = null">✕</button>
+      </div>
     </div>
-<!-- Champ Image -->
-<div class="form-group">
-  <label for="image">Image de l'événement</label>
-  <input 
-    type="file" 
-    id="image" 
-    name="image"
-    (change)="onFileSelected($event)"
-    accept="image/*"
-    class="form-control-file">
-  <small class="helper-text">Format acceptés: JPG, PNG, GIF (max 5MB)</small>
-  
-  <!-- Aperçu -->
-  <div *ngIf="imagePreview" class="image-preview">
-    <img [src]="imagePreview" alt="Aperçu" class="preview-img">
-    <button type="button" class="remove-image" (click)="imagePreview = null; selectedFile = null">✕</button>
-  </div>
-</div>
+
     <!-- Résumé des erreurs -->
     <div class="error-summary" *ngIf="submitted && eventForm.invalid">
       <i class="error-icon">⚠️</i>
       <p>Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.</p>
       <ul>
-        <li *ngIf="titre.invalid && (titre.dirty || titre.touched)">• Titre : {{getErrorMessage('titre', eventForm)}}</li>
-        <li *ngIf="type.invalid && (type.dirty || type.touched)">• Type : {{getErrorMessage('type', eventForm)}}</li>
-        <li *ngIf="lieu.invalid && (lieu.dirty || lieu.touched)">• Lieu : {{getErrorMessage('lieu', eventForm)}}</li>
-        <li *ngIf="dateDebut.invalid && (dateDebut.dirty || dateDebut.touched)">• Date de début : {{getErrorMessage('dateDebut', eventForm)}}</li>
-        <li *ngIf="capaciteMax.invalid && (capaciteMax.dirty || capaciteMax.touched)">• Capacité : {{getErrorMessage('capaciteMax', eventForm)}}</li>
+        <li *ngIf="titre.invalid">• Titre : {{getErrorMessage('titre', eventForm)}}</li>
+        <li *ngIf="type.invalid">• Type : {{getErrorMessage('type', eventForm)}}</li>
+        <li *ngIf="lieu.invalid">• Lieu : {{getErrorMessage('lieu', eventForm)}}</li>
+        <li *ngIf="dateDebut.invalid">• Date de début : {{getErrorMessage('dateDebut', eventForm)}}</li>
+        <li *ngIf="dateFin.invalid || !event.dateFin">• Date de fin : obligatoire</li>
+        <li *ngIf="capaciteMax.invalid">• Capacité : {{getErrorMessage('capaciteMax', eventForm)}}</li>
       </ul>
     </div>
 
     <!-- Boutons d'action -->
     <div class="form-actions">
       <button type="button" class="btn-secondary" (click)="cancel()">Annuler</button>
-    <button type="submit" class="btn-primary" [disabled]="loading">
-      <span *ngIf="loading" class="spinner-small"></span>
-      {{loading ? 'Enregistrement...' : 'Enregistrer'}}
-    </button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-small"></span>
+        {{loading ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer')}}
+      </button>
     </div>
   </form>
 </div>

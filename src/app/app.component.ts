@@ -15,4 +15,5 @@ export class AppComponent {
     // Méthode pour fermer manuellement une notification
     // La suppression se fait automatiquement après la durée définie
   }
+  
 }

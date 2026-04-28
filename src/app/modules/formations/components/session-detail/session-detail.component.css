@@ -258,3 +258,89 @@
 .btn-danger:hover {
   background: #c0392b;
 }
+/* session-detail.component.css */
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.btn-toggle {
+  background: var(--primary-light);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-toggle:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.participants-table th,
+.participants-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.participants-table th {
+  background: var(--surface-2);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.participants-table tr:hover {
+  background: var(--surface-2);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-badge.inscrit {
+  background: #e8f8f5;
+  color: #27ae60;
+}
+
+.progression-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progression-fill {
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  width: 0%;
+}
+
+.progression-bar span {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 35px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 12px;
+}

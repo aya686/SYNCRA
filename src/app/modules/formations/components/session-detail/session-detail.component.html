@@ -12,7 +12,6 @@
   <div class="detail-content">
     <div class="main-info">
       <h1>Session de formation</h1>
-      <span class="status-badge" [class]="session.statut">{{session.statut}}</span>
     </div>
 
     <div class="info-grid">
@@ -61,75 +60,44 @@
       </div>
     </div>
 
-    <div class="participations-section">
-      <div class="section-header">
-        <h2>Participants</h2>
-        <button class="btn-primary" (click)="showInscriptionForm = !showInscriptionForm">
-          + Inscrire un participant
-        </button>
-      </div>
+    <!-- session-detail.component.html -->
 
-      <div class="inscription-form" *ngIf="showInscriptionForm">
-        <h3>Ajouter un participant</h3>
-        <div class="form-group">
-          <label>ID Participant</label>
-          <input type="number" [(ngModel)]="newParticipation.participantId" placeholder="ID du participant">
-        </div>
-        <div class="form-actions">
-          <button class="btn-secondary" (click)="showInscriptionForm = false">Annuler</button>
-          <button class="btn-primary" (click)="inscrire()">Confirmer</button>
-        </div>
-      </div>
+<!-- session-detail.component.html -->
 
-      <div class="participations-list">
-        <div class="participation-card" *ngFor="let participation of participations">
-          <div class="participation-info">
-            <strong>Participant #{{participation.participantId}}</strong>
-            <span class="status" [class]="participation.statut">
-              {{getStatutLabel(participation.statut)}}
-            </span>
-            <span class="progression">Progression: {{participation.progression}}%</span>
-          </div>
-          <div class="participation-actions">
-            <input 
-              type="range" 
-              [value]="participation.progression" 
-              (change)="updateProgression(participation.id, $any($event.target).value)"
-              min="0" 
-              max="100"
-              step="10">
-            <span>{{participation.progression}}%</span>
-          </div>
-        </div>
+<div class="participants-section">
+  <div class="section-header">
+    <h2>👥 Participants inscrits</h2>
+    <button class="btn-toggle" (click)="showParticipantsList = !showParticipantsList">
+      {{ showParticipantsList ? '▼ Masquer' : '▶ Afficher' }} ({{ participants.length }})
+    </button>
+  </div>
 
-        <div *ngIf="participations.length === 0" class="no-data">
-          <p>Aucun participant inscrit</p>
-        </div>
-      </div>
+  <div *ngIf="showParticipantsList" class="participants-list">
+    <div *ngIf="participants.length === 0" class="no-data">
+      <p>Aucun participant inscrit</p>
     </div>
-
-    <div class="evaluation-section">
-      <div class="section-header">
-        <h2>Évaluation post-formation</h2>
-        <button class="btn-primary" (click)="showEvaluationForm = !showEvaluationForm">
-          + Donner mon avis
-        </button>
-      </div>
-
-      <div class="evaluation-form" *ngIf="showEvaluationForm">
-        <div class="form-group">
-          <label>Note (0-20)</label>
-          <input type="number" [(ngModel)]="evaluation.note" min="0" max="20">
-        </div>
-        <div class="form-group">
-          <label>Commentaire</label>
-          <textarea [(ngModel)]="evaluation.commentaire" rows="3"></textarea>
-        </div>
-        <div class="form-actions">
-          <button class="btn-secondary" (click)="showEvaluationForm = false">Annuler</button>
-          <button class="btn-primary" (click)="submitEvaluation()">Soumettre</button>
-        </div>
-      </div>
-    </div>
+    
+    <table *ngIf="participants.length > 0" class="participants-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nom complet</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of participants; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td><strong>{{ p.prenom }} {{ p.nom }}</strong></td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.telephone || '-' }}</td>
+          <td>{{ p.dateInscription | date:'dd/MM/yyyy' }}</td>
+          <td>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

@@ -21,24 +21,29 @@ export class FormationService {
 
   // ============ MÉTHODES FORMATION ============
   
-  getFormations(): Observable<FormationDisplay[]> {
-    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() })
-      .pipe(
-        map(formations => {
-          console.log('Formations reçues de l\'API:', formations);
-          return formations.map(f => ({
-            id: f.formationId,
-            titre: f.titre,
-            description: `Formation de niveau ${f.niveau}`,
-            dureeTotale: f.dureeHeures,
-            niveau: f.niveau,
-            prix: f.prix,
-            certificate: f.certificate,
-            createdAt: new Date(f.createdAt || Date.now())
-          }));
-        })
-      );
-  }
+// formation.service.ts
+
+getFormations(): Observable<FormationDisplay[]> {
+  return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() })
+    .pipe(
+      map(formations => {
+        console.log('Formations reçues de l\'API:', formations);
+        return formations.map(f => ({
+          id: f.formationId,
+          titre: f.titre,
+          description: f.description || '',
+          dureeTotale: f.dureeHeures,
+          niveau: f.niveau,
+          prix: f.prix,
+          certificate: f.certificate,
+          createdAt: new Date(f.createdAt || Date.now()),
+          formateurNom: f.formateur?.nom || 'Non assigné',  // ← AJOUTER
+          formateurPrenom: f.formateur?.prenom || '',       // ← AJOUTER
+          formateurExpertise: f.formateur?.expertise || ''  // ← AJOUTER
+        }));
+      })
+    );
+}
 
   getFormation(id: number): Observable<FormationDisplay> {
     return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
@@ -46,63 +51,79 @@ export class FormationService {
         map(f => ({
           id: f.formationId,
           titre: f.titre,
-          description: `Formation de niveau ${f.niveau}`,
+          description: f.description || '',  // ✅ CORRIGÉ : utilise la vraie description
           dureeTotale: f.dureeHeures,
           niveau: f.niveau,
           prix: f.prix,
           certificate: f.certificate,
-          createdAt: new Date(f.createdAt || Date.now())
+          createdAt: new Date(f.createdAt || Date.now()),
+          formateurNom: f.formateur?.nom || 'Non assigné',  // ← AJOUTER
+          formateurPrenom: f.formateur?.prenom || '',       // ← AJOUTER
+          formateurExpertise: f.formateur?.expertise || ''  // ← AJOUTER
         }))
       );
   }
 
-  createFormation(formationData: any): Observable<FormationDisplay> {
-    const formationToSend = {
-      titre: formationData.titre,
-      niveau: formationData.niveau,
-      dureeHeures: formationData.dureeTotale,
-      certificate: formationData.certificate,
-      prix: formationData.prix,
-      statut: 'active'
-    };
-    return this.http.post<any>(this.apiUrl, formationToSend, { headers: this.getHeaders() })
-      .pipe(
-        map(created => ({
-          id: created.formationId,
-          titre: created.titre,
-          description: `Formation de niveau ${created.niveau}`,
-          dureeTotale: created.dureeHeures,
-          niveau: created.niveau,
-          prix: created.prix,
-          certificate: created.certificate,
-          createdAt: new Date()
-        }))
-      );
-  }
+// formation.service.ts
 
-  updateFormation(id: number, formationData: any): Observable<FormationDisplay> {
-    const formationToSend = {
-      titre: formationData.titre,
-      niveau: formationData.niveau,
-      dureeHeures: formationData.dureeTotale,
-      certificate: formationData.certificate,
-      prix: formationData.prix,
-      statut: 'active'
-    };
-    return this.http.put<any>(`${this.apiUrl}/${id}`, formationToSend, { headers: this.getHeaders() })
-      .pipe(
-        map(updated => ({
-          id: updated.formationId,
-          titre: updated.titre,
-          description: `Formation de niveau ${updated.niveau}`,
-          dureeTotale: updated.dureeHeures,
-          niveau: updated.niveau,
-          prix: updated.prix,
-          certificate: updated.certificate,
-          createdAt: new Date()
-        }))
-      );
-  }
+createFormation(formationData: any): Observable<FormationDisplay> {
+  const formationToSend = {
+    titre: formationData.titre,
+    description: formationData.description || '',
+    niveau: formationData.niveau,
+    dureeHeures: formationData.dureeTotale,
+    certificate: formationData.certificate,
+    prix: formationData.prix,
+    statut: 'active',
+    formateurId: formationData.formateurId  // ← AJOUTER CETTE LIGNE
+  };
+  
+  console.log('Données envoyées pour création:', formationToSend);
+  
+  return this.http.post<any>(this.apiUrl, formationToSend, { headers: this.getHeaders() })
+    .pipe(
+      map(created => ({
+        id: created.formationId,
+        titre: created.titre,
+        description: created.description || '',
+        dureeTotale: created.dureeHeures,
+        niveau: created.niveau,
+        prix: created.prix,
+        certificate: created.certificate,
+        createdAt: new Date()
+      }))
+    );
+}
+
+// Pareil pour updateFormation
+updateFormation(id: number, formationData: any): Observable<FormationDisplay> {
+  const formationToSend = {
+    titre: formationData.titre,
+    description: formationData.description || '',
+    niveau: formationData.niveau,
+    dureeHeures: formationData.dureeTotale,
+    certificate: formationData.certificate,
+    prix: formationData.prix,
+    statut: 'active',
+    formateurId: formationData.formateurId  // ← AJOUTER CETTE LIGNE
+  };
+  
+  console.log('Données envoyées pour mise à jour:', formationToSend);
+  
+  return this.http.put<any>(`${this.apiUrl}/${id}`, formationToSend, { headers: this.getHeaders() })
+    .pipe(
+      map(updated => ({
+        id: updated.formationId,
+        titre: updated.titre,
+        description: updated.description || '',
+        dureeTotale: updated.dureeHeures,
+        niveau: updated.niveau,
+        prix: updated.prix,
+        certificate: updated.certificate,
+        createdAt: new Date()
+      }))
+    );
+}
 
   deleteFormation(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
@@ -178,29 +199,60 @@ export class FormationService {
     return this.http.put<any>(`${this.sessionsApiUrl}/${id}`, sessionToSend, { headers: this.getHeaders() });
   }
 
-  deleteSession(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.sessionsApiUrl}/${id}`, { headers: this.getHeaders() });
-  }
+deleteSession(id: number): Observable<void> {
+  // ✅ Ajouter responseType: 'text' pour accepter une réponse vide
+  return this.http.delete<void>(`${this.sessionsApiUrl}/${id}`, { 
+    headers: this.getHeaders(),
+    responseType: 'text' as 'json'
+  });
+}
+  // Dans formation.service.ts, ajoutez :
+
+isSessionLive(session: any): boolean {
+  const now = new Date();
+  const start = new Date(session.dateDebut);
+  const end = new Date(session.dateFin);
+  return now >= start && now <= end;
+}
+
+canJoinLive(session: any): boolean {
+  return session.statut === 'PUBLIE' && this.isSessionLive(session);
+}
 
   // ============ MÉTHODES PARTICIPATION ============
 
-  getParticipations(sessionId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.sessionsApiUrl}/${sessionId}/participations`, { headers: this.getHeaders() })
-      .pipe(map(p => p || []));
-  }
+// formation.service.ts - Remplacez les méthodes par ceci
 
-  inscrireParticipant(participation: any): Observable<any> {
-    return this.http.post<any>(`${this.sessionsApiUrl}/${participation.sessionId}/inscriptions`, participation, { headers: this.getHeaders() });
-  }
+// ============ MÉTHODES PARTICIPATION ============
 
-  updateProgression(participationId: number, progression: number): Observable<any> {
-    return this.http.put<any>(`${this.sessionsApiUrl}/participations/${participationId}/progression`, { progression }, { headers: this.getHeaders() });
-  }
+getParticipations(sessionId: number): Observable<any[]> {
+  console.log('📞 Chargement participations pour session:', sessionId);
+  return this.http.get<any[]>(`${this.sessionsApiUrl}/${sessionId}/participations`, { headers: this.getHeaders() })
+    .pipe(map(p => p || []));
+}
 
-  // ============ MÉTHODES COMPÉTENCES ============
+inscrireParticipant(participation: any): Observable<any> {
+  return this.http.post<any>(`${this.sessionsApiUrl}/${participation.sessionId}/inscriptions`, participation, { headers: this.getHeaders() });
+}
 
-  getCompetences(formationId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${formationId}/competences`, { headers: this.getHeaders() })
-      .pipe(map(c => c || []));
-  }
+updateProgression(participationId: number, progression: number): Observable<any> {
+  return this.http.put<any>(`${this.sessionsApiUrl}/participations/${participationId}/progression`, { progression }, { headers: this.getHeaders() });
+}
+
+// ============ MÉTHODES COMPÉTENCES ============
+
+getCompetences(formationId: number): Observable<any[]> {
+  console.log('📞 Chargement compétences pour formation:', formationId);
+  return this.http.get<any[]>(`${this.apiUrl}/${formationId}/competences`, { headers: this.getHeaders() })
+    .pipe(map(c => c || []));
+}
+
+// ============ MÉTHODES PARTICIPANTS PAR FORMATION ============
+
+getParticipantsByFormation(formationId: number): Observable<any[]> {
+  console.log('📞 Chargement participants pour formation:', formationId);
+  // ✅ URL CORRECTE
+  const inscriptionsUrl = 'http://localhost:8089/event_db/api/inscriptions-formation';
+  return this.http.get<any[]>(`${inscriptionsUrl}/formation/${formationId}/participants`, { headers: this.getHeaders() });
+}
 }

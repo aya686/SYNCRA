@@ -36,22 +36,24 @@ export class EventListComponent implements OnInit {
     this.loadEvents();
   }
 
-  loadEvents(): void {
-    this.loading = true;
-    this.eventService.getEvents().subscribe({
-      next: (events) => {
-        this.events = events;
-        this.filteredEvents = events;
-        this.loading = false;
-        this.notificationService.success(`${events.length} événements chargés`);
-      },
-      error: (err) => {
-        console.error('Erreur détaillée:', err);
-        this.notificationService.error('Impossible de charger les événements depuis le serveur');
-        this.loading = false;
-      }
-    });
-  }
+loadEvents(): void {
+  this.loading = true;
+  this.eventService.getEvents().subscribe({
+    next: (events) => {
+      console.log('=== VÉRIFICATION DES IDS ===');
+      events.forEach(event => {
+        console.log(`Titre: ${event.titre}, ID: ${event.id}, Type: ${typeof event.id}`);
+      });
+      this.events = events;
+      this.filteredEvents = events;
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Erreur:', err);
+      this.loading = false;
+    }
+  });
+}
 
   filterEvents(): void {
     this.filteredEvents = this.events.filter(event => {

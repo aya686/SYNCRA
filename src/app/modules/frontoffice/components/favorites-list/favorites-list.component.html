@@ -1,0 +1,44 @@
+<!-- favorites-list.component.html -->
+<div class="favorites-container">
+  <div class="favorites-header">
+    <h1>❤️ Mes favoris</h1>
+    <p>Retrouvez tous les événements que vous avez aimés</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement de vos favoris...</p>
+  </div>
+
+  <!-- Liste des favoris -->
+  <div *ngIf="!loading && favoriteEvents.length > 0" class="favorites-grid">
+    <div *ngFor="let event of favoriteEvents" class="favorite-card">
+      <div class="card-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (event.imageUrl || '') + ')'">
+        <div class="card-category">{{event.type}}</div>
+        <button class="remove-favorite" (click)="removeFavorite(event.id)" title="Retirer des favoris">
+          ❌
+        </button>
+      </div>
+      <div class="card-content">
+        <h3>{{event.titre}}</h3>
+        <div class="card-meta">
+          <span>📅 {{event.dateDebut | date:'dd MMM yyyy'}}</span>
+          <span>📍 {{event.lieu}}</span>
+          <span>💰 {{event.prix === 0 ? 'GRATUIT' : event.prix + '€'}}</span>
+        </div>
+        <a [routerLink]="['/events', event.id]" class="card-link">
+          Voir les détails →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun favori -->
+  <div *ngIf="!loading && favoriteEvents.length === 0" class="empty-state">
+    <div class="empty-icon">❤️</div>
+    <h2>Aucun favori pour le moment</h2>
+    <p>Explorez les événements et ajoutez-les à vos favoris en cliquant sur le cœur ❤️</p>
+    <a routerLink="/events" class="btn-explore">Explorer les événements</a>
+  </div>
+</div>

@@ -14,6 +14,8 @@ export class SessionDetailComponent implements OnInit {
   participations: Participation[] = [];
   competences: Competence[] = [];
   showInscriptionForm: boolean = false;
+  showParticipantsList: boolean = false;
+  participants: any[] = [];
   newParticipation: Partial<Participation> = {
     participantId: 0,
     statut: 'inscrit',
@@ -29,7 +31,7 @@ export class SessionDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private formationService: FormationService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -40,16 +42,50 @@ export class SessionDetailComponent implements OnInit {
     });
   }
 
-  loadSession(id: number): void {
-    this.formationService.getSession(id).subscribe(session => {
-      if (session) {
-        this.session = session;
-        this.loadCompetences(session.formationId);
-      } else {
-        this.notificationService.error('Session non trouvée');
-        this.router.navigate(['/admin/formations']);
-      }
-    });
+ // session-detail.component.ts
+
+loadSession(id: number): void {
+  this.formationService.getSession(id).subscribe(session => {
+    if (session) {
+      this.session = session;
+      // ✅ DÉCOMMENTER
+      this.loadCompetences(session.formationId);
+      this.loadParticipantsByFormation(session.formationId);
+    } else {
+      this.notificationService.error('Session non trouvée');
+      this.router.navigate(['/admin/formations']);
+    }
+  });
+}
+
+loadParticipations(sessionId: number): void {
+  // ✅ DÉCOMMENTER
+  this.formationService.getParticipations(sessionId).subscribe(participations => {
+    this.participations = participations;
+  });
+}
+
+  // session-detail.component.ts
+
+loadParticipantsByFormation(formationId: number): void {
+  console.log('📞 Chargement participants pour formation:', formationId);
+  
+  this.formationService.getParticipantsByFormation(formationId).subscribe({
+    next: (participants) => {
+      // ✅ Filtrer les participants invalides
+      this.participants = participants.filter(p => p.nom && p.nom !== 'null' && p.email);
+      console.log('✅ Participants chargés:', this.participants.length);
+    },
+    error: (err) => {
+      console.error('❌ Erreur:', err);
+      // ✅ En cas d'erreur, participants vide
+      this.participants = [];
+    }
+  });
+}
+
+  toggleParticipantsList(): void {
+    this.showParticipantsList = !this.showParticipantsList;
   }
 
   loadCompetences(formationId: number): void {
@@ -58,11 +94,6 @@ export class SessionDetailComponent implements OnInit {
     });
   }
 
-  loadParticipations(sessionId: number): void {
-    this.formationService.getParticipations(sessionId).subscribe(participations => {
-      this.participations = participations;
-    });
-  }
 
   inscrire(): void {
     if (this.session && this.newParticipation.participantId) {

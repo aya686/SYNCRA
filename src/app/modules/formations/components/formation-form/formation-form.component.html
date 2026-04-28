@@ -52,26 +52,6 @@
     </div>
 
     <div class="form-row">
-      <!-- Champ Durée -->
-      <div class="form-group" [class.has-error]="isInvalid('dureeTotale', formationForm)">
-        <label for="dureeTotale">
-          Durée totale (heures) <span class="required">*</span>
-        </label>
-        <input 
-          type="number" 
-          id="dureeTotale" 
-          name="dureeTotale"
-          [(ngModel)]="formation.dureeTotale" 
-          #dureeTotale="ngModel"
-          required
-          min="1"
-          max="500"
-          class="form-control">
-        <div class="error-message" *ngIf="isInvalid('dureeTotale', formationForm)">
-          {{getErrorMessage('dureeTotale', formationForm)}}
-        </div>
-        <small class="helper-text">Entre 1 et 500 heures</small>
-      </div>
 
       <!-- Champ Prix -->
       <div class="form-group" [class.has-error]="isInvalid('prix', formationForm)">
@@ -153,7 +133,6 @@
       <p>Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.</p>
       <ul>
         <li *ngIf="titre.invalid && (titre.dirty || titre.touched)">• Titre : {{getErrorMessage('titre', formationForm)}}</li>
-        <li *ngIf="dureeTotale.invalid && (dureeTotale.dirty || dureeTotale.touched)">• Durée : {{getErrorMessage('dureeTotale', formationForm)}}</li>
         <li *ngIf="prix.invalid && (prix.dirty || prix.touched)">• Prix : {{getErrorMessage('prix', formationForm)}}</li>
       </ul>
     </div>

@@ -122,59 +122,63 @@ export class FormationFormComponent implements OnInit {
     return 'Ce champ est invalide';
   }
 
-  onSubmit(form: NgForm): void {
-    this.submitted = true;
-    
-    if (form.invalid) {
-      this.notificationService.warning('Veuillez corriger les erreurs dans le formulaire');
-      const firstInvalid = document.querySelector('.ng-invalid');
-      if (firstInvalid) {
-        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      return;
-    }
+  // src/app/modules/formations/components/formation-form/formation-form.component.ts
 
-    this.loading = true;
-
-    const formationData = {
-      titre: this.formation.titre,
-      niveau: this.formation.niveau,
-      dureeHeures: this.formation.dureeTotale,
-      certificate: this.formation.certificate,
-      prix: this.formation.prix,
-      statut: 'active',
-      formateur: this.formation.formateurId ? { formateurId: this.formation.formateurId } : null
-    };
-
-    if (this.isEditMode) {
-      this.formationService.updateFormation(this.formationId, formationData).subscribe({
-        next: () => {
-          this.notificationService.success('Formation modifiée avec succès');
-          this.router.navigate(['/admin/formations']);
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Erreur:', err);
-          this.notificationService.error('Erreur lors de la modification');
-          this.loading = false;
-        }
-      });
-    } else {
-      this.formationService.createFormation(formationData).subscribe({
-        next: (response) => {
-          console.log('Formation créée:', response);
-          this.notificationService.success('Formation créée avec succès');
-          this.router.navigate(['/admin/formations']);
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Erreur détaillée:', err);
-          this.notificationService.error('Erreur lors de la création');
-          this.loading = false;
-        }
-      });
-    }
+onSubmit(form: NgForm): void {
+  this.submitted = true;
+  
+  if (form.invalid) {
+    this.notificationService.warning('Veuillez corriger les erreurs dans le formulaire');
+    return;
   }
+
+  this.loading = true;
+
+  // ✅ VÉRIFIER QUE formateurId EST BIEN RÉCUPÉRÉ
+  console.log('Valeur de formation.formateurId:', this.formation.formateurId);
+
+  const formationData = {
+    titre: this.formation.titre,
+    description: this.formation.description || '',
+    niveau: this.formation.niveau,
+    dureeHeures: this.formation.dureeTotale,
+    certificate: this.formation.certificate,
+    prix: this.formation.prix,
+    statut: 'active',
+    formateurId: this.formation.formateurId  // ← Envoyer directement l'ID
+  };
+
+  console.log('Données envoyées:', formationData);
+
+  if (this.isEditMode) {
+    this.formationService.updateFormation(this.formationId, formationData).subscribe({
+      next: () => {
+        this.notificationService.success('Formation modifiée avec succès');
+        this.router.navigate(['/admin/formations']);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erreur:', err);
+        this.notificationService.error('Erreur lors de la modification');
+        this.loading = false;
+      }
+    });
+  } else {
+    this.formationService.createFormation(formationData).subscribe({
+      next: (response) => {
+        console.log('Formation créée:', response);
+        this.notificationService.success('Formation créée avec succès');
+        this.router.navigate(['/admin/formations']);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erreur détaillée:', err);
+        this.notificationService.error('Erreur lors de la création');
+        this.loading = false;
+      }
+    });
+  }
+}
 
   cancel(): void {
     this.router.navigate(['/admin/formations']);

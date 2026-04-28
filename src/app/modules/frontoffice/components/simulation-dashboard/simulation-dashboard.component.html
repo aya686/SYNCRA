@@ -1,0 +1,338 @@
+<!-- src/app/modules/frontoffice/components/simulation-dashboard/simulation-dashboard.component.html -->
+<div class="simulation-container">
+  
+  <!-- En-tête -->
+  <div class="simulation-header">
+    <div>
+      <h2>🧬 Simulation Multi-Agents avec IA</h2>
+      <p>{{ agentStats.total }} agents virtuels simulent le comportement des utilisateurs</p>
+    </div>
+    <div class="ai-badge" [class.active]="useAI">
+      {{ useAI ? '🤖 IA Activée' : '📊 Mode Classique' }}
+    </div>
+  </div>
+  
+  <!-- Cartes de statistiques IA -->
+  <div class="ai-stats" *ngIf="useAI && simulationResult">
+    <div class="ai-stat-card">
+      <span class="ai-stat-icon">🎯</span>
+      <div>
+        <span class="ai-stat-value">{{ (simulationResult.aiMetrics.modelAccuracy * 100).toFixed(1) }}%</span>
+        <span class="ai-stat-label">Précision du modèle</span>
+      </div>
+    </div>
+    <div class="ai-stat-card">
+      <span class="ai-stat-icon">📊</span>
+      <div>
+        <span class="ai-stat-value">{{ simulationResult.aiMetrics.trainingDataSize }}</span>
+        <span class="ai-stat-label">Données d'entraînement</span>
+      </div>
+    </div>
+    <div class="ai-stat-card">
+      <span class="ai-stat-icon">📈</span>
+      <div>
+        <span class="ai-stat-value">{{ simulationResult.confidence.toFixed(0) }}%</span>
+        <span class="ai-stat-label">Confiance simulation</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Distribution des agents -->
+  <div class="agent-stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ getEtudiantCount() }}</span>
+      <span class="stat-label">🎓 Étudiants</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ getProfessionnelCount() }}</span>
+      <span class="stat-label">💼 Professionnels</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ getCurieuxCount() }}</span>
+      <span class="stat-label">🔍 Curieux</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ getExpertCount() }}</span>
+      <span class="stat-label">🧠 Experts</span>
+    </div>
+  </div>
+  
+  <!-- Contrôles avancés -->
+  <div class="simulation-controls">
+    <div class="control-group">
+      <label>🔄 Itérations :</label>
+      <input type="range" [(ngModel)]="iterations" min="5" max="50" step="5">
+      <span class="value-badge">{{ iterations }}</span>
+    </div>
+    
+    <div class="control-group">
+      <label>🤖 Mode IA :</label>
+      <button class="toggle-ai" [class.active]="useAI" (click)="toggleAI()">
+        {{ useAI ? 'Activée' : 'Désactivée' }}
+      </button>
+    </div>
+    
+    <div class="control-group" *ngIf="useAI">
+      <label>🔄 Réentraînement :</label>
+      <button class="train-btn" (click)="retrainModel()" [disabled]="isTraining">
+        {{ isTraining ? '⏳ Entraînement...' : '🚀 Réentraîner l\'IA' }}
+      </button>
+    </div>
+    
+    <button class="run-btn" (click)="runSimulation()" [disabled]="isLoading">
+      {{ isLoading ? '🔄 Simulation en cours...' : '🚀 Lancer la simulation' }}
+    </button>
+  </div>
+  
+  <!-- Barre de progression entraînement -->
+  <div class="training-progress" *ngIf="isTraining">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="trainingProgress"></div>
+    </div>
+    <span>Entraînement du réseau de neurones...</span>
+  </div>
+  
+  <!-- Résultats -->
+  <div *ngIf="simulationResult" class="simulation-results">
+    <h3>📊 Résultats de la simulation</h3>
+    
+    <!-- Badge de confiance IA -->
+    <div class="confidence-badge" [class.high]="simulationResult.confidence > 70" 
+         [class.medium]="simulationResult.confidence > 40" [class.low]="simulationResult.confidence <= 40">
+      🎯 Confiance: {{ simulationResult.confidence }}%
+      <span *ngIf="simulationResult.aiMetrics.isAiEnabled && simulationResult.aiMetrics.modelAccuracy > 0.7"></span>
+    </div>
+    
+    <!-- Tendances -->
+    <div class="trends">
+      <div class="trend-emerging">
+        <h4>📈 Tendances émergentes</h4>
+        <ul>
+          <li *ngFor="let trend of simulationResult.trends.emerging">🔥 {{ trend }}</li>
+        </ul>
+      </div>
+      <div class="trend-declining">
+        <h4>📉 Tendances en baisse</h4>
+        <ul>
+          <li *ngFor="let trend of simulationResult.trends.declining">💤 {{ trend }}</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Classement des événements -->
+    <h4>🏆 Prédictions IA - Événements les plus prometteurs</h4>
+    <div class="events-ranking">
+      <div *ngFor="let event of simulationResult.events.slice(0, 5); let i = index" class="rank-item">
+        <div class="rank-number">{{ i+1 }}</div>
+        <div class="rank-info">
+          <strong>{{ event.titre }}</strong>
+          <div class="rank-details">
+            <span>🎯 Popularité: {{ event.predictedPopularity.toFixed(0) }}%</span>
+            <span>👥 {{ event.simulatedReservations }} réservations</span>
+            <span *ngIf="useAI" class="ai-confidence">🤖 Confiance IA: {{ event.aiConfidence.toFixed(0) }}%</span>
+          </div>
+          <div class="agent-distribution">
+            <span class="agent-badge etudiant">🎓 {{ getAgentDistribution(event).etudiant }}</span>
+            <span class="agent-badge professionnel">💼 {{ getAgentDistribution(event).professionnel }}</span>
+            <span class="agent-badge curieux">🔍 {{ getAgentDistribution(event).curieux }}</span>
+            <span class="agent-badge expert">🧠 {{ getAgentDistribution(event).expert }}</span>
+          </div>
+          <div class="top-factors" *ngIf="event.topFactors.length">
+            <span class="factor-tag" *ngFor="let factor of event.topFactors">{{ factor }}</span>
+          </div>
+        </div>
+        <div class="rank-bar">
+          <div class="rank-fill" [style.width]="event.predictedPopularity + '%'">
+            <span class="rank-percent">{{ event.predictedPopularity.toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Explication IA -->
+    <div class="ai-explanation" *ngIf="useAI">
+      <h4 class="toggle-title" (click)="toggleExplanation()">
+        🤖 Comment l'IA fait ses prédictions ?
+        <span class="arrow" [class.open]="showExplanation">
+          {{ showExplanation ? '⬆️' : '⬇️' }}
+        </span>
+      </h4>  
+      <div *ngIf="showExplanation" class="ai-explanation">
+  <!-- Section 1 : Les données analysées -->
+  <div class="explanation-section">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <h5>12 dimensions analysées par l'IA</h5>
+    </div>
+    <p>Pour chaque utilisateur virtuel (agent) et chaque événement, l'IA examine simultanément <strong>12 caractéristiques</strong> :</p>
+    <div class="dimensions-grid">
+      <div class="dimension-card">
+        <div class="dimension-icon">👤</div>
+        <div class="dimension-content">
+          <strong>Profil de l'agent</strong>
+          <ul>
+            <li>Type : étudiant, pro, curieux, expert</li>
+            <li>Budget disponible (50€ – 800€)</li>
+            <li>Sensibilité au prix (0-1)</li>
+            <li>Spontanéité (0-1)</li>
+            <li>Loyauté (0-1)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="dimension-card">
+        <div class="dimension-icon">🎯</div>
+        <div class="dimension-content">
+          <strong>Caractéristiques de l'événement</strong>
+          <ul>
+            <li>Prix (gratuit – 500€)</li>
+            <li>Type (conférence, atelier, etc.)</li>
+            <li>Popularité (places restantes)</li>
+            <li>Durée (heures)</li>
+            <li>Catégorie (tech, business, etc.)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="dimension-card">
+        <div class="dimension-icon">⏰</div>
+        <div class="dimension-content">
+          <strong>Facteurs contextuels</strong>
+          <ul>
+            <li>Jour de la semaine</li>
+            <li>Heure de la journée</li>
+            <li>Weekend ou pas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+  <!-- Section 3 : L'apprentissage supervisé -->
+  <div class="explanation-section">
+    <div class="section-header">
+      <span class="section-icon">📈</span>
+      <h5>Apprentissage supervisé : comment l'IA s'améliore</h5>
+    </div>
+    
+    <div class="learning-steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <strong>Collecte de données réelles</strong>
+          <p>Le système enregistre les véritables choix des utilisateurs (inscriptions, clics, favoris). Chaque interaction devient un exemple d'entraînement.</p>
+          <div class="step-example">
+            📝 Exemple : "Un étudiant avec budget 80€ a choisi l'atelier gratuit le mardi à 14h"
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <strong>Feed-forward (propagation avant)</strong>
+          <p>Le réseau calcule une prédiction à partir des caractéristiques. Au début, les prédictions sont aléatoires.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <strong>Calcul de l'erreur (Loss)</strong>
+          <p>On compare la prédiction avec la réalité : <code>Erreur = (Prédiction - Réalité)²</code></p>
+          <div class="step-example">
+            🎯 Si l'IA prédisait 30% mais l'utilisateur a choisi → Erreur = (0.3 - 1)² = 0.49
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <strong>Rétro-propagation (Backpropagation)</strong>
+          <p>L'erreur est propagée vers l'arrière à travers toutes les couches. Chaque neurone reçoit sa "part de responsabilité".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <strong>Descente de gradient</strong>
+          <p>Les 3 457 poids sont légèrement ajustés pour réduire l'erreur la prochaine fois. C'est comme apprendre d'une erreur pour ne pas la répéter.</p>
+          <div class="step-example">
+            📉 Nouveau poids = Ancien poids - 0.001 × Dérivée de l'erreur
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <strong>Répétition (Époques)</strong>
+          <p>Le processus est répété 30 à 50 fois sur l'ensemble des données. À chaque époque, la précision du modèle augmente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 : Exemple concret -->
+  <div class="explanation-section">
+    <div class="section-header">
+      <span class="section-icon">💡</span>
+      <h5>Exemple concret de prédiction</h5>
+    </div>
+    <div class="example-case">
+      <div class="case-scenario">
+        <div class="agent-info">
+          <strong>🤖 Agent :</strong> Étudiant, budget 120€, sensible au prix (0.8), spontané (0.4)
+        </div>
+        <div class="event-info">
+          <strong>🎯 Événement :</strong> Workshop Tech, 50€, populaire (places limitées)
+        </div>
+      </div>
+      <div class="case-calculation">
+        <div class="calc-step">
+          <span class="calc-label">1. Normalisation :</span>
+          <span>Budget → 0.12, Prix → 0.1, Popularité → 0.85, ...</span>
+        </div>
+        <div class="calc-step">
+          <span class="calc-label">2. Entrée X :</span>
+          <span>[0.8, 0.12, 0.8, 0.4, 0.5, 0.1, 0.6, 0.85, 0.08, 0.4, 0.57, 0.58]</span>
+        </div>
+        <div class="calc-step">
+          <span class="calc-label">3. Propagation :</span>
+          <span>X → Couche1 (64) → ReLU → Couche2 (32) → ReLU → Couche3 (16) → ReLU → Sortie (1)</span>
+        </div>
+        <div class="calc-step result">
+          <span class="calc-label">4. Probabilité finale :</span>
+          <span><strong>78.3%</strong> → L'agent va probablement s'inscrire</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5 : Performances et limites -->
+  <div class="explanation-section">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <h5>Performances et améliorations continues</h5>
+    </div>
+    <div class="performance-grid">
+      <div class="perf-card">
+        <div class="perf-value">3 457</div>
+        <div class="perf-label">Paramètres ajustables</div>
+        <div class="perf-desc">Poids synaptiques appris automatiquement</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-value">{{ trainingDataSize || 0 }}</div>
+        <div class="perf-label">Données d'entraînement</div>
+        <div class="perf-desc">Plus de données = plus de précision</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-value">{{ modelAccuracy || 0 }}%</div>
+        <div class="perf-label">Précision actuelle</div>
+        <div class="perf-desc">Objectif : 85%+ après 1000 exemples</div>
+      </div>
+    </div>
+    <div class="improvement-note">
+      <span>📈</span>
+      <p>À chaque clique, inscription ou favori, l'IA collecte une nouvelle donnée. <strong>Plus vous utilisez la plateforme, plus les prédictions deviennent précises !</strong></p>
+    </div>
+  </div>
+</div>
+</div>
+</div>

@@ -1,24 +1,32 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Component, OnInit, AfterViewInit  } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { PublicEventService } from '../../services/public-event.service';
 import { MapViewerComponent } from './map-viewer.component';
+import { SimilarityEngineService, SimilarItem } from '../../services/similarity-engine.service';
+import { PopularityForecastService, ForecastResult } from '../../services/popularity-forecast.service';
+import { FavoritesService } from '../../../shared/services/favorites.service';
 
 @Component({
   selector: 'app-event-detail',
-  standalone: true,
-  imports: [CommonModule, RouterModule, MapViewerComponent],
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css']
 })
-export class EventDetailComponent implements OnInit {
+export class EventDetailComponent implements OnInit, AfterViewInit  {
   event: any = null;
   loading = true;
-
+  similarEvents: SimilarItem[] = [];
+  forecast: ForecastResult | null = null;
+  isFavorite = false;
   constructor(
     private route: ActivatedRoute,
-    private eventService: PublicEventService
+    private eventService: PublicEventService,
+    
   ) {}
+    ngAfterViewInit(): void {
+    // Forcer le scroll en haut après le rendu complet
+    window.scrollTo(0, 0);
+  }
+
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
@@ -41,11 +49,20 @@ export class EventDetailComponent implements OnInit {
           dateFin: event.dateFin || event.dateDebut
         };
         this.loading = false;
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
       },
       error: (err) => {
         console.error('Erreur:', err);
         this.loading = false;
       }
     });
+  }
+ isSameDay(): boolean {
+    if (!this.event?.dateDebut || !this.event?.dateFin) return false;
+    const debut = new Date(this.event.dateDebut);
+    const fin = new Date(this.event.dateFin);
+    return debut.toDateString() === fin.toDateString();
   }
 }

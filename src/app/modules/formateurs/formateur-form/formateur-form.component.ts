@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { NgForm } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-formateur-form',
-  standalone: true,  // ← AJOUTER standalone
-  imports: [CommonModule, FormsModule, RouterModule],  // ← AJOUTER imports
   templateUrl: './formateur-form.component.html',
   styleUrls: ['./formateur-form.component.css']
 })

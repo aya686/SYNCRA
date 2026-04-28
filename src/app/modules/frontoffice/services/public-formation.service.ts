@@ -33,18 +33,26 @@ export class PublicFormationService {
       })))
     );
   }
+  // inscription.service.ts
+checkUserRegistration(userId: number, sessionId: number): Observable<boolean> {
+  return this.http.get<boolean>(`/api/inscriptions/session/${sessionId}/user/${userId}`);
+}
+// public-formation.service.ts
 
-  getFormation(id: number): Observable<PublicFormation> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(f => ({
-        id: f.formationId,
-        titre: f.titre,
-        description: f.description || `Formation ${f.titre}`,
-        dureeTotale: f.dureeHeures,
-        niveau: f.niveau,
-        prix: f.prix,
-        certificate: f.certificate
-      }))
-    );
-  }
+getFormation(id: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+    map(f => ({
+      id: f.formationId,
+      titre: f.titre,
+      description: f.description || `Formation ${f.titre}`,
+      dureeTotale: f.dureeHeures,
+      niveau: f.niveau,
+      prix: f.prix,
+      certificate: f.certificate,
+      formateurNom: f.formateur?.nom || 'Non assigné',      // ← AJOUTER
+      formateurPrenom: f.formateur?.prenom || '',           // ← AJOUTER
+      formateurExpertise: f.formateur?.expertise || ''      // ← AJOUTER
+    }))
+  );
+}
 }

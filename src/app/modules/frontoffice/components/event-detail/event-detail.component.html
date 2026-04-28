@@ -19,15 +19,15 @@
       
       <div class="event-content">
         <div class="event-main-info">
-          <div class="info-card">
-            <div class="info-icon">📅</div>
-            <div class="info-text">
-              <h4>Date</h4>
-              <p>Du {{event?.dateDebut | date:'dd/MM/yyyy'}}</p>
-              <p>Au {{event?.dateFin | date:'dd/MM/yyyy'}}</p>
-            </div>
-          </div>
-          
+<div class="info-card">
+  <div class="info-icon">📅</div>
+  <div class="info-text">
+    <h4>Date et heure</h4>
+    <p>{{event?.dateDebut | date:'dd/MM/yyyy HH:mm'}}</p>
+    <p *ngIf="!isSameDay()">au {{event?.dateFin | date:'dd/MM/yyyy HH:mm'}}</p>
+  </div>
+</div>
+
           <div class="info-card">
             <div class="info-icon">📍</div>
             <div class="info-text">
@@ -85,91 +85,4 @@
       <a routerLink="/events" class="btn-back">← Retour aux événements</a>
     </div>
   </div>
-  <footer class="main-footer">
-  <div class="container">
-    <div class="footer-wrapper">
-      
-      <div class="footer-brand-section">
-        <div class="brand-header">
-          <div class="resolvo-logo">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-              <defs>
-                <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#4f46e5"/>
-                  <stop offset="1" stop-color="#06b6d4"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <h3>RESOLVO</h3>
-        </div>
-        <p class="brand-desc">
-          Propulsez votre carrière grâce à des formations certifiantes et un réseau professionnel dynamique. <br>
-          Développez vos compétences et connectez-vous aux opportunités de demain.
-        </p>
-      </div>
-
-      <div class="footer-links-section">
-        <div class="footer-grid">
-          
-          <div class="footer-column">
-            <h4>HELP</h4>
-            <ul>
-              <li><a href="#">Blog</a></li>
-              <li><a href="#">Documentation</a></li>
-              <li><a href="#">Change Log</a></li>
-              <li><a href="#">Support</a></li>
-              <li><a href="#">Discord</a></li>
-              <li><a href="#">License</a></li>
-              <li><a href="#">Refund Policy</a></li>
-              <li><a href="#">Submit a Request</a></li>
-
-            </ul>
-          </div>
-
-          <div class="footer-column">
-            <h4>Écosystème Berry</h4>
-            <ul>
-              <li><a href="#">Angular Bundle</a></li>
-              <li><a href="#">Berry Figma</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-column">
-            <h4>Technologies</h4>
-            <ul>
-              <li><a href="#">.Net</a></li>
-              <li><a href="#">CodeIgniter</a></li>
-              <li><a href="#">Django</a></li>
-              <li><a href="#" class="badge-link">Shopify <small>Bientôt</small></a></li>
-            </ul>
-          </div>
-
-          <div class="footer-column">
-            <h4>Gratuit</h4>
-            <ul>
-              <li><a href="#">React MUI</a></li>
-              <li><a href="#">Bootstrap 5</a></li>
-              <li><a href="#">Angular</a></li>
-              <li><a href="#">Figma</a></li>
-               <li><a href="#">Bootstrap 5</a></li>
-              <li><a href="#">React</a></li>
-            </ul>
-          </div>
-
-        </div>
-      </div>
-      
-    </div> <div class="footer-bottom">
-      <p>&copy; 2026 RESOLVO. Tous droits réservés.</p>
-      <div class="footer-legal">
-        <a href="#">Licence</a>
-        <a href="#">Politique de remboursement</a>
-      </div>
-    </div>
-  </div>
-</footer>
 </div>

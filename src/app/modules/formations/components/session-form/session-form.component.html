@@ -57,7 +57,7 @@
       <div class="form-group" *ngIf="session.typeLieu === 'en-ligne'">
         <div class="info-message">
           <i class="info-icon">🌐</i>
-          <span>Session en ligne - Le lien de connexion sera envoyé par email</span>
+          <span>Session en ligne - Le lien de connexion sera disponible au temps</span>
         </div>
         <input type="hidden" name="lieu" [(ngModel)]="session.lieu" value="En ligne">
       </div>
@@ -117,16 +117,6 @@
           {{getErrorMessage('capaciteMax', sessionForm)}}
         </div>
         <small class="helper-text">Entre 1 et 500 participants</small>
-      </div>
-
-      <div class="form-group">
-        <label for="statut">Statut</label>
-        <select id="statut" name="statut" [(ngModel)]="session.statut" class="form-control">
-          <option value="planifiee">Planifiée</option>
-          <option value="en_cours">En cours</option>
-          <option value="terminee">Terminée</option>
-          <option value="annulee">Annulée</option>
-        </select>
       </div>
     </div>
 

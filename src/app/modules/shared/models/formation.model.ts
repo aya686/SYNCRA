@@ -7,6 +7,7 @@ export interface FormationApi {
   certificate: boolean;
   prix: number;
   statut: string;
+  description?: string;
 }
 
 // Interface pour l'affichage dans le frontend
@@ -19,6 +20,10 @@ export interface FormationDisplay {
   prix: number;
   certificate: boolean;
   createdAt: Date;
+  formateurNom?: string;
+  formateurPrenom?: string;
+  formateurExpertise?: string;
+  
 }
 
 // Type alias pour compatibilité
@@ -60,9 +65,9 @@ export function convertApiToFormationDisplay(apiFormation: FormationApi): Format
   return {
     id: apiFormation.formationId,
     titre: apiFormation.titre,
-    description: `Formation de niveau ${apiFormation.niveau}`,
     dureeTotale: apiFormation.dureeHeures,
     niveau: apiFormation.niveau,
+    description: apiFormation.description || '',
     prix: apiFormation.prix,
     certificate: apiFormation.certificate,
     createdAt: new Date()

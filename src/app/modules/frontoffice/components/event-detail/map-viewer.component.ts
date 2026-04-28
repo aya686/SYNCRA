@@ -1,10 +1,7 @@
 import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-map-viewer',
-  standalone: true,
-  imports: [CommonModule],
   template: `
     <div class="map-viewer-container">
       <div id="viewer-map" style="height: 250px; width: 100%; border-radius: 12px;"></div>

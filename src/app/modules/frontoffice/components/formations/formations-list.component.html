@@ -1,41 +1,5 @@
+<!-- formations-list.component.html -->
 <div class="formations-app">
-    <!-- Bouton de bascule du thème -->
-  <div class="theme-toggle-wrapper">
-    <button class="theme-toggle-btn" (click)="toggleTheme()">
-      <span *ngIf="!isDarkMode">🌙 Mode sombre</span>
-      <span *ngIf="isDarkMode">☀️ Mode clair</span>
-    </button>
-  </div>
-  <!-- Header Navigation -->
-  <header class="app-header">
-    <div class="header-container">
-      <div class="logo-area">
-        <div class="resolvo-logo">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-            <defs>
-              <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#4f46e5"/>
-                <stop offset="1" stop-color="#06b6d4"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <span class="logo-text">Resolvo</span>
-      </div>
-      <nav class="main-nav">
-        <a routerLink="/" class="nav-link">Accueil</a>
-        <a routerLink="/events" routerLinkActive="active" class="nav-link">Événements</a>
-        <a routerLink="/formations" routerLinkActive="active" class="nav-link active">Formations</a>
-        <a href="#" class="nav-link">Contact</a>
-      </nav>
-      <div class="header-actions">
-        <button class="icon-btn">👤</button>
-      </div>
-    </div>
-  </header>
 
   <!-- Main Content -->
   <main class="app-main">
@@ -112,33 +76,52 @@
           </div>
         </div>
 
-        <!-- Formations -->
+        <!-- Formations - Version sans image -->
         <div *ngIf="!loading" class="formations-masonry">
           <div *ngFor="let formation of filteredFormations" class="formation-item">
-            <div class="formation-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (formation.imageUrl || '') + ')'" 
-                 [style.backgroundSize]="'cover'" [style.backgroundPosition]="'center'">
-              <div class="formation-level" [class]="formation.niveau">
-                {{formation.niveau}}
-              </div>
-              <div class="formation-title-overlay">{{formation.titre}}</div>
-              <div class="formation-overlay"></div>
+            
+            <!-- ✅ NIVEAU (badge en haut) -->
+            <div class="formation-badge">
+              <span class="formation-level" [class]="formation.niveau">
+                {{formation.niveau === 'debutant' ? '🎓 Débutant' : formation.niveau === 'intermediaire' ? '📚 Intermédiaire' : '🚀 Avancé'}}
+              </span>
+              <span *ngIf="formation.certificate" class="certif-badge">🎓 Certifiante</span>
             </div>
             
-            <div class="formation-details">
-              <h3>{{formation.titre}}</h3>
-              <p>{{formation.description | slice:0:80}}...</p>
-              <div class="formation-meta-row">
-                <span>⏱️ {{formation.dureeTotale}} heures</span>
-                <span>💰 {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
-                <span *ngIf="formation.certificate">🎓 Certifiante</span>
+            <!-- ✅ TITRE -->
+            <div class="formation-header">
+              <h3 class="formation-title">{{formation.titre}}</h3>
+            </div>
+            
+            <!-- ✅ DESCRIPTION -->
+            <p class="formation-description">{{formation.description | slice:0:100}}...</p>
+            
+            <!-- ✅ MÉTADONNÉES -->
+            <div class="formation-meta">
+              <div class="meta-item">
+                <span class="meta-icon">⏱️</span>
+                <span>{{formation.dureeTotale}} heures</span>
               </div>
-              <div class="formation-footer-row">
-                <a [routerLink]="['/formations', formation.id]" class="formation-link">
-                  Découvrir
-                  <span>→</span>
-                </a>
+              <div class="meta-item">
+                <span class="meta-icon">💰</span>
+                <span class="price" [class.free]="formation.prix === 0">
+                  {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">📊</span>
+                <span>{{formation.niveau === 'debutant' ? 'Accessible' : formation.niveau === 'intermediaire' ? 'Confirmé' : 'Expert'}}</span>
               </div>
             </div>
+            
+            <!-- ✅ BOUTON -->
+            <div class="formation-footer">
+              <a [routerLink]="['/formations', formation.id]" class="formation-link">
+                Découvrir la formation
+                <span>→</span>
+              </a>
+            </div>
+            
           </div>
         </div>
 
@@ -153,36 +136,4 @@
     </section>
   </main>
 
-  <!-- Footer Minimal -->
-  <footer class="app-footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <div class="footer-logo">🎯 Resolvo</div>
-        <p>La plateforme qui connecte les talents aux opportunités</p>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4>Explorer</h4>
-          <a href="#">Événements</a>
-          <a href="#">Formations</a>
-          <a href="#">Conférences</a>
-        </div>
-        <div class="footer-col">
-          <h4>Support</h4>
-          <a href="#">Aide</a>
-          <a href="#">Contact</a>
-          <a href="#">FAQ</a>
-        </div>
-        <div class="footer-col">
-          <h4>Légal</h4>
-          <a href="#">Mentions</a>
-          <a href="#">CGU</a>
-          <a href="#">Confidentialité</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 Resolvo - Tous droits réservés</p>
-    </div>
-  </footer>
 </div>

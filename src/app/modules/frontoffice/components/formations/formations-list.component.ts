@@ -1,14 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { PublicFormationService } from '../../services/public-formation.service';
 import { ThemeService } from '../../../shared/services/theme.service';
 
 @Component({
   selector: 'app-formations-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './formations-list.component.html',
   styleUrls: ['./formations-list.component.css']
 })

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ExportService } from '../../../shared/services/export.service';
@@ -7,8 +6,6 @@ import { NotificationService } from '../../../shared/services/notification.servi
 
 @Component({
   selector: 'app-export-data',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './export-data.component.html',
   styleUrls: ['./export-data.component.css']
 })

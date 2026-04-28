@@ -1,12 +1,9 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-analytics-dashboard',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './analytics-dashboard.component.html',
   styleUrls: ['./analytics-dashboard.component.css']
 })

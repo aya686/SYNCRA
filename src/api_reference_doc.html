@@ -1,0 +1,353 @@
+
+<h2 class="sr-only">API Reference — all endpoints grouped by controller with method, path, params, and description</h2>
+
+<style>
+:root {
+  --pad: 1rem 1.25rem;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 0 1rem;
+  align-items: center;
+}
+.toolbar input {
+  flex: 1;
+  min-width: 180px;
+}
+.filter-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn.active, .filter-btn:hover {
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+}
+
+.section { margin-bottom: 1.5rem; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.section-header:hover { background: var(--color-background-secondary); }
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.section-count {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-left: auto;
+  font-weight: 500;
+}
+.chevron {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  transition: transform 0.2s;
+}
+.chevron.open { transform: rotate(90deg); }
+
+.ep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: fixed;
+}
+.ep-table th {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+.ep-table td {
+  padding: 7px 10px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  color: var(--color-text-primary);
+  vertical-align: top;
+  word-break: break-word;
+}
+.ep-table tr:last-child td { border-bottom: none; }
+.ep-table tr:hover td { background: var(--color-background-secondary); }
+
+.method-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  white-space: nowrap;
+}
+.GET    { background: #EAF3DE; color: #3B6D11; }
+.POST   { background: #E6F1FB; color: #185FA5; }
+.PUT    { background: #FAEEDA; color: #854F0B; }
+.DELETE { background: #FCEBEB; color: #A32D2D; }
+
+.path-cell {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--color-text-primary);
+}
+.params-cell { font-size: 12px; color: var(--color-text-secondary); }
+.desc-cell { font-size: 12.5px; }
+
+.hidden { display: none; }
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 500px) {
+  .col-params { display: none; }
+}
+</style>
+
+<div class="toolbar">
+  <input type="text" id="search" placeholder="Rechercher endpoint, méthode, chemin..." oninput="filter()" />
+  <div class="filter-btns" id="method-filters"></div>
+</div>
+
+<div id="sections"></div>
+<div class="no-results hidden" id="no-results">Aucun résultat.</div>
+
+<script>
+const RAW = [
+  ["Abonnement","GET","/api/abonnements","—","Liste tous les abonnements"],
+  ["Abonnement","GET","/api/abonnements/{id}","id (path)","Abonnement par ID"],
+  ["Abonnement","GET","/api/abonnements/user/{idUser}","idUser (path)","Abonnements d'un utilisateur"],
+  ["Abonnement","GET","/api/abonnements/user/{idUser}/actif","idUser (path)","Abonnement actif d'un user"],
+  ["Abonnement","POST","/api/abonnements/souscrire/{idUser}/{idPlan}","idUser, idPlan (path)","Souscrire à un plan"],
+  ["Abonnement","POST","/api/abonnements/souscrire/{idUser}/{idPlan}/code/{codePromo}","idUser, idPlan, codePromo (path)","Souscrire avec code promo"],
+  ["Abonnement","PUT","/api/abonnements/{id}/activite","id (path)","Mettre à jour dernière activité"],
+  ["Abonnement","GET","/api/abonnements/{id}/devrait-downgrade/{jours}","id, jours (path)","Vérifier si devrait downgrade"],
+  ["Abonnement","PUT","/api/abonnements/{id}/resilier","id (path)","Résilier un abonnement"],
+  ["Abonnement","DELETE","/api/abonnements/{id}","id (path)","Supprimer un abonnement"],
+  ["Abonnement","PUT","/api/abonnements/{id}","id + body Abonnement","Modifier un abonnement"],
+  ["Admin","GET","/api/admin/stream","—","SSE notifications temps réel"],
+  ["Admin","GET","/api/admin/stats","—","Statistiques dashboard"],
+  ["Admin","GET","/api/admin/suspended-users","—","Liste comptes suspendus"],
+  ["Admin","PUT","/api/admin/users/{id}/reactivate","id (path)","Réactiver un compte"],
+  ["Admin","GET","/api/admin/recent-logins","limit (query, défaut=50)","Dernières connexions"],
+  ["Admin","GET","/api/admin/decision-distribution","—","Distribution décisions 7 jours"],
+  ["Auth","POST","/api/auth/login","body {email, password}","Connexion utilisateur"],
+  ["Auth","POST","/api/auth/verify-2fa","body {userId, code}","Vérification code 2FA"],
+  ["Auth","POST","/api/auth/logout","—","Déconnexion"],
+  ["Auth","GET","/api/auth/test-geo/{ip}","ip (path)","Test géolocalisation IP"],
+  ["Avis","GET","/api/avis","—","Liste tous les avis"],
+  ["Avis","GET","/api/avis/{id}","id (path)","Avis par ID"],
+  ["Avis","GET","/api/avis/cible/{idCible}","idCible (path)","Avis d'une cible"],
+  ["Avis","GET","/api/avis/score/{idCible}","idCible (path)","Score moyen d'une cible"],
+  ["Avis","POST","/api/avis/{idAuteur}/{idCible}","idAuteur, idCible (path) + body","Créer un avis"],
+  ["Avis","PUT","/api/avis/repondre/{id}","id (path), reponse (query)","Répondre à un avis"],
+  ["Avis","DELETE","/api/avis/{id}","id (path)","Supprimer un avis"],
+  ["Badge","GET","/api/badges","—","Liste tous les badges"],
+  ["Badge","GET","/api/badges/{id}","id (path)","Badge par ID"],
+  ["Badge","POST","/api/badges","body Badge","Créer un badge"],
+  ["Badge","PUT","/api/badges/{id}","id + body Badge","Modifier un badge"],
+  ["Badge","DELETE","/api/badges/{id}","id (path)","Supprimer un badge"],
+  ["Client","GET","/api/clients","—","Liste tous les clients"],
+  ["Client","GET","/api/clients/{id}","id (path)","Client par ID"],
+  ["Client","GET","/api/clients/type/{type}","type (path) PARTICULIER/ENTREPRISE","Clients par type"],
+  ["Client","POST","/api/clients/user/{idUser}","idUser (path) + body Client","Créer un client"],
+  ["Client","PUT","/api/clients/{id}","id + body Client","Modifier un client"],
+  ["Client","DELETE","/api/clients/{id}","id (path)","Supprimer un client"],
+  ["CodePromo","GET","/api/codes-promo","—","Liste tous les codes promo"],
+  ["CodePromo","GET","/api/codes-promo/{id}","id (path)","Code promo par ID"],
+  ["CodePromo","GET","/api/codes-promo/code/{code}","code (path)","Code promo par valeur"],
+  ["CodePromo","POST","/api/codes-promo","body CodePromo","Créer un code promo"],
+  ["CodePromo","PUT","/api/codes-promo/{id}","id + body CodePromo","Modifier un code promo"],
+  ["CodePromo","DELETE","/api/codes-promo/{id}","id (path)","Supprimer un code promo"],
+  ["Competence","GET","/api/competences","—","Liste toutes les compétences"],
+  ["Competence","GET","/api/competences/{id}","id (path)","Compétence par ID"],
+  ["Competence","GET","/api/competences/user/{idUser}","idUser (path)","Compétences d'un utilisateur"],
+  ["Competence","POST","/api/competences/user/{idUser}","idUser + body Competence","Créer une compétence"],
+  ["Competence","PUT","/api/competences/{id}","id + body Competence","Modifier une compétence"],
+  ["Competence","DELETE","/api/competences/{id}","id (path)","Supprimer une compétence"],
+  ["EmailVerification","POST","/api/email-verification/send","body {email}","Envoyer code vérification"],
+  ["EmailVerification","POST","/api/email-verification/verify","body {email, code}","Vérifier code"],
+  ["Etudiant","GET","/api/etudiants","—","Liste tous les étudiants"],
+  ["Etudiant","GET","/api/etudiants/{id}","id (path)","Étudiant par ID"],
+  ["Etudiant","GET","/api/etudiants/acces-expires","—","Étudiants avec accès expiré"],
+  ["Etudiant","POST","/api/etudiants/user/{idUser}","idUser + body Etudiant","Créer un étudiant"],
+  ["Etudiant","PUT","/api/etudiants/{id}","id + body Etudiant","Modifier un étudiant"],
+  ["Etudiant","DELETE","/api/etudiants/{id}","id (path)","Supprimer un étudiant"],
+  ["Freelancer","GET","/api/freelancers","—","Liste tous les freelancers"],
+  ["Freelancer","GET","/api/freelancers/{id}","id (path)","Freelancer par ID"],
+  ["Freelancer","GET","/api/freelancers/disponibles","—","Freelancers disponibles"],
+  ["Freelancer","POST","/api/freelancers/user/{idUser}","idUser + body Freelancer","Créer un freelancer"],
+  ["Freelancer","PUT","/api/freelancers/{id}","id + body Freelancer","Modifier un freelancer"],
+  ["Freelancer","DELETE","/api/freelancers/{id}","id (path)","Supprimer un freelancer"],
+  ["Investisseur","GET","/api/investisseurs","—","Liste tous les investisseurs"],
+  ["Investisseur","GET","/api/investisseurs/{id}","id (path)","Investisseur par ID"],
+  ["Investisseur","GET","/api/investisseurs/budget/{montant}","montant (path)","Investisseurs par budget min"],
+  ["Investisseur","POST","/api/investisseurs/user/{idUser}","idUser + body Investisseur","Créer un investisseur"],
+  ["Investisseur","PUT","/api/investisseurs/{id}","id + body Investisseur","Modifier un investisseur"],
+  ["Investisseur","DELETE","/api/investisseurs/{id}","id (path)","Supprimer un investisseur"],
+  ["Plan","GET","/api/plans","—","Liste tous les plans"],
+  ["Plan","GET","/api/plans/{id}","id (path)","Plan par ID"],
+  ["Plan","GET","/api/plans/{id}/limite/{cle}","id, cle (path)","Valeur d'une limite"],
+  ["Plan","POST","/api/plans","body Plan","Créer un plan"],
+  ["Plan","PUT","/api/plans/{id}","id + body Plan","Modifier un plan"],
+  ["Plan","DELETE","/api/plans/{id}","id (path)","Supprimer un plan"],
+  ["Portfolio","GET","/api/portfolios","—","Liste tous les portfolios"],
+  ["Portfolio","GET","/api/portfolios/{id}","id (path)","Portfolio par ID"],
+  ["Portfolio","GET","/api/portfolios/user/{idUser}","idUser (path)","Portfolios d'un utilisateur"],
+  ["Portfolio","POST","/api/portfolios/user/{idUser}","idUser + body Portfolio","Créer un portfolio"],
+  ["Portfolio","PUT","/api/portfolios/{id}","id + body Portfolio","Modifier un portfolio"],
+  ["Portfolio","DELETE","/api/portfolios/{id}","id (path)","Supprimer un portfolio"],
+  ["Role","GET","/api/roles","—","Liste tous les rôles"],
+  ["Role","GET","/api/roles/{id}","id (path)","Rôle par ID"],
+  ["Role","GET","/api/roles/libelle/{libelle}","libelle (path)","Rôle par libellé"],
+  ["Role","POST","/api/roles","body Role","Créer un rôle"],
+  ["Role","PUT","/api/roles/{id}","id + body Role","Modifier un rôle"],
+  ["Role","DELETE","/api/roles/{id}","id (path)","Supprimer un rôle"],
+  ["UserBadge","GET","/api/user-badges/user/{idUser}","idUser (path)","Badges d'un utilisateur"],
+  ["UserBadge","POST","/api/user-badges/attribuer/{idUser}/{idBadge}","idUser, idBadge (path)","Attribuer un badge"],
+  ["UserBadge","POST","/api/user-badges/verifier/{idUser}","idUser (path)","Vérifier badges à attribuer"],
+  ["User","GET","/api/users","—","Liste tous les utilisateurs"],
+  ["User","GET","/api/users/{id}","id (path)","Utilisateur par ID"],
+  ["User","POST","/api/users","body User","Créer un utilisateur"],
+  ["User","PUT","/api/users/{id}","id + body User","Modifier un utilisateur"],
+  ["User","DELETE","/api/users/{id}","id (path)","Supprimer un utilisateur"],
+  ["User","PUT","/api/users/{id}/revoquer","id (path), motif (query)","Révoquer un rôle"],
+  ["User","PUT","/api/users/{id}/with-photo","id + body User + photo (multipart)","Modifier avec photo"],
+  ["UserRole","GET","/api/user-roles","—","Liste tous les user-roles"],
+  ["UserRole","GET","/api/user-roles/{id}","id (path)","UserRole par ID"],
+  ["UserRole","GET","/api/user-roles/user/{idUser}","idUser (path)","Rôles d'un utilisateur"],
+  ["UserRole","GET","/api/user-roles/user/{idUser}/actifs","idUser (path)","Rôles actifs d'un user"],
+  ["UserRole","POST","/api/user-roles/assigner/{idUser}","idUser + idRole, motif, dateExpiration (query)","Assigner un rôle"],
+  ["UserRole","PUT","/api/user-roles/{id}/revoquer","id (path), motif (query)","Révoquer un rôle"],
+  ["UserRole","DELETE","/api/user-roles/{id}","id (path)","Supprimer un user-role"],
+];
+
+const COLORS = {
+  Abonnement: "#7F77DD", Admin: "#1D9E75", Auth: "#D85A30",
+  Avis: "#D4537E", Badge: "#378ADD", Client: "#BA7517",
+  CodePromo: "#639922", Competence: "#985BA5", EmailVerification: "#185FA5",
+  Etudiant: "#0F6E56", Freelancer: "#D85A30", Investisseur: "#BA7517",
+  Plan: "#7F77DD", Portfolio: "#1D9E75", Role: "#D4537E",
+  UserBadge: "#378ADD", User: "#639922", UserRole: "#A32D2D"
+};
+
+const CTRL_ORDER = [...new Set(RAW.map(r => r[0]))];
+let activeMethod = "ALL";
+let searchVal = "";
+
+const methodFilters = document.getElementById("method-filters");
+["ALL","GET","POST","PUT","DELETE"].forEach(m => {
+  const btn = document.createElement("button");
+  btn.className = "filter-btn" + (m === "ALL" ? " active" : "");
+  btn.textContent = m;
+  btn.onclick = () => {
+    activeMethod = m;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  };
+  methodFilters.appendChild(btn);
+});
+
+function render() {
+  const q = searchVal.toLowerCase();
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+  let totalVisible = 0;
+
+  CTRL_ORDER.forEach(ctrl => {
+    let rows = RAW.filter(r => r[0] === ctrl);
+    if (activeMethod !== "ALL") rows = rows.filter(r => r[1] === activeMethod);
+    if (q) rows = rows.filter(r => r.join(" ").toLowerCase().includes(q));
+    if (!rows.length) return;
+    totalVisible += rows.length;
+
+    const sec = document.createElement("div");
+    sec.className = "section";
+
+    const hdr = document.createElement("div");
+    hdr.className = "section-header";
+    hdr.innerHTML = `
+      <span class="chevron open" id="chev-${ctrl}">▶</span>
+      <span class="section-title">${ctrl}</span>
+      <span class="section-count" style="background:${COLORS[ctrl]}22;color:${COLORS[ctrl]}">${rows.length} endpoint${rows.length>1?"s":""}</span>
+    `;
+
+    const body = document.createElement("div");
+    body.id = "body-" + ctrl;
+
+    const table = document.createElement("table");
+    table.className = "ep-table";
+    table.innerHTML = `<colgroup>
+      <col style="width:60px">
+      <col style="width:42%">
+      <col class="col-params" style="width:25%">
+      <col>
+    </colgroup>
+    <thead><tr>
+      <th>Méthode</th>
+      <th>Endpoint</th>
+      <th class="col-params">Paramètres</th>
+      <th>Description</th>
+    </tr></thead>`;
+
+    const tbody = document.createElement("tbody");
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="method-badge ${r[1]}">${r[1]}</span></td>
+        <td class="path-cell">${r[2]}</td>
+        <td class="params-cell col-params">${r[3]}</td>
+        <td class="desc-cell">${r[4]}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    body.appendChild(table);
+
+    hdr.onclick = () => {
+      const isOpen = body.style.display !== "none";
+      body.style.display = isOpen ? "none" : "";
+      document.getElementById("chev-" + ctrl).classList.toggle("open", !isOpen);
+    };
+
+    sec.appendChild(hdr);
+    sec.appendChild(body);
+    container.appendChild(sec);
+  });
+
+  document.getElementById("no-results").classList.toggle("hidden", totalVisible > 0);
+}
+
+function filter() {
+  searchVal = document.getElementById("search").value;
+  render();
+}
+
+render();
+</script>

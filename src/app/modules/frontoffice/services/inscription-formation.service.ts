@@ -49,4 +49,20 @@ export class InscriptionFormationService {
   deleteInscription(inscriptionId: number): Observable<string> {
     return this.http.delete<string>(`${this.apiUrl}/${inscriptionId}`);
   }
+// inscription-formation.service.ts
+inscrire(participantId: number, formationId: number, email: string, nom: string): Observable<any> {
+    const body = {
+        participantId: participantId,  // ← CE participantId VIENT DE SimpleAuth (1,2,3)
+        formationId: formationId,
+        email: email,
+        nom: nom
+    };
+    return this.http.post(this.apiUrl, body);
+}
+
+  checkUserRegistrationForFormation(participantId: number, formationId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/check?participantId=${participantId}&formationId=${formationId}`);
+  }
+
+
 }

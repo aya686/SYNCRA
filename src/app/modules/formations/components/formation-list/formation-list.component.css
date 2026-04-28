@@ -332,3 +332,15 @@
   font-size: 11px;
   cursor: pointer;
 }
+/* formation-list.component.css */
+.formateur-expertise {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

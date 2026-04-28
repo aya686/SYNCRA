@@ -1,15 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FormsModule, NgForm } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { DesktopNotificationService } from '../../../shared/services/notification-desktop.service';
 
 @Component({
   selector: 'app-inscription-form',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './inscription-form.component.html',
   styleUrls: ['./inscription-form.component.css']
 })
