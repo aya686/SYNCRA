@@ -1,0 +1,514 @@
+<!-- PARTICLE CANVAS BACKGROUND -->
+<canvas class="particle-canvas" #particleCanvas></canvas>
+
+<!-- CURSOR GLOW -->
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- NAVBAR FRONT OFFICE -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap">
+        <div class="brand-hex">♡</div>
+      </div>
+      <span class="brand-name">WELLSYNC</span>
+    </a>
+    <div class="nav-links">
+      <a routerLink="/dashboard" class="nav-link active">Mon Tableau de Bord</a>
+      <a routerLink="/dossier" class="nav-link">Mon Dossier Santé</a>
+      <a routerLink="/seances" class="nav-link">Mes Séances</a>
+      <a routerLink="/bibliotheque" class="nav-link">Bibliothèque</a>
+      <a routerLink="/alertes" class="nav-link nav-alert">
+        <span class="alert-dot" *ngIf="hasUnreadAlerts"></span>
+        Mes Alertes
+      </a>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar">{{ userInitials }}</div>
+    </div>
+    <button class="nav-mobile-toggle" (click)="mobileMenuOpen = !mobileMenuOpen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE WRAPPER -->
+<div class="page-wrapper">
+
+  <!-- HERO HEADER -->
+  <div class="page-hero">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-inner">
+      <div class="hero-welcome reveal">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-pulse"></span>
+          Tableau de Bord Bien-être
+        </div>
+        <h1 class="hero-title">
+          Bonjour, <span class="hero-highlight">{{ userName }}</span> 👋
+        </h1>
+        <p class="hero-desc">
+          Votre santé au travail, centralisée et intelligente. Suivez votre bien-être en temps réel.
+        </p>
+      </div>
+      <div class="hero-date reveal" style="--delay:0.1s">
+        <div class="date-card">
+          <div class="date-day">{{ todayDay }}</div>
+          <div class="date-full">{{ todayFull }}</div>
+          <div class="date-badge">
+            <span class="status-dot"></span>
+            Système actif
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-content">
+
+    <!-- SCROLLING MARQUEE -->
+    <div class="marquee-divider">
+      <div class="marquee-track">
+        <span>Bien-être au Travail</span><span class="sep">◆</span>
+        <span>Prévention Burnout</span><span class="sep">◆</span>
+        <span>Suivi Psychologique</span><span class="sep">◆</span>
+        <span>Programme Personnalisé</span><span class="sep">◆</span>
+        <span>Santé Mentale</span><span class="sep">◆</span>
+        <span>Ressources Bien-être</span><span class="sep">◆</span>
+        <span>Bien-être au Travail</span><span class="sep">◆</span>
+        <span>Prévention Burnout</span><span class="sep">◆</span>
+        <span>Suivi Psychologique</span><span class="sep">◆</span>
+        <span>Programme Personnalisé</span><span class="sep">◆</span>
+        <span>Santé Mentale</span><span class="sep">◆</span>
+        <span>Ressources Bien-être</span><span class="sep">◆</span>
+      </div>
+    </div>
+
+    <!-- KPI STATS ROW -->
+    <section class="stats-section">
+      <div class="stats-container">
+        <div class="stat-card reveal" [style.--delay]="'0s'">
+          <div class="stat-icon-wrap burnout">
+            <span class="stat-icon">🧠</span>
+          </div>
+          <div class="stat-body">
+            <div class="stat-number" [ngClass]="getRiskClass()">{{ riskLevel }}</div>
+            <div class="stat-label">Niveau de Risque</div>
+          </div>
+          <div class="stat-arrow">→</div>
+        </div>
+        <div class="stat-card reveal" [style.--delay]="'0.1s'">
+          <div class="stat-icon-wrap seances">
+            <span class="stat-icon">📅</span>
+          </div>
+          <div class="stat-body">
+            <div class="stat-number">{{ nextSeanceDate || '—' }}</div>
+            <div class="stat-label">Prochain RDV</div>
+          </div>
+          <div class="stat-arrow">→</div>
+        </div>
+        <div class="stat-card reveal" [style.--delay]="'0.2s'">
+          <div class="stat-icon-wrap alertes">
+            <span class="stat-icon">⚡</span>
+          </div>
+          <div class="stat-body">
+            <div class="stat-number">{{ activeAlerts }}</div>
+            <div class="stat-label">Alertes Actives</div>
+          </div>
+          <div class="stat-arrow">→</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="main-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="grid-left">
+
+        <!-- BURNOUT RISK GAUGE -->
+        <div class="card gauge-card reveal">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">🧠</div>
+              <div>
+                <h3 class="card-title">Score Bien-être</h3>
+                <p class="card-subtitle">Basé sur votre activité récente</p>
+              </div>
+            </div>
+            <span class="card-badge" [ngClass]="getRiskBadgeClass()">{{ riskLevel }}</span>
+          </div>
+
+          <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 200 120">
+              <!-- Track -->
+              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e8f0f9" stroke-width="14" stroke-linecap="round"/>
+              <!-- Fill -->
+              <path class="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none"
+                    [attr.stroke]="getGaugeColor()"
+                    stroke-width="14" stroke-linecap="round"
+                    [style.stroke-dasharray]="getGaugeDash()"
+                    [style.stroke-dashoffset]="getGaugeDash()"/>
+              <!-- Needle -->
+              <line class="gauge-needle"
+                    x1="100" y1="100"
+                    [attr.x2]="getNeedleX()"
+                    [attr.y2]="getNeedleY()"
+                    stroke="#0a6ebd" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="100" cy="100" r="6" fill="#0a6ebd"/>
+              <!-- Score text -->
+              <text x="100" y="90" text-anchor="middle" font-size="24" font-weight="800" [attr.fill]="getGaugeColor()">
+                {{ burnoutScore }}/10
+              </text>
+              <text x="100" y="108" text-anchor="middle" font-size="9" fill="#607a96" font-weight="600">
+                SCORE DE RISQUE
+              </text>
+            </svg>
+
+            <div class="gauge-scale">
+              <span class="scale-low">Faible</span>
+              <span class="scale-mid">Modéré</span>
+              <span class="scale-high">Critique</span>
+            </div>
+          </div>
+
+          <div class="gauge-legend">
+            <div class="legend-item">
+              <span class="legend-dot green"></span>
+              <span>0–3 Faible</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot orange"></span>
+              <span>4–6 Modéré</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot red"></span>
+              <span>7–10 Critique</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DERNIERE ALERTE -->
+        <div class="card alert-card reveal" style="--delay:0.1s" *ngIf="lastAlert">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">⚡</div>
+              <div>
+                <h3 class="card-title">Dernière Alerte</h3>
+                <p class="card-subtitle">{{ lastAlert.date | date:'dd/MM/yyyy' }}</p>
+              </div>
+            </div>
+            <span class="card-badge" [ngClass]="getAlertBadge(lastAlert.niveauRisque)">
+              {{ lastAlert.niveauRisque }}
+            </span>
+          </div>
+          <div class="alert-body">
+            <div class="alert-row">
+              <span class="alert-label">Déclencheur</span>
+              <span class="alert-value trigger">{{ lastAlert.declencheur }}</span>
+            </div>
+            <div class="alert-row">
+              <span class="alert-label">Source</span>
+              <span class="alert-value">{{ lastAlert.source }}</span>
+            </div>
+            <div class="alert-row">
+              <span class="alert-label">Statut</span>
+              <span class="alert-value" [ngClass]="lastAlert.traitee ? 'treated' : 'pending'">
+                {{ lastAlert.traitee ? '✓ Traitée' : '⏳ En attente' }}
+              </span>
+            </div>
+          </div>
+          <a routerLink="/alertes" class="card-action-btn">
+            Voir toutes mes alertes
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <!-- NO ALERT STATE -->
+        <div class="card alert-card empty reveal" style="--delay:0.1s" *ngIf="!lastAlert">
+          <div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <div class="empty-title">Aucune alerte récente</div>
+            <div class="empty-sub">Votre niveau de stress est sous contrôle</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CENTER COLUMN -->
+      <div class="grid-center">
+
+        <!-- CHARGE DE TRAVAIL -->
+        <div class="card workload-card reveal">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">📊</div>
+              <div>
+                <h3 class="card-title">Charge de Travail</h3>
+                <p class="card-subtitle">Cette semaine — heures actives</p>
+              </div>
+            </div>
+            <span class="card-badge blue">Semaine en cours</span>
+          </div>
+
+          <div class="workload-chart">
+            <div class="wl-bar-group" *ngFor="let day of weeklyLoad; let i = index">
+              <div class="wl-bar-wrap">
+                <div class="wl-bar"
+                     [style.height.%]="day.load * 10"
+                     [style.--i]="i"
+                     [ngClass]="getBarClass(day.load)">
+                </div>
+              </div>
+              <span class="wl-label">{{ day.day }}</span>
+              <span class="wl-hours">{{ day.hours }}h</span>
+            </div>
+          </div>
+
+          <div class="workload-summary">
+            <div class="ws-item">
+              <span class="ws-label">Total semaine</span>
+              <span class="ws-val">{{ totalHours }}h</span>
+            </div>
+            <div class="ws-item">
+              <span class="ws-label">Moyenne / jour</span>
+              <span class="ws-val">{{ avgHours }}h</span>
+            </div>
+            <div class="ws-item">
+              <span class="ws-label">Pic journalier</span>
+              <span class="ws-val red">{{ peakHours }}h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECOMMANDATION DU JOUR -->
+        <div class="card reco-card reveal" style="--delay:0.1s">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">💡</div>
+              <div>
+                <h3 class="card-title">Recommandation du Jour</h3>
+                <p class="card-subtitle">Générée par IA pour vous</p>
+              </div>
+            </div>
+            <div class="ai-badge">
+              <span>✨</span> IA
+            </div>
+          </div>
+
+          <div class="reco-body" *ngIf="!loadingReco">
+            <div class="reco-quote">"</div>
+            <p class="reco-text">{{ aiRecommendation }}</p>
+
+            <div class="reco-tags">
+              <span class="rtag" *ngFor="let tag of recoTags">{{ tag }}</span>
+            </div>
+          </div>
+
+          <div class="reco-loading" *ngIf="loadingReco">
+            <div class="loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <p>Génération en cours...</p>
+          </div>
+
+          <button class="btn-reco" (click)="generateRecommendation()">
+            <span class="btn-bg"></span>
+            Nouvelle recommandation ✨
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="grid-right">
+
+        <!-- PROCHAIN RDV -->
+        <div class="card rdv-card reveal">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">📅</div>
+              <div>
+                <h3 class="card-title">Prochain RDV</h3>
+                <p class="card-subtitle">Séance psychologique</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rdv-body" *ngIf="nextSeance">
+            <div class="rdv-date-block">
+              <div class="rdv-day">{{ nextSeance.date | date:'dd' }}</div>
+              <div class="rdv-month">{{ nextSeance.date | date:'MMM yyyy' }}</div>
+            </div>
+            <div class="rdv-details">
+              <div class="rdv-time">
+                🕐 {{ nextSeance.heure }}
+              </div>
+              <div class="rdv-motif">{{ nextSeance.motif }}</div>
+              <div class="rdv-specialiste" *ngIf="nextSeance.medecin">
+                👨‍⚕️ Dr. {{ nextSeance.medecin.nom }} {{ nextSeance.medecin.prenom }}
+              </div>
+              <div class="rdv-specialite" *ngIf="nextSeance.medecin">
+                {{ nextSeance.medecin.specialite }}
+              </div>
+            </div>
+          </div>
+
+          <div class="rdv-empty" *ngIf="!nextSeance">
+            <div class="empty-icon">📭</div>
+            <p>Aucun rendez-vous planifié</p>
+          </div>
+
+          <a routerLink="/seances/planifier" class="card-action-btn outline">
+            + Planifier une séance
+          </a>
+        </div>
+
+        <!-- PROGRAMME BIENETRE -->
+        <div class="card programme-card reveal" style="--delay:0.1s" *ngIf="activeProgramme">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <div class="card-icon">🏃</div>
+              <div>
+                <h3 class="card-title">Programme Actif</h3>
+                <p class="card-subtitle">{{ activeProgramme.nom }}</p>
+              </div>
+            </div>
+            <span class="card-badge teal">En cours</span>
+          </div>
+
+          <div class="programme-body">
+            <div class="prog-objective">
+              <span class="prog-obj-label">Objectif</span>
+              <span class="prog-obj-text">{{ activeProgramme.objectif }}</span>
+            </div>
+
+            <div class="prog-progress-wrap">
+              <div class="prog-progress-header">
+                <span>Progression</span>
+                <span class="prog-pct">{{ activeProgramme.progression | number:'1.0-0' }}%</span>
+              </div>
+              <div class="prog-bar-bg">
+                <div class="prog-bar-fill" [style.width.%]="activeProgramme.progression"></div>
+              </div>
+            </div>
+
+            <div class="prog-meta">
+              <div class="prog-meta-item">
+                <span class="pm-icon">📆</span>
+                <span>{{ activeProgramme.dureesemaines }} semaines</span>
+              </div>
+              <div class="prog-meta-item">
+                <span class="pm-icon">✅</span>
+                <span>{{ getCompletedWeeks() }} semaines complètes</span>
+              </div>
+            </div>
+          </div>
+
+          <a routerLink="/programme" class="card-action-btn">
+            Voir mon programme
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <!-- NO PROGRAMME -->
+        <div class="card programme-card empty reveal" style="--delay:0.1s" *ngIf="!activeProgramme">
+          <div class="empty-state">
+            <div class="empty-icon">🚀</div>
+            <div class="empty-title">Aucun programme actif</div>
+            <div class="empty-sub">Démarrez votre programme bien-être</div>
+          </div>
+          <a routerLink="/bibliotheque" class="card-action-btn">
+            Découvrir les ressources →
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- BOTTOM SECTION: QUICK ACTIONS + AI INSIGHT -->
+    <section class="bottom-section">
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-actions reveal">
+        <h3 class="section-label">Actions Rapides</h3>
+        <div class="qa-grid">
+          <a routerLink="/seances/planifier" class="qa-card">
+            <div class="qa-icon-wrap blue">📅</div>
+            <span class="qa-label">Planifier une séance</span>
+            <span class="qa-arrow">→</span>
+          </a>
+          <a routerLink="/dossier" class="qa-card">
+            <div class="qa-icon-wrap teal">📋</div>
+            <span class="qa-label">Mon dossier santé</span>
+            <span class="qa-arrow">→</span>
+          </a>
+          <a routerLink="/alertes" class="qa-card">
+            <div class="qa-icon-wrap orange">⚡</div>
+            <span class="qa-label">Mes alertes burnout</span>
+            <span class="qa-arrow">→</span>
+          </a>
+          <a routerLink="/bibliotheque" class="qa-card">
+            <div class="qa-icon-wrap purple">📚</div>
+            <span class="qa-label">Bibliothèque bien-être</span>
+            <span class="qa-arrow">→</span>
+          </a>
+          <a routerLink="/preferences" class="qa-card">
+            <div class="qa-icon-wrap green">⚙️</div>
+            <span class="qa-label">Mes préférences</span>
+            <span class="qa-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- HISTORIQUE ALERTES MINI -->
+      <div class="card alerts-mini reveal" style="--delay:0.1s">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <div class="card-icon">📈</div>
+            <div>
+              <h3 class="card-title">Historique des Alertes</h3>
+              <p class="card-subtitle">Les 5 dernières alertes</p>
+            </div>
+          </div>
+          <a routerLink="/alertes" class="see-all-link">Voir tout →</a>
+        </div>
+
+        <div class="alerts-list">
+          <div class="alert-item" *ngFor="let alert of recentAlerts">
+            <div class="ai-risk-dot" [ngClass]="alert.niveauRisque?.toLowerCase()"></div>
+            <div class="ai-info">
+              <span class="ai-trigger">{{ alert.declencheur }}</span>
+              <span class="ai-date">{{ alert.date | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="ai-badge-mini" [ngClass]="getAlertBadge(alert.niveauRisque)">{{ alert.niveauRisque }}</div>
+            <div class="ai-status" [ngClass]="alert.traitee ? 'done' : 'pending'">
+              {{ alert.traitee ? '✓' : '⏳' }}
+            </div>
+          </div>
+
+          <div class="alerts-empty" *ngIf="recentAlerts.length === 0">
+            <div class="empty-icon small">✅</div>
+            <p>Aucune alerte récente</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+<!-- FLOATING NOTIFICATION -->
+<div class="float-notif" [class.show]="showNotif">
+  <div class="fn-icon">{{ notifIcon }}</div>
+  <div class="fn-content">
+    <div class="fn-title">{{ notifTitle }}</div>
+    <div class="fn-sub">{{ notifSub }}</div>
+  </div>
+  <button class="fn-close" (click)="showNotif = false">×</button>
+</div>

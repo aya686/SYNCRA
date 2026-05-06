@@ -1,0 +1,225 @@
+<!-- TOAST -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999" *ngIf="showToast">
+  <div class="toast show border-0" [class.bg-success]="toastType==='success'" [class.text-white]="toastType==='success'" [class.bg-warning]="toastType==='warning'" [class.bg-danger]="toastType==='danger'" [class.text-white]="toastType==='danger'">
+    <div class="d-flex"><div class="toast-body fw-semibold">{{ toastMsg }}</div><button class="btn-close me-2 m-auto" (click)="showToast=false"></button></div>
+  </div>
+</div>
+
+<div class="row">
+
+  <!-- STATS -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-primary"><i class="ti ti-calendar text-primary f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.total }}</h3><p class="mb-0 text-muted f-13">Total séances</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-success"><i class="ti ti-check text-success f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.effectuees }}</h3><p class="mb-0 text-muted f-13">Effectuées</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-warning"><i class="ti ti-clock text-warning f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.planifiees }}</h3><p class="mb-0 text-muted f-13">À venir</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-danger"><i class="ti ti-x text-danger f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.tauxAnnulation }}%</h3><p class="mb-0 text-muted f-13">Taux annulation</p></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- GRAPHIQUE MENSUEL -->
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Séances par mois — 6 derniers mois</h5></div>
+      <div class="card-body">
+        <div class="d-flex align-items-end gap-3" style="height:140px">
+          <div *ngFor="let m of seancesParMois" class="d-flex flex-column align-items-center gap-1 flex-grow-1">
+            <span class="f-11 text-muted">{{ m.effectuees + m.annulees }}</span>
+            <div class="w-100 d-flex flex-column justify-content-end" style="flex:1">
+              <div class="w-100 rounded-top bg-light-danger" [style.height.px]="(m.annulees / getMaxSeances()) * 110"></div>
+              <div class="w-100 bg-primary" [style.height.px]="(m.effectuees / getMaxSeances()) * 110"></div>
+            </div>
+            <span class="f-11 text-muted">{{ m.mois }}</span>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mt-3">
+          <div class="d-flex align-items-center gap-1"><span class="avatar avatar-xxs bg-primary rounded-1"></span><span class="f-11 text-muted">Effectuées</span></div>
+          <div class="d-flex align-items-center gap-1"><span class="avatar avatar-xxs bg-light-danger rounded-1"></span><span class="f-11 text-muted">Annulées</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RÉSUMÉ RAPIDE -->
+  <div class="col-xl-4">
+    <div class="card h-100">
+      <div class="card-header"><h5 class="mb-0">Répartition statuts</h5></div>
+      <div class="card-body d-flex flex-column justify-content-center gap-3">
+        <div>
+          <div class="d-flex justify-content-between f-13 mb-1">
+            <span>Effectuées</span><span class="text-success fw-semibold">{{ stats.effectuees }}</span>
+          </div>
+          <div class="progress" style="height:6px">
+            <div class="progress-bar bg-success" [style.width.%]="stats.total ? (stats.effectuees/stats.total)*100 : 0"></div>
+          </div>
+        </div>
+        <div>
+          <div class="d-flex justify-content-between f-13 mb-1">
+            <span>Planifiées / En attente</span><span class="text-primary fw-semibold">{{ stats.planifiees }}</span>
+          </div>
+          <div class="progress" style="height:6px">
+            <div class="progress-bar bg-primary" [style.width.%]="stats.total ? (stats.planifiees/stats.total)*100 : 0"></div>
+          </div>
+        </div>
+        <div>
+          <div class="d-flex justify-content-between f-13 mb-1">
+            <span>Annulées</span><span class="text-danger fw-semibold">{{ stats.annulees }}</span>
+          </div>
+          <div class="progress" style="height:6px">
+            <div class="progress-bar bg-danger" [style.width.%]="stats.total ? (stats.annulees/stats.total)*100 : 0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE PRINCIPALE -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center g-2">
+          <div class="col"><h5 class="mb-0">Toutes les séances</h5></div>
+          <div class="col-auto">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="ti ti-search"></i></span>
+              <input type="text" class="form-control" placeholder="Rechercher..." style="width:180px" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreStatut" (ngModelChange)="applyFilters()" style="width:150px">
+              <option value="tous">Tous statuts</option>
+              <option value="EN_ATTENTE">En attente</option>
+              <option value="PLANIFIEE">Planifiée</option>
+              <option value="EFFECTUEE">Effectuée</option>
+              <option value="ANNULEE">Annulée</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreSpecialiste" (ngModelChange)="applyFilters()" style="width:180px">
+              <option value="tous">Tous spécialistes</option>
+              <option *ngFor="let s of specialistes" [value]="s.id">Dr {{ s.prenom }} {{ s.nom }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="text-center py-5" *ngIf="loading"><div class="spinner-border text-primary"></div></div>
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="f-12 text-muted fw-semibold">UTILISATEUR</th>
+                <th class="f-12 text-muted fw-semibold">SPÉCIALISTE</th>
+                <th class="f-12 text-muted fw-semibold">DATE / HEURE</th>
+                <th class="f-12 text-muted fw-semibold">TYPE</th>
+                <th class="f-12 text-muted fw-semibold">MOTIF</th>
+                <th class="f-12 text-muted fw-semibold">STATUT</th>
+                <th class="f-12 text-muted fw-semibold">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of seancesFiltrees">
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar avatar-sm bg-light-primary"><span class="text-primary f-11 fw-bold">{{ getInitiales(s) }}</span></div>
+                    <div><div class="f-13 fw-semibold">{{ s.utilisateurPrenom }} {{ s.utilisateurNom }}</div><div class="f-11 text-muted">{{ s.utilisateurEmail }}</div></div>
+                  </div>
+                </td>
+                <td><div class="f-13 fw-semibold">Dr {{ s.specialiste.prenom }} {{ s.specialiste.nom }}</div><div class="f-11 text-muted">{{ s.specialiste.specialite }}</div></td>
+                <td><div class="f-13 fw-semibold">{{ formatDate(s.date) }}</div><div class="f-11 text-muted">{{ s.heure }} · {{ s.dureeMinutes }} min</div></td>
+                <td><span class="badge bg-light-secondary text-secondary"><i [class]="getTypeIcon(s.typeSeance) + ' me-1'"></i>{{ s.typeSeance === 'EN_LIGNE' ? 'En ligne' : 'Présentiel' }}</span></td>
+                <td><span class="f-12 text-muted" style="max-width:200px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.motif }}</span></td>
+                <td><span class="badge" [class]="getStatutClass(s.statut)">{{ getStatutLabel(s.statut) }}</span></td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-light-success" title="Confirmer" *ngIf="s.statut === 'EN_ATTENTE'" (click)="confirmerSeance(s)"><i class="ti ti-check"></i></button>
+                    <button class="btn btn-sm btn-light-primary" title="Rapport" *ngIf="s.statut === 'EFFECTUEE' || s.statut === 'PLANIFIEE'" (click)="ouvrirRapport(s)"><i class="ti ti-file-text"></i></button>
+                    <button class="btn btn-sm btn-light-info" title="Détail" (click)="voirDetail(s)"><i class="ti ti-eye"></i></button>
+                    <button class="btn btn-sm btn-light-danger" title="Annuler" *ngIf="s.statut !== 'ANNULEE' && s.statut !== 'EFFECTUEE'" (click)="annulerSeance(s)"><i class="ti ti-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center py-4" *ngIf="seancesFiltrees.length === 0">
+            <i class="ti ti-calendar-off f-36 text-muted opacity-25 d-block mb-2"></i>
+            <p class="text-muted f-13 mb-0">Aucune séance trouvée</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RAPPORT -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showRapportModal" style="background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ti ti-file-text me-2 text-primary"></i>Rapport de séance</h5>
+        <button class="btn-close" (click)="showRapportModal=false"></button>
+      </div>
+      <div class="modal-body" *ngIf="rapportSeance">
+        <div class="alert alert-light-primary border-0 mb-3">
+          <strong>{{ rapportSeance.utilisateurPrenom }} {{ rapportSeance.utilisateurNom }}</strong> · {{ formatDate(rapportSeance.date) }} · Dr {{ rapportSeance.specialiste.prenom }} {{ rapportSeance.specialiste.nom }}
+        </div>
+        <label class="form-label fw-semibold f-13">Contenu du rapport *</label>
+        <textarea class="form-control" rows="6" placeholder="Rédigez le compte-rendu de la séance..." [(ngModel)]="rapportTexte"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="showRapportModal=false">Annuler</button>
+        <button class="btn btn-primary" (click)="sauvegarderRapport()" [disabled]="savingRapport || !rapportTexte.trim()">
+          <span *ngIf="savingRapport" class="spinner-border spinner-border-sm me-1"></span>
+          Sauvegarder le rapport
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showDetailModal" style="background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" *ngIf="seanceDetail">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ti ti-eye me-2 text-primary"></i>Détail séance</h5>
+        <button class="btn-close" (click)="showDetailModal=false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-6"><label class="f-11 text-muted text-uppercase fw-semibold">Utilisateur</label><p class="mb-0 fw-semibold">{{ seanceDetail.utilisateurPrenom }} {{ seanceDetail.utilisateurNom }}</p><p class="mb-0 f-12 text-muted">{{ seanceDetail.utilisateurEmail }}</p></div>
+          <div class="col-6"><label class="f-11 text-muted text-uppercase fw-semibold">Spécialiste</label><p class="mb-0 fw-semibold">Dr {{ seanceDetail.specialiste.prenom }} {{ seanceDetail.specialiste.nom }}</p><p class="mb-0 f-12 text-muted">{{ seanceDetail.specialiste.specialite }}</p></div>
+          <div class="col-6"><label class="f-11 text-muted text-uppercase fw-semibold">Date & heure</label><p class="mb-0 fw-semibold">{{ formatDate(seanceDetail.date) }}</p><p class="mb-0 f-12 text-muted">{{ seanceDetail.heure }} · {{ seanceDetail.dureeMinutes }} min</p></div>
+          <div class="col-6"><label class="f-11 text-muted text-uppercase fw-semibold">Statut</label><br><span class="badge" [class]="getStatutClass(seanceDetail.statut)">{{ getStatutLabel(seanceDetail.statut) }}</span></div>
+          <div class="col-12"><label class="f-11 text-muted text-uppercase fw-semibold">Motif</label><p class="mb-0">{{ seanceDetail.motif }}</p></div>
+          <div class="col-12" *ngIf="seanceDetail.rapport"><label class="f-11 text-muted text-uppercase fw-semibold">Rapport</label><div class="alert alert-light-success border-0 f-13">{{ seanceDetail.rapport }}</div></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-light" (click)="showDetailModal=false">Fermer</button></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,221 @@
+<!-- TOAST -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999" *ngIf="showToast">
+  <div class="toast show border-0" [class.bg-success]="toastType==='success'" [class.text-white]="toastType==='success'||toastType==='danger'" [class.bg-danger]="toastType==='danger'" [class.bg-warning]="toastType==='warning'">
+    <div class="d-flex"><div class="toast-body fw-semibold">{{ toastMsg }}</div><button class="btn-close me-2 m-auto" (click)="showToast=false"></button></div>
+  </div>
+</div>
+
+<div class="row">
+
+  <!-- STATS -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-primary"><i class="ti ti-books text-primary f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.total }}</h3><p class="mb-0 text-muted f-13">Total ressources</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-success"><i class="ti ti-eye text-success f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.consultationsTotal }}</h3><p class="mb-0 text-muted f-13">Consultations totales</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-warning"><i class="ti ti-check text-warning f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.actives }}</h3><p class="mb-0 text-muted f-13">Actives</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-info"><i class="ti ti-lock-open text-info f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.gratuites }}</h3><p class="mb-0 text-muted f-13">Gratuites</p></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- TOP RESSOURCE -->
+  <div class="col-12" *ngIf="stats.plusPopulaire !== '-'">
+    <div class="alert alert-light-success border-0 d-flex align-items-center gap-2 mb-0">
+      <i class="ti ti-trophy text-success f-18"></i>
+      <span class="f-13"><strong>Plus consultée :</strong> {{ stats.plusPopulaire }}</span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center g-2">
+          <div class="col"><h5 class="mb-0">Bibliothèque de ressources</h5></div>
+          <div class="col-auto">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="ti ti-search"></i></span>
+              <input type="text" class="form-control" placeholder="Rechercher..." style="width:170px" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreType" (ngModelChange)="applyFilters()" style="width:140px">
+              <option value="tous">Tous types</option>
+              <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreNiveau" (ngModelChange)="applyFilters()" style="width:150px">
+              <option value="tous">Tous niveaux</option>
+              <option *ngFor="let n of niveaux" [value]="n.value">{{ n.label }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreAcces" (ngModelChange)="applyFilters()" style="width:130px">
+              <option value="tous">Accès</option>
+              <option value="gratuit">Gratuit</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary btn-sm" (click)="ouvrirCreer()">
+              <i class="ti ti-plus me-1"></i> Nouvelle ressource
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="text-center py-5" *ngIf="loading"><div class="spinner-border text-primary"></div></div>
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="f-12 text-muted fw-semibold">RESSOURCE</th>
+                <th class="f-12 text-muted fw-semibold">TYPE</th>
+                <th class="f-12 text-muted fw-semibold">NIVEAU</th>
+                <th class="f-12 text-muted fw-semibold">ACCÈS</th>
+                <th class="f-12 text-muted fw-semibold">DURÉE</th>
+                <th class="f-12 text-muted fw-semibold">CONSULTATIONS</th>
+                <th class="f-12 text-muted fw-semibold">STATUT</th>
+                <th class="f-12 text-muted fw-semibold">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of ressourcesFiltrees" [class.opacity-50]="!r.actif">
+                <td style="max-width:260px">
+                  <div class="f-13 fw-semibold">{{ r.titre }}</div>
+                  <div class="f-11 text-muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.description }}</div>
+                  <div class="d-flex flex-wrap gap-1 mt-1">
+                    <span *ngFor="let tag of r.tags" class="badge bg-light-secondary text-secondary f-10">{{ tag }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge {{ getTypeInfo(r.type).bg }} {{ getTypeInfo(r.type).color }}">
+                    <i [class]="getTypeInfo(r.type).icon + ' me-1'"></i>{{ getTypeInfo(r.type).label }}
+                  </span>
+                </td>
+                <td><span class="badge" [class]="getNiveauInfo(r.niveau).color">{{ getNiveauInfo(r.niveau).label }}</span></td>
+                <td>
+                  <span class="badge" [class.bg-light-success]="r.gratuit" [class.text-success]="r.gratuit" [class.bg-light-warning]="!r.gratuit" [class.text-warning]="!r.gratuit">
+                    {{ r.gratuit ? '🆓 Gratuit' : '⭐ Premium' }}
+                  </span>
+                </td>
+                <td class="f-13 text-muted">{{ r.dureeMinutes }} min</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height:4px;min-width:50px">
+                      <div class="progress-bar bg-primary" [style.width.%]="stats.consultationsTotal ? (r.consultations / stats.consultationsTotal) * 100 : 0"></div>
+                    </div>
+                    <span class="f-12 fw-semibold">{{ r.consultations }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" [checked]="r.actif" (change)="toggleActif(r)">
+                    <label class="form-check-label f-12" [class.text-success]="r.actif" [class.text-muted]="!r.actif">{{ r.actif ? 'Actif' : 'Inactif' }}</label>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-light-primary" title="Modifier" (click)="ouvrirEditer(r)"><i class="ti ti-edit"></i></button>
+                    <button class="btn btn-sm btn-light-danger" title="Supprimer" (click)="supprimer(r)"><i class="ti ti-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center py-4" *ngIf="ressourcesFiltrees.length === 0">
+            <i class="ti ti-books f-36 text-muted opacity-25 d-block mb-2"></i>
+            <p class="text-muted f-13 mb-0">Aucune ressource trouvée</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CRÉER / MODIFIER -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showModal" style="background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ti ti-books me-2 text-primary"></i>{{ isEdit ? 'Modifier la ressource' : 'Nouvelle ressource' }}</h5>
+        <button class="btn-close" (click)="showModal=false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-semibold f-13">Titre *</label>
+            <input type="text" class="form-control" placeholder="Titre de la ressource" [(ngModel)]="form.titre">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold f-13">Type</label>
+            <select class="form-select" [(ngModel)]="form.type">
+              <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold f-13">Niveau</label>
+            <select class="form-select" [(ngModel)]="form.niveau">
+              <option *ngFor="let n of niveaux" [value]="n.value">{{ n.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold f-13">Durée (min)</label>
+            <input type="number" class="form-control" [(ngModel)]="form.dureeMinutes" min="1">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold f-13">Description</label>
+            <textarea class="form-control" rows="3" placeholder="Décrivez cette ressource..." [(ngModel)]="form.description"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold f-13">Tags (séparés par des virgules)</label>
+            <input type="text" class="form-control" placeholder="stress, respiration, rapide" [(ngModel)]="form.tags">
+          </div>
+          <div class="col-md-6">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="form.gratuit" id="gratuitSwitch">
+              <label class="form-check-label f-13" for="gratuitSwitch">{{ form.gratuit ? '🆓 Gratuit' : '⭐ Premium' }}</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="form.actif" id="actifSwitchR">
+              <label class="form-check-label f-13" for="actifSwitchR" [class.text-success]="form.actif" [class.text-muted]="!form.actif">{{ form.actif ? 'Active' : 'Inactive' }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="showModal=false">Annuler</button>
+        <button class="btn btn-primary" (click)="sauvegarder()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isEdit ? 'Mettre à jour' : 'Créer la ressource' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
