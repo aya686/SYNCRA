@@ -1,0 +1,241 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="create-projet-page">
+
+  <!-- BG DECORATION -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- BACK + HEADER -->
+    <div class="top-bar animate-in" style="--d:0s">
+      <a routerLink="/ms2/projets" class="back-link">
+        <i class="ti ti-arrow-left"></i>
+        <span>Retour aux projets</span>
+      </a>
+    </div>
+
+    <div class="page-header animate-in" style="--d:0.08s">
+      <div class="header-badge">
+        <i class="ti ti-sparkles"></i>
+        Génération automatique
+      </div>
+      <h1>{{ isEditMode ? 'Modifier le projet' : 'Nouveau Projet' }}</h1>
+      <p>Remplissez les informations — Spring Boot génère automatiquement jalons, objectifs, sprints et tâches.</p>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-overlay animate-in">
+      <div class="loader-ring"></div>
+      <span>Chargement du projet...</span>
+    </div>
+
+    <!-- FORM + PREVIEW -->
+    <div *ngIf="!loading" class="layout animate-in" style="--d:0.16s">
+ 
+      <!-- ══ FORMULAIRE ══ -->
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form-panel">
+
+        <!-- Erreur globale -->
+        <div *ngIf="error" class="alert-error">
+          <i class="ti ti-alert-circle"></i>{{ error }}
+        </div>
+
+        <!-- SECTION 1 : Informations de base -->
+        <div class="form-section">
+          <div class="section-label">
+            <span class="section-num">01</span>
+            <span>Informations générales</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="titre">
+              Titre du projet <span class="req">*</span>
+            </label>
+            <div class="input-wrap" [class.has-error]="f['titre'].invalid && f['titre'].touched">
+              <i class="ti ti-folder input-icon"></i>
+              <input
+                id="titre"
+                type="text"
+                class="field-input"
+                placeholder="Ex : Plateforme e-commerce B2B"
+                formControlName="titre"
+                maxlength="100">
+              <span class="char-count">{{ f['titre'].value?.length ?? 0 }}/100</span>
+            </div>
+            <div class="field-error" *ngIf="f['titre'].invalid && f['titre'].touched">
+              <ng-container *ngIf="f['titre'].errors?.['required']">Le titre est requis.</ng-container>
+              <ng-container *ngIf="f['titre'].errors?.['minlength']">Minimum 3 caractères.</ng-container>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="description">Description</label>
+            <div class="input-wrap textarea-wrap">
+              <textarea
+                id="description"
+                class="field-input field-textarea"
+                placeholder="Décrivez les objectifs principaux, le contexte et la portée du projet..."
+                formControlName="description"
+                rows="4"
+                maxlength="2000"></textarea>
+            </div>
+            <div class="field-hint">{{ f['description'].value?.length ?? 0 }}/2000 caractères</div>
+          </div>
+        </div>
+
+        <!-- SECTION 2 : Catégorie -->
+        <div class="form-section">
+          <div class="section-label">
+            <span class="section-num">02</span>
+            <span>Catégorie du projet <span class="req">*</span></span>
+          </div>
+          <p class="section-sub">La catégorie détermine les tâches et objectifs générés automatiquement.</p>
+
+          <div class="categorie-grid">
+            <button
+              type="button"
+              *ngFor="let cat of categories"
+              class="cat-card"
+              [class.selected]="selectedCategorie === cat.value"
+              (click)="selectCategorie(cat.value)">
+              <div class="cat-icon"><i class="ti {{ cat.icon }}"></i></div>
+              <div class="cat-label">{{ cat.label }}</div>
+              <div class="cat-desc">{{ cat.desc }}</div>
+              <div class="cat-check"><i class="ti ti-check"></i></div>
+            </button>
+          </div>
+          <div class="field-error" *ngIf="f['categorie'].invalid && f['categorie'].touched">
+            Veuillez sélectionner une catégorie.
+          </div>
+        </div>
+
+        <!-- SECTION 3 : Budget & Dates -->
+        <div class="form-section">
+          <div class="section-label">
+            <span class="section-num">03</span>
+            <span>Budget & Calendrier</span>
+          </div>
+
+          <div class="row-fields">
+            <div class="field">
+              <label class="field-label" for="dateDebut">Date de début <span class="req">*</span></label>
+              <div class="input-wrap" [class.has-error]="f['dateDebut'].invalid && f['dateDebut'].touched">
+                <i class="ti ti-calendar-event input-icon"></i>
+                <input id="dateDebut" type="date" class="field-input" formControlName="dateDebut" [min]="today">
+              </div>
+              <div class="field-error" *ngIf="f['dateDebut'].invalid && f['dateDebut'].touched">
+                La date de début est requise.
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="dateFin">Date de fin <span class="req">*</span></label>
+              <div class="input-wrap" [class.has-error]="f['dateFin'].invalid && f['dateFin'].touched || dateRangeInvalid">
+                <i class="ti ti-calendar-due input-icon"></i>
+                <input id="dateFin" type="date" class="field-input" formControlName="dateFin" [min]="f['dateDebut'].value || today">
+              </div>
+              <div class="field-error" *ngIf="dateRangeInvalid">
+                La date de fin doit être après la date de début.
+              </div>
+              <div class="field-error" *ngIf="f['dateFin'].invalid && f['dateFin'].touched && !dateRangeInvalid">
+                La date de fin est requise.
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="budget">Budget (TND)</label>
+              <div class="input-wrap" [class.has-error]="f['budget'].invalid && f['budget'].touched">
+                <i class="ti ti-coin input-icon"></i>
+                <input id="budget" type="number" class="field-input" placeholder="Ex : 15000" formControlName="budget" min="0">
+              </div>
+              <div class="field-error" *ngIf="f['budget'].invalid && f['budget'].touched">
+                Le budget doit être positif.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="form-actions">
+          <a routerLink="/ms2/projets" class="btn-cancel">
+            <i class="ti ti-x"></i> Annuler
+          </a>
+          <button type="submit" class="btn-submit" [disabled]="submitting">
+            <span class="btn-bg"></span>
+            <span *ngIf="!submitting" class="btn-content">
+              <i class="ti ti-rocket"></i>
+              {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le projet' }}
+            </span>
+            <span *ngIf="submitting" class="btn-content">
+              <span class="mini-spinner"></span>
+              Génération en cours...
+            </span>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- ══ PANNEAU PRÉVISUALISATION ══ -->
+      <aside class="preview-panel">
+
+        <div class="preview-header">
+          <i class="ti ti-wand"></i>
+          <span>Ce qui sera généré</span>
+        </div>
+
+        <!-- État vide -->
+        <div *ngIf="!preview" class="preview-empty">
+          <div class="preview-empty-icon"><i class="ti ti-click"></i></div>
+          <p>Sélectionnez une catégorie pour voir la prévisualisation de la génération automatique.</p>
+        </div>
+
+        <!-- Contenu -->
+        <div *ngIf="preview" class="preview-content">
+
+          <div class="preview-block">
+            <div class="preview-block-title">
+              <i class="ti ti-flag"></i> Jalons ({{ preview.jalons.length }})
+            </div>
+            <ul class="preview-list">
+              <li *ngFor="let j of preview.jalons">
+                <i class="ti ti-point-filled"></i>{{ j }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="preview-block">
+            <div class="preview-block-title">
+              <i class="ti ti-target"></i> Objectifs ({{ preview.objectifs.length }})
+            </div>
+            <ul class="preview-list">
+              <li *ngFor="let o of preview.objectifs">
+                <i class="ti ti-point-filled"></i>{{ o }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="preview-block">
+            <div class="preview-block-title">
+              <i class="ti ti-checklist"></i> Tâches ({{ preview.taches.length }})
+            </div>
+            <ul class="preview-list">
+              <li *ngFor="let t of preview.taches">
+                <i class="ti ti-point-filled"></i>{{ t }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="preview-note">
+            <i class="ti ti-info-circle"></i>
+            Des sprints bimensuels sont aussi créés automatiquement selon la durée du projet.
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+</div>

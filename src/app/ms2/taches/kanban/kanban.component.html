@@ -1,0 +1,205 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="kanban-page">
+
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="kanban-inner">
+
+    <!-- HEADER -->
+    <div class="kanban-header">
+      <div class="header-left">
+        <a [routerLink]="['/ms2/projets', projetId]" class="back-link">
+          <i class="ti ti-arrow-left"></i> Retour au projet
+        </a>
+        <div class="header-info" *ngIf="projet">
+          <div class="header-tag"><i class="ti ti-layout-kanban"></i> Kanban</div>
+          <h1>{{ projet.titre }}</h1>
+          <div class="header-meta">
+            <span><i class="ti ti-checklist"></i> {{ totalTaches() }} tâches</span>
+            <span><i class="ti ti-circle-check"></i> {{ tachesTerminees() }} terminées</span>
+            <span class="avancement-mini">
+              <div class="av-bar-outer">
+                <div class="av-bar-inner" [style.width.%]="avancement()"></div>
+              </div>
+              {{ avancement() }}%
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <a [routerLink]="['/ms2/projets', projetId]" class="btn-detail">
+          <i class="ti ti-info-circle"></i> Détail projet
+        </a>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader-ring"></div>
+      <span>Chargement du kanban...</span>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="error && !loading" class="error-state">
+      <i class="ti ti-alert-circle"></i>{{ error }}
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div *ngIf="!loading && !error" class="kanban-board" cdkDropListGroup>
+
+      <div class="kanban-col" *ngFor="let col of colonnes">
+
+        <!-- EN-TÊTE COLONNE -->
+        <div class="col-header" [style.--col-color]="col.color">
+          <div class="col-title-wrap">
+            <i class="ti {{ col.icon }}" [style.color]="col.color"></i>
+            <span class="col-title">{{ col.label }}</span>
+          </div>
+          <span class="col-count" [style.background]="col.color + '18'" [style.color]="col.color">
+            {{ col.taches.length }}
+          </span>
+        </div>
+
+        <!-- LISTE DROPPABLE -->
+        <div
+          class="col-body"
+          cdkDropList
+          [id]="col.id"
+          [cdkDropListData]="col.taches"
+          [cdkDropListConnectedTo]="colonneIds"
+          (cdkDropListDropped)="drop($event, col)">
+
+          <!-- VIDE -->
+          <div *ngIf="col.taches.length === 0" class="col-empty">
+            <i class="ti ti-circle-dashed"></i>
+            <span>Aucune tâche</span>
+          </div>
+
+          <!-- TACHE CARD -->
+          <div
+            class="tache-card"
+            *ngFor="let tache of col.taches"
+            cdkDrag
+            [class.updating]="updatingId === tache.id"
+            (click)="ouvrirPanneau(tache)">
+
+            <!-- DRAG HANDLE -->
+            <div class="drag-handle" cdkDragHandle>
+              <i class="ti ti-grip-vertical"></i>
+            </div>
+
+            <!-- CONTENU -->
+            <div class="tache-content">
+              <div class="tache-top">
+                <span class="badge-prio {{ badgePriorite(tache.priorite) }}">
+                  {{ labelPriorite(tache.priorite) }}
+                </span>
+                <span *ngIf="updatingId === tache.id" class="updating-spinner"></span>
+              </div>
+
+              <div class="tache-titre">{{ tache.titre }}</div>
+
+              <div class="tache-desc" *ngIf="tache.description">
+                {{ tache.description }}
+              </div>
+
+              <div class="tache-footer">
+                <span class="meta-item" *ngIf="tache.estimationHeures">
+                  <i class="ti ti-clock"></i>{{ tache.estimationHeures }}h
+                </span>
+                <span class="meta-item" *ngIf="tache.sousTaches?.length">
+                  <i class="ti ti-subtask"></i>{{ tache.sousTaches!.length }}
+                </span>
+                <span
+                  class="deadline-chip {{ joursClass(tache.deadline) }}"
+                  *ngIf="tache.deadline">
+                  <i class="ti ti-calendar-due"></i>
+                  {{ joursLabel(tache.deadline) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- PLACEHOLDER DRAG -->
+            <div class="drag-placeholder" *cdkDragPlaceholder></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- PANNEAU LATÉRAL DÉTAIL TACHE -->
+  <div class="panneau-overlay" *ngIf="panneauOuvert" (click)="fermerPanneau()"></div>
+  <div class="panneau-lateral" [class.ouvert]="panneauOuvert">
+    <div class="panneau-header">
+      <h3>Détail de la tâche</h3>
+      <button class="btn-close-panneau" (click)="fermerPanneau()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <div class="panneau-body" *ngIf="tacheSelectionnee">
+
+      <div class="panneau-section">
+        <div class="panneau-badges">
+          <span class="badge-prio {{ badgePriorite(tacheSelectionnee.priorite) }}">
+            {{ labelPriorite(tacheSelectionnee.priorite) }}
+          </span>
+        </div>
+        <h2 class="panneau-titre">{{ tacheSelectionnee.titre }}</h2>
+        <p class="panneau-desc" *ngIf="tacheSelectionnee.description">
+          {{ tacheSelectionnee.description }}
+        </p>
+      </div>
+
+      <div class="panneau-section">
+        <div class="panneau-label">Informations</div>
+        <div class="panneau-kv" *ngIf="tacheSelectionnee.estimationHeures">
+          <i class="ti ti-clock"></i>
+          <span>{{ tacheSelectionnee.estimationHeures }}h estimées</span>
+        </div>
+        <div class="panneau-kv" *ngIf="tacheSelectionnee.deadline">
+          <i class="ti ti-calendar-due"></i>
+          <span>{{ tacheSelectionnee.deadline | date:'dd/MM/yyyy' }}</span>
+          <span class="deadline-chip {{ joursClass(tacheSelectionnee.deadline) }}">
+            {{ joursLabel(tacheSelectionnee.deadline) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="panneau-section" *ngIf="tacheSelectionnee.sousTaches?.length">
+        <div class="panneau-label">
+          Sous-tâches ({{ tacheSelectionnee.sousTaches!.length }})
+        </div>
+        <div class="sous-tache-item"
+             *ngFor="let st of tacheSelectionnee.sousTaches">
+          <i class="ti"
+             [class.ti-circle-check-filled]="st.statut === 'TERMINE'"
+             [class.ti-circle]="st.statut !== 'TERMINE'"
+             [style.color]="st.statut === 'TERMINE' ? '#00c2d4' : '#9ab3cc'">
+          </i>
+          <span [class.done]="st.statut === 'TERMINE'">{{ st.titre }}</span>
+        </div>
+      </div>
+
+      <div class="panneau-actions">
+        <a [routerLink]="['/ms2/taches', tacheSelectionnee.id]"
+           class="btn-voir-tache">
+          <i class="ti ti-external-link"></i> Voir la tâche complète
+        </a>
+        <a [routerLink]="['/ms2/sessions']"
+           [queryParams]="{ tacheId: tacheSelectionnee.id }"
+           class="btn-session">
+          <i class="ti ti-player-play"></i> Démarrer une session
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>

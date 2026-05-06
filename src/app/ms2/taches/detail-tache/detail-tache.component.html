@@ -1,0 +1,227 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="detail-tache-page">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader-ring"></div>
+      <span>Chargement de la tâche...</span>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="error && !loading" class="error-state">
+      <i class="ti ti-alert-circle"></i>{{ error }}
+    </div>
+
+    <ng-container *ngIf="!loading && !error && tache">
+
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <a [routerLink]="['/ms2/projets', tache.projetId]" class="back-link">
+          <i class="ti ti-arrow-left"></i> Retour au projet
+        </a>
+        <a [routerLink]="['/ms2/taches', tache.projetId, 'kanban']" class="btn-kanban">
+          <i class="ti ti-layout-kanban"></i> Kanban
+        </a>
+      </div>
+
+      <div class="page-layout">
+
+        <!-- ── COLONNE GAUCHE ── -->
+        <div class="col-main">
+
+          <!-- HERO TÂCHE -->
+          <div class="tache-hero">
+            <div class="hero-top">
+              <span class="badge-prio {{ badgePriorite(tache.priorite) }}">
+                {{ labelPriorite(tache.priorite) }}
+              </span>
+              <span class="badge-statut-tache {{ badgeStatut(tache.statut) }}">
+                {{ labelStatut(tache.statut) }}
+              </span>
+            </div>
+            <h1 class="tache-titre">{{ tache.titre }}</h1>
+            <p class="tache-desc" *ngIf="tache.description">{{ tache.description }}</p>
+
+            <div class="tache-meta-row">
+              <div class="meta-chip" *ngIf="tache.estimationHeures">
+                <i class="ti ti-clock"></i>{{ tache.estimationHeures }}h estimées
+              </div>
+              <div class="meta-chip {{ joursClass(tache.deadline) }}" *ngIf="tache.deadline">
+                <i class="ti ti-calendar-due"></i>
+                {{ tache.deadline | date:'dd/MM/yyyy' }} — {{ joursLabel(tache.deadline) }}
+              </div>
+              <div class="meta-chip" *ngIf="tache.projetId">
+                <i class="ti ti-folder"></i>Projet #{{ tache.projetId }}
+              </div>
+            </div>
+          </div>
+
+          <!-- CHANGER STATUT -->
+          <div class="section-card">
+            <div class="section-card-header">
+              <i class="ti ti-refresh"></i>
+              <span>Changer le statut</span>
+            </div>
+            <div class="statut-btns">
+              <button
+                *ngFor="let s of statutsTache"
+                class="statut-btn {{ badgeStatut(s) }}"
+                [class.actif]="tache.statut === s"
+                (click)="changerStatut(s)">
+                {{ labelStatut(s) }}
+              </button>
+            </div>
+          </div>
+
+          <!-- SOUS-TÂCHES -->
+          <div class="section-card" *ngIf="sousTaches.length > 0">
+            <div class="section-card-header">
+              <i class="ti ti-subtask"></i>
+              <span>Sous-tâches</span>
+              <span class="count-badge">
+                {{ sousTachesTerminees }}/{{ sousTaches.length }}
+              </span>
+            </div>
+
+            <div class="progress-wrap">
+              <div class="progress-bar-outer">
+                <div class="progress-bar-inner"
+                     [style.width.%]="sousTaches.length ? (sousTachesTerminees / sousTaches.length * 100) : 0">
+                </div>
+              </div>
+              <span class="progress-pct">
+                {{ sousTaches.length ? ((sousTachesTerminees / sousTaches.length) * 100 | number:'1.0-0') : 0 }}%
+              </span>
+            </div>
+
+            <div class="sous-tache-list">
+              <div
+                class="sous-tache-item"
+                *ngFor="let st of sousTaches"
+                [class.done]="st.statut === 'TERMINE'">
+                <button
+                  class="st-toggle"
+                  [class.checked]="st.statut === 'TERMINE'"
+                  [disabled]="updatingSousTache === st.id"
+                  (click)="toggleSousTache(st)">
+                  <i class="ti"
+                     [class.ti-circle-check-filled]="st.statut === 'TERMINE'"
+                     [class.ti-circle]="st.statut !== 'TERMINE'">
+                  </i>
+                </button>
+                <span class="st-titre">{{ st.titre }}</span>
+                <span *ngIf="updatingSousTache === st.id" class="mini-spinner"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- HISTORIQUE SESSIONS -->
+          <div class="section-card" *ngIf="sessions.length > 0">
+            <div class="section-card-header">
+              <i class="ti ti-history"></i>
+              <span>Historique des sessions</span>
+              <span class="count-badge">{{ sessions.length }}</span>
+            </div>
+            <div class="sessions-list">
+              <div class="session-item" *ngFor="let s of sessions">
+                <div class="session-icon">
+                  <i class="ti ti-player-play"></i>
+                </div>
+                <div class="session-info">
+                  <div class="session-date">
+                    {{ s.debut | date:'dd/MM/yyyy HH:mm' }}
+                  </div>
+                  <div class="session-duree">
+                    {{ dureeLabel(s.dureeMinutes) }}
+                    <span class="session-charge" *ngIf="s.niveauCharge">
+                      — charge {{ s.niveauCharge }}/10
+                    </span>
+                  </div>
+                </div>
+                <div class="session-badge"
+                     [style.background]="s.niveauCharge && s.niveauCharge > 7 ? 'rgba(220,38,38,0.1)' : 'rgba(0,194,212,0.1)'"
+                     [style.color]="s.niveauCharge && s.niveauCharge > 7 ? '#dc2626' : '#009aaa'">
+                  {{ dureeLabel(s.dureeMinutes) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── COLONNE DROITE : SESSION ── -->
+        <div class="col-session">
+
+          <!-- CHRONOMÈTRE -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <i class="ti ti-player-record" [style.color]="sessionEnCours ? '#dc2626' : 'var(--primary)'"></i>
+              <span>{{ sessionEnCours ? 'Session en cours' : 'Démarrer une session' }}</span>
+              <span class="live-dot" *ngIf="sessionEnCours"></span>
+            </div>
+
+            <!-- CHRONO DISPLAY -->
+            <div class="chrono-display" [class.active]="sessionEnCours">
+              <div class="chrono-time">{{ chronometre }}</div>
+              <div class="chrono-label">{{ sessionEnCours ? 'En cours...' : 'Prêt' }}</div>
+            </div>
+
+            <!-- NIVEAU CHARGE -->
+            <div class="charge-section" *ngIf="!sessionEnCours">
+              <div class="charge-header">
+                <span class="charge-label">Niveau de charge</span>
+                <span class="charge-val" [style.color]="niveauChargeColor">
+                  {{ niveauCharge }}/10 — {{ niveauChargeLabel }}
+                </span>
+              </div>
+              <input
+                type="range"
+                class="charge-slider"
+                min="1" max="10"
+                [(ngModel)]="niveauCharge"
+                [style.--thumb-color]="niveauChargeColor">
+              <div class="charge-icons">
+                <span>😌</span><span>😐</span><span>😤</span><span>🔥</span>
+              </div>
+            </div>
+
+            <!-- BOUTON -->
+            <button
+              class="btn-session"
+              [class.stop]="sessionEnCours"
+              (click)="sessionEnCours ? terminerSession() : demarrerSession()">
+              <span class="btn-bg"></span>
+              <i class="ti" [class.ti-player-play]="!sessionEnCours" [class.ti-player-stop]="sessionEnCours"></i>
+              {{ sessionEnCours ? 'Terminer la session' : 'Démarrer' }}
+            </button>
+
+            <!-- ALERTE CHARGE HAUTE -->
+            <div class="charge-warning" *ngIf="sessionEnCours && niveauCharge >= 8">
+              <i class="ti ti-alert-triangle"></i>
+              Charge élevée détectée. Une alerte sera générée automatiquement.
+            </div>
+          </div>
+
+          <!-- LIEN KANBAN -->
+          <a [routerLink]="['/ms2/taches', tache.projetId, 'kanban']"
+             class="link-kanban-card">
+            <i class="ti ti-layout-kanban"></i>
+            <div>
+              <div class="lkc-title">Vue Kanban</div>
+              <div class="lkc-sub">Gérer toutes les tâches</div>
+            </div>
+            <i class="ti ti-arrow-right lkc-arrow"></i>
+          </a>
+
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,357 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="idees-page">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- HEADER -->
+    <div class="page-header reveal">
+      <div>
+        <div class="header-badge">
+          <i class="ti ti-bulb"></i> Espace Idées
+        </div>
+        <h1>Mes Idées</h1>
+        <p>Capturez vos idées, validez-les et transformez-les en projets concrets.</p>
+      </div>
+      <button class="btn-nouveau" (click)="ouvrirCreer()">
+        <span class="btn-bg"></span>
+        <i class="ti ti-plus"></i>
+        Nouvelle Idée
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card reveal" style="--delay:0.05s">
+        <div class="stat-icon-wrap"><i class="ti ti-bulb"></i></div>
+        <div>
+          <div class="stat-value">{{ stats.total }}</div>
+          <div class="stat-label">Total idées</div>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="--delay:0.10s">
+        <div class="stat-icon-wrap"><i class="ti ti-sparkles"></i></div>
+        <div>
+          <div class="stat-value">{{ stats.nouvelles }}</div>
+          <div class="stat-label">Nouvelles</div>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="--delay:0.15s">
+        <div class="stat-icon-wrap"><i class="ti ti-circle-check"></i></div>
+        <div>
+          <div class="stat-value">{{ stats.acceptees }}</div>
+          <div class="stat-label">Acceptées</div>
+        </div>
+      </div>
+      <div class="stat-card reveal" style="--delay:0.20s">
+        <div class="stat-icon-wrap"><i class="ti ti-rocket"></i></div>
+        <div>
+          <div class="stat-value">{{ stats.transformees }}</div>
+          <div class="stat-label">Transformées</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="filtres reveal" style="--delay:0.25s">
+      <button
+        *ngFor="let f of filtres"
+        class="filtre-btn"
+        [class.actif]="filtreActif === f"
+        (click)="filtrer(f)">
+        {{ f === 'TOUTES' ? 'Toutes' : labelStatut(f) }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader-ring"></div>
+      <span>Chargement des idées...</span>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="error && !loading" class="error-state">
+      <i class="ti ti-alert-circle"></i>{{ error }}
+    </div>
+
+    <!-- VIDE -->
+    <div *ngIf="!loading && !error && filteredIdees.length === 0" class="empty-state reveal">
+      <div class="empty-icon"><i class="ti ti-bulb-off"></i></div>
+      <h6>Aucune idée trouvée</h6>
+      <p>Commencez par capturer votre première idée !</p>
+      <button class="btn-create" (click)="ouvrirCreer()">
+        <span class="btn-bg"></span>
+        <i class="ti ti-plus"></i> Créer une idée
+      </button>
+    </div>
+
+    <!-- GRILLE IDÉES -->
+    <div *ngIf="!loading && !error && filteredIdees.length > 0" class="idees-grid">
+      <div class="idee-card reveal"
+           *ngFor="let idee of filteredIdees; let i = index"
+           [style.--delay]="i * 0.07 + 's'"
+           [class.acceptee]="idee.statut === 'ACCEPTEE'"
+           [class.rejetee]="idee.statut === 'REJETEE'"
+           [class.transformee]="idee.statut === 'TRANSFORMEE'">
+
+        <!-- Card Header -->
+        <div class="card-top">
+          <div class="idee-icon-wrap">
+            <i class="ti {{ iconCategorie(idee.categorie) }}"></i>
+          </div>
+          <span class="badge-statut {{ badgeClass(idee.statut) }}">
+            {{ labelStatut(idee.statut) }}
+          </span>
+        </div>
+
+        <!-- Contenu -->
+        <div class="card-body">
+          <div class="idee-titre">{{ idee.titre }}</div>
+          <div class="idee-desc" *ngIf="idee.description">{{ idee.description }}</div>
+          <div class="idee-cat" *ngIf="idee.categorie">
+            <i class="ti ti-tag"></i>{{ idee.categorie }}
+          </div>
+        </div>
+
+        <!-- Projet lié -->
+        <div class="projet-lie" *ngIf="idee.statut === 'TRANSFORMEE'">
+          <i class="ti ti-rocket"></i>
+          <span>Transformée en projet</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+
+          <!-- NOUVELLE → Valider / Rejeter / Éditer / Supprimer -->
+          <ng-container *ngIf="idee.statut === 'NOUVELLE'">
+            <button class="btn-act valider" (click)="valider(idee)">
+              <i class="ti ti-check"></i> Valider
+            </button>
+            <button class="btn-act rejeter" (click)="rejeter(idee)">
+              <i class="ti ti-x"></i> Rejeter
+            </button>
+            <button class="btn-act edit" (click)="ouvrirEditer(idee)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-act delete" (click)="confirmerSupprimer(idee)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- ACCEPTEE → Transformer / Éditer / Supprimer -->
+          <ng-container *ngIf="idee.statut === 'ACCEPTEE'">
+            <button class="btn-act transformer" (click)="ouvrirTransformer(idee)">
+              <i class="ti ti-rocket"></i> Transformer en projet
+            </button>
+            <button class="btn-act edit" (click)="ouvrirEditer(idee)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-act delete" (click)="confirmerSupprimer(idee)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- REJETEE → Supprimer uniquement -->
+          <ng-container *ngIf="idee.statut === 'REJETEE'">
+            <button class="btn-act edit" (click)="ouvrirEditer(idee)">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-act delete" (click)="confirmerSupprimer(idee)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- TRANSFORMEE → lecture seule -->
+          <ng-container *ngIf="idee.statut === 'TRANSFORMEE'">
+            <span class="readonly-label"><i class="ti ti-lock"></i> Projet créé</span>
+          </ng-container>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- MODAL CRÉER / ÉDITER IDÉE              -->
+<!-- ════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="fermerModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-icon"><i class="ti ti-bulb"></i></div>
+      <div>
+        <h3>{{ isEditMode ? 'Modifier l\'idée' : 'Nouvelle Idée' }}</h3>
+        <p>{{ isEditMode ? 'Mettez à jour votre idée.' : 'Capturez une nouvelle idée.' }}</p>
+      </div>
+      <button class="modal-close" (click)="fermerModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="ideeForm" (ngSubmit)="submitIdee()" class="modal-form">
+
+      <!-- Titre -->
+      <div class="field">
+        <label class="field-label">Titre <span class="req">*</span></label>
+        <div class="input-wrap" [class.has-error]="f['titre'].invalid && f['titre'].touched">
+          <i class="ti ti-text-size input-icon"></i>
+          <input type="text" class="field-input" placeholder="Ex : Application mobile de covoiturage"
+                 formControlName="titre" maxlength="100">
+        </div>
+        <div class="field-error" *ngIf="f['titre'].invalid && f['titre'].touched">
+          Le titre est requis (min 3 caractères).
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="field">
+        <label class="field-label">Description</label>
+        <div class="input-wrap textarea-wrap">
+          <textarea class="field-input field-textarea"
+                    placeholder="Décrivez votre idée, ses objectifs, sa valeur..."
+                    formControlName="description" rows="4" maxlength="2000"></textarea>
+        </div>
+      </div>
+
+      <!-- Catégorie -->
+      <div class="field">
+        <label class="field-label">Catégorie <span class="req">*</span></label>
+        <div class="categorie-grid-mini">
+          <button
+            type="button"
+            *ngFor="let cat of categories"
+            class="cat-mini"
+            [class.selected]="selectedCategorie === cat.value"
+            (click)="selectCategorie(cat.value)">
+            <i class="ti {{ cat.icon }}"></i>
+            {{ cat.label }}
+          </button>
+        </div>
+        <div class="field-error" *ngIf="f['categorie'].invalid && f['categorie'].touched">
+          Choisissez une catégorie.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="fermerModal()">Annuler</button>
+        <button type="submit" class="btn-submit" [disabled]="submitting">
+          <span class="btn-bg"></span>
+          <span class="btn-content">
+            <span *ngIf="submitting" class="mini-spinner"></span>
+            <i *ngIf="!submitting" class="ti ti-check"></i>
+            {{ isEditMode ? 'Enregistrer' : 'Créer l\'idée' }}
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- MODAL TRANSFORMER EN PROJET            -->
+<!-- ════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showTransformerModal" (click)="fermerTransformerModal()">
+  <div class="modal-box modal-box--large" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-icon rocket"><i class="ti ti-rocket"></i></div>
+      <div>
+        <h3>Transformer en Projet</h3>
+        <p>Complétez les informations pour créer le projet depuis <strong>{{ ideeATransformer?.titre }}</strong>.</p>
+      </div>
+      <button class="modal-close" (click)="fermerTransformerModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="projetForm" (ngSubmit)="submitTransformer()" class="modal-form">
+
+      <div class="field">
+        <label class="field-label">Titre du projet <span class="req">*</span></label>
+        <div class="input-wrap" [class.has-error]="pf['titre'].invalid && pf['titre'].touched">
+          <i class="ti ti-folder input-icon"></i>
+          <input type="text" class="field-input" formControlName="titre">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Description</label>
+        <div class="input-wrap textarea-wrap">
+          <textarea class="field-input field-textarea" formControlName="description" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="row-fields">
+        <div class="field">
+          <label class="field-label">Date de début <span class="req">*</span></label>
+          <div class="input-wrap" [class.has-error]="pf['dateDebut'].invalid && pf['dateDebut'].touched">
+            <i class="ti ti-calendar-event input-icon"></i>
+            <input type="date" class="field-input" formControlName="dateDebut" [min]="today">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Date de fin <span class="req">*</span></label>
+          <div class="input-wrap" [class.has-error]="pf['dateFin'].invalid && pf['dateFin'].touched">
+            <i class="ti ti-calendar-due input-icon"></i>
+            <input type="date" class="field-input" formControlName="dateFin">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Budget (TND)</label>
+          <div class="input-wrap">
+            <i class="ti ti-coin input-icon"></i>
+            <input type="number" class="field-input" formControlName="budget" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="transformer-note">
+        <i class="ti ti-info-circle"></i>
+        Spring Boot va générer automatiquement les jalons, objectifs, sprints et tâches selon la catégorie
+        <strong>{{ ideeATransformer?.categorie }}</strong>.
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="fermerTransformerModal()">Annuler</button>
+        <button type="submit" class="btn-submit btn-rocket" [disabled]="transforming">
+          <span class="btn-bg"></span>
+          <span class="btn-content">
+            <span *ngIf="transforming" class="mini-spinner"></span>
+            <i *ngIf="!transforming" class="ti ti-rocket"></i>
+            {{ transforming ? 'Création...' : 'Créer le projet' }}
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<!-- MODAL CONFIRMATION SUPPRESSION         -->
+<!-- ════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="annulerSupprimer()">
+  <div class="modal-box modal-box--small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon danger"><i class="ti ti-trash"></i></div>
+      <div>
+        <h3>Supprimer l'idée</h3>
+        <p>Voulez-vous vraiment supprimer <strong>{{ ideeASupprimer?.titre }}</strong> ? Cette action est irréversible.</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="annulerSupprimer()">Annuler</button>
+      <button class="btn-submit btn-danger" (click)="supprimerIdee()">
+        <span class="btn-bg danger-bg"></span>
+        <span class="btn-content"><i class="ti ti-trash"></i> Supprimer</span>
+      </button>
+    </div>
+  </div>
+</div>

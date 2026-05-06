@@ -1,0 +1,275 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MODALE BLOQUANTE                           -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modale-overlay" *ngIf="modaleVisible">
+  <div class="modale-bloquante">
+
+    <div class="modale-header">
+      <div class="modale-icon-wrap">
+        <i class="ti ti-flame"></i>
+      </div>
+      <div class="modale-urgence">ALERTE CRITIQUE</div>
+      <h2 class="modale-titre">Action requise avant de continuer</h2>
+      <p class="modale-sub">
+        Une alerte critique a été détectée. Vous devez lire les recommandations
+        et confirmer avant de pouvoir utiliser la plateforme.
+      </p>
+    </div>
+
+    <!-- ANALYSE IA LOADING -->
+    <div *ngIf="analyseBloquanteLoading" class="ia-loading">
+      <div class="ia-spinner"></div>
+      <span>L'IA analyse votre situation...</span>
+    </div>
+
+    <!-- ANALYSE IA RÉSULTAT -->
+    <div *ngIf="!analyseBloquanteLoading && analyseBloquante" class="ia-resultat">
+
+      <!-- SCORE RISQUE -->
+      <div class="score-risque-wrap">
+        <div class="score-label">Score de risque IA</div>
+        <div class="score-bar-outer">
+          <div class="score-bar-inner"
+               [style.width.%]="(analyseBloquante.scoreRisque ?? 0) * 10"
+               [style.background]="scoreColor(analyseBloquante.scoreRisque)">
+          </div>
+        </div>
+        <div class="score-num" [style.color]="scoreColor(analyseBloquante.scoreRisque)">
+          {{ analyseBloquante.scoreRisque }}/10
+        </div>
+      </div>
+
+      <!-- MESSAGE IA -->
+      <div class="ia-message">
+        <div class="ia-message-label">
+          <i class="ti ti-robot"></i> Message de l'assistant IA
+        </div>
+        <p>{{ analyseBloquante.messagePersonnalise }}</p>
+      </div>
+
+      <!-- ACTIONS CONCRÈTES -->
+      <div class="actions-list">
+        <div class="actions-label">Actions recommandées maintenant</div>
+        <div class="action-item"
+             *ngFor="let action of analyseBloquante.actionsConcretes; let i = index">
+          <div class="action-num">{{ i + 1 }}</div>
+          <span>{{ action }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ALERTE BRUTE SI PAS D'ANALYSE -->
+    <div *ngIf="!analyseBloquanteLoading && !analyseBloquante && alerteBloquante"
+         class="alerte-brute">
+      <i class="ti ti-alert-circle"></i>
+      <p>{{ alerteBloquante.message }}</p>
+    </div>
+
+    <button class="btn-accepter" (click)="accepterEtFermer()">
+      <span class="btn-bg"></span>
+      <i class="ti ti-check"></i>
+      J'ai pris connaissance et je vais agir
+    </button>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PAGE PRINCIPALE                            -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="alertes-page" [class.bloque]="modaleVisible">
+
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-tag">
+        <i class="ti ti-bell"></i> Alertes
+      </div>
+      <h1>Mes Alertes</h1>
+      <p>Surveillez et gérez toutes vos alertes intelligentes générées par l'IA.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-bell"></i></div>
+        <div>
+          <div class="stat-val">{{ stats.total }}</div>
+          <div class="stat-lbl">Total alertes</div>
+        </div>
+      </div>
+      <div class="stat-card" [class.warn]="stats.nonTraitees > 0">
+        <div class="stat-icon"><i class="ti ti-bell-exclamation"></i></div>
+        <div>
+          <div class="stat-val" [style.color]="stats.nonTraitees > 0 ? '#c47a00' : 'var(--text)'">
+            {{ stats.nonTraitees }}
+          </div>
+          <div class="stat-lbl">Non traitées</div>
+        </div>
+      </div>
+      <div class="stat-card" [class.danger]="stats.critiques > 0">
+        <div class="stat-icon"><i class="ti ti-flame"></i></div>
+        <div>
+          <div class="stat-val" [style.color]="stats.critiques > 0 ? '#dc2626' : 'var(--text)'">
+            {{ stats.critiques }}
+          </div>
+          <div class="stat-lbl">Critiques</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTRES -->
+    <div class="filtres">
+      <button
+        *ngFor="let f of filtres"
+        class="filtre-btn"
+        [class.actif]="filtreActif === f"
+        (click)="filtrer(f)">
+        {{ f === 'TOUTES' ? 'Toutes' : labelType(f) }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loader-ring"></div>
+      <span>Chargement des alertes...</span>
+    </div>
+
+    <!-- VIDE -->
+    <div *ngIf="!loading && filteredCards.length === 0" class="empty-state">
+      <div class="empty-icon"><i class="ti ti-bell-off"></i></div>
+      <h6>Aucune alerte</h6>
+      <p>Tout va bien — continuez sur cette lancée !</p>
+    </div>
+
+    <!-- LISTE ALERTES -->
+    <div *ngIf="!loading" class="alertes-list">
+
+      <div
+        class="alerte-card"
+        *ngFor="let card of filteredCards"
+        [class.traitee]="card.alerte.traitee"
+        [class.critique]="isCritique(card.alerte.type) && !card.alerte.traitee">
+
+        <!-- BANDE COULEUR GAUCHE -->
+        <div class="alerte-band"
+             [style.background]="card.alerte.traitee ? '#d4e4f4' : colorType(card.alerte.type)">
+        </div>
+
+        <div class="alerte-body">
+
+          <!-- HEADER CARD -->
+          <div class="alerte-header">
+            <div class="alerte-icon-wrap"
+                 [style.background]="card.alerte.traitee ? 'rgba(96,122,150,0.1)' : bgType(card.alerte.type)"
+                 [style.color]="card.alerte.traitee ? '#9ab3cc' : colorType(card.alerte.type)">
+              <i class="ti {{ iconType(card.alerte.type) }}"></i>
+            </div>
+
+            <div class="alerte-info">
+              <div class="alerte-type-badge"
+                   [style.background]="card.alerte.traitee ? 'rgba(96,122,150,0.1)' : bgType(card.alerte.type)"
+                   [style.color]="card.alerte.traitee ? '#9ab3cc' : colorType(card.alerte.type)">
+                {{ labelType(card.alerte.type) }}
+              </div>
+              <div class="alerte-message">{{ card.alerte.message }}</div>
+              <div class="alerte-meta">
+                <span *ngIf="card.alerte.date">
+                  <i class="ti ti-calendar"></i>
+                  {{ card.alerte.date | date:'dd/MM/yyyy' }}
+                </span>
+                <span *ngIf="card.alerte.projetId">
+                  <i class="ti ti-folder"></i>
+                  Projet #{{ card.alerte.projetId }}
+                </span>
+                <span class="badge-traitee" *ngIf="card.alerte.traitee">
+                  <i class="ti ti-check"></i> Traitée
+                </span>
+              </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="alerte-actions">
+              <button
+                class="btn-ia"
+                *ngIf="!card.alerte.traitee"
+                [class.loading]="card.analyseLoading"
+                [class.done]="!!card.analyse"
+                (click)="analyserAlerte(card)">
+                <span *ngIf="card.analyseLoading" class="mini-spinner"></span>
+                <i *ngIf="!card.analyseLoading" class="ti ti-robot"></i>
+                {{ card.analyseLoading ? 'Analyse...' : (card.analyse ? 'IA ↕' : 'Analyser IA') }}
+              </button>
+
+              <button
+                class="btn-traiter"
+                *ngIf="!card.alerte.traitee"
+                (click)="marquerTraitee(card)">
+                <i class="ti ti-check"></i>
+              </button>
+
+              <button class="btn-suppr" (click)="supprimerAlerte(card)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PANNEAU IA EXPANDÉ -->
+          <div class="ia-panel" *ngIf="card.expanded && card.analyse">
+
+            <div class="ia-panel-header">
+              <i class="ti ti-sparkles"></i>
+              <span>Analyse IA — Recommandations personnalisées</span>
+            </div>
+
+            <!-- SCORE -->
+            <div class="ia-score-row">
+              <span class="ia-score-label">Score de risque</span>
+              <div class="ia-score-bar-outer">
+                <div class="ia-score-bar-inner"
+                     [style.width.%]="(card.analyse.scoreRisque ?? 0) * 10"
+                     [style.background]="scoreColor(card.analyse.scoreRisque)">
+                </div>
+              </div>
+              <span class="ia-score-num" [style.color]="scoreColor(card.analyse.scoreRisque)">
+                {{ card.analyse.scoreRisque }}/10
+              </span>
+            </div>
+
+            <!-- MESSAGE IA -->
+            <div class="ia-msg-box">
+              <div class="ia-msg-icon"><i class="ti ti-robot"></i></div>
+              <p>{{ card.analyse.messagePersonnalise }}</p>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="ia-actions-grid">
+              <div class="ia-action-item"
+                   *ngFor="let a of card.analyse.actionsConcretes; let i = index">
+                <div class="ia-action-num">{{ i + 1 }}</div>
+                <span>{{ a }}</span>
+              </div>
+            </div>
+
+            <!-- BLOQUANT -->
+            <div class="ia-bloquant-warn" *ngIf="card.analyse.bloquante">
+              <i class="ti ti-alert-triangle"></i>
+              Cette situation est critique. Une action immédiate est requise.
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

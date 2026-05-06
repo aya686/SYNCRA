@@ -1,0 +1,158 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="dashboard-projets">
+
+  <!-- HEADER -->
+  <div class="page-header reveal">
+    <div>
+      <h4>Mes Projets</h4>
+      <p>Gérez et suivez l'avancement de vos projets</p>
+    </div>
+    <a routerLink="/ms2/projets/nouveau" class="btn-nouveau">
+      <span class="btn-bg"></span>
+      <i class="ti ti-plus"></i>
+      Nouveau Projet
+    </a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card reveal" style="--delay:0.05s">
+      <div class="stat-icon-wrap"><i class="ti ti-folder"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total projets</div>
+      </div>
+    </div>
+    <div class="stat-card reveal" style="--delay:0.1s">
+      <div class="stat-icon-wrap"><i class="ti ti-clock"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.enAttente }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </div>
+    <div class="stat-card reveal" style="--delay:0.15s">
+      <div class="stat-icon-wrap"><i class="ti ti-activity"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.enCours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+    </div>
+    <div class="stat-card reveal" style="--delay:0.2s">
+      <div class="stat-icon-wrap"><i class="ti ti-circle-check"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.termines }}</div>
+        <div class="stat-label">Terminés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filtres reveal" style="--delay:0.25s">
+    <button
+      *ngFor="let s of statuts"
+      class="filtre-btn"
+      [class.actif]="filtreActif === s"
+      (click)="filtrer(s)">
+      {{ s === 'TOUS' ? 'Tous' : labelStatut(s) }}
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des projets...</p>
+  </div>
+
+  <!-- ERREUR -->
+  <div *ngIf="error && !loading" class="error-state">
+    <i class="ti ti-alert-circle"></i>{{ error }}
+  </div>
+
+  <!-- VIDE -->
+  <div *ngIf="!loading && !error && filteredCards.length === 0" class="empty-state reveal">
+    <div class="empty-icon"><i class="ti ti-folder-off"></i></div>
+    <h6>Aucun projet trouvé</h6>
+    <p>Créez votre premier projet pour commencer</p>
+    <a routerLink="/ms2/projets/nouveau" class="btn-create">
+      <span class="btn-bg"></span>
+      <i class="ti ti-plus"></i> Créer un projet
+    </a>
+  </div>
+
+  <!-- GRILLE -->
+  <div *ngIf="!loading && !error && filteredCards.length > 0" class="projets-grid">
+    <div class="projet-card reveal"
+         *ngFor="let card of filteredCards; let i = index"
+         [style.--delay]="i * 0.07 + 's'">
+
+      <!-- Header -->
+      <div class="card-header-inner">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div class="projet-icon-wrap">
+            <i class="ti ti-folder-filled"></i>
+          </div>
+          <span class="badge-statut {{ getBadgeClass(card.projet.statut) }}">
+            {{ labelStatut(card.projet.statut) }}
+          </span>
+        </div>
+        <div class="projet-titre">{{ card.projet.titre }}</div>
+        <div class="projet-desc">{{ card.projet.description || 'Aucune description.' }}</div>
+      </div>
+
+      <!-- Avancement -->
+      <div class="avancement-wrap">
+        <div class="avancement-header">
+          <span>Avancement</span>
+          <span class="pct" [style.color]="couleurAvancement(card.avancement)">
+            {{ card.avancement }}%
+          </span>
+        </div>
+        <div class="progress-bar-outer">
+          <div
+            class="progress-bar-inner"
+            [style.width.%]="card.avancement"
+            [style.background]="couleurAvancement(card.avancement)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Infos -->
+      <div class="card-infos">
+        <div class="info-item">
+          <i class="ti ti-calendar"></i>
+          <span>{{ card.projet.dateDebut | date:'dd/MM/yyyy' }} → {{ card.projet.dateFin | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-item" *ngIf="card.projet.budget">
+          <i class="ti ti-coin"></i>
+          <span>{{ card.projet.budget | number }} TND</span>
+        </div>
+        <div class="info-item" *ngIf="card.projet.categorie">
+          <i class="ti ti-tag"></i>
+          <span>{{ card.projet.categorie }}</span>
+        </div>
+        <div class="info-item"
+             [class.danger]="card.joursRestants < 0"
+             [class.warning]="card.joursRestants >= 0 && card.joursRestants <= 7">
+          <i class="ti ti-clock-hour-4"></i>
+          <span>{{ joursLabel(card.joursRestants) }}</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer-inner">
+        <a [routerLink]="['/ms2/projets', card.projet.id]" class="btn-action">
+          <i class="ti ti-eye"></i>Voir
+        </a>
+        <a [routerLink]="['/ms2/projets', card.projet.id, 'modifier']" class="btn-action">
+          <i class="ti ti-edit"></i>Modifier
+        </a>
+        <button class="btn-action danger" (click)="supprimerProjet(card.projet.id!)">
+          <i class="ti ti-trash"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

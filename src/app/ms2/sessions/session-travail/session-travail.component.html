@@ -1,0 +1,247 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="session-page">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-tag">
+        <i class="ti ti-player-record"></i> Sessions de Travail
+      </div>
+      <h1>Espace de Travail</h1>
+      <p>Suivez vos sessions, gérez votre charge et restez productif.</p>
+    </div>
+
+    <!-- STATS DU JOUR -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-clock"></i></div>
+        <div>
+          <div class="stat-val">{{ totalHeuresJour }}</div>
+          <div class="stat-lbl">Travaillé aujourd'hui</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-player-play"></i></div>
+        <div>
+          <div class="stat-val">{{ nbSessionsJour }}</div>
+          <div class="stat-lbl">Sessions du jour</div>
+        </div>
+      </div>
+      <div class="stat-card" [class.warn]="chargeMax >= 8">
+        <div class="stat-icon"><i class="ti ti-bolt"></i></div>
+        <div>
+          <div class="stat-val" [style.color]="chargeColor(chargeMax)">
+            {{ chargeMax }}/10
+          </div>
+          <div class="stat-lbl">Charge max aujourd'hui</div>
+        </div>
+      </div>
+      <div class="stat-card" [class.danger]="nbAlertes > 0">
+        <div class="stat-icon"><i class="ti ti-bell"></i></div>
+        <div>
+          <div class="stat-val" [style.color]="nbAlertes > 0 ? '#dc2626' : 'var(--text)'">
+            {{ nbAlertes }}
+          </div>
+          <div class="stat-lbl">Alertes actives</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-layout">
+
+      <!-- ── COLONNE GAUCHE : CHRONO ── -->
+      <div class="col-main">
+
+        <!-- TÂCHE SÉLECTIONNÉE -->
+        <div class="tache-selector-card">
+          <div class="tsc-header">
+            <i class="ti ti-checkbox"></i>
+            <span>Tâche en cours</span>
+          </div>
+
+          <div *ngIf="tachePreselected" class="tache-selected">
+            <div class="ts-icon"><i class="ti ti-checkbox"></i></div>
+            <div class="ts-info">
+              <div class="ts-titre">{{ tachePreselected.titre }}</div>
+              <div class="ts-meta">
+                <span *ngIf="tachePreselected.priorite" class="ts-prio">
+                  {{ tachePreselected.priorite }}
+                </span>
+                <span *ngIf="tachePreselected.estimationHeures">
+                  <i class="ti ti-clock"></i>{{ tachePreselected.estimationHeures }}h estimées
+                </span>
+              </div>
+            </div>
+            <a [routerLink]="['/ms2/taches', tachePreselected.id]"
+               class="ts-link">
+              <i class="ti ti-external-link"></i>
+            </a>
+          </div>
+
+          <div *ngIf="!tachePreselected" class="tache-empty">
+            <i class="ti ti-click"></i>
+            <p>Aucune tâche sélectionnée.</p>
+            <p class="hint">Ouvrez une tâche et cliquez sur "Démarrer une session".</p>
+          </div>
+        </div>
+
+        <!-- CHRONOMÈTRE PRINCIPAL -->
+        <div class="chrono-card" [class.active]="sessionEnCours">
+
+          <div class="chrono-header">
+            <div class="chrono-title">
+              <i class="ti ti-player-record"
+                 [style.color]="sessionEnCours ? '#dc2626' : 'var(--primary)'"></i>
+              <span>{{ sessionEnCours ? 'Session active' : 'Démarrer une session' }}</span>
+            </div>
+            <span class="live-badge" *ngIf="sessionEnCours">
+              <span class="live-dot"></span> EN DIRECT
+            </span>
+          </div>
+
+          <!-- DISPLAY CHRONO -->
+          <div class="chrono-display">
+            <div class="chrono-ring">
+              <div class="chrono-time">{{ chronometre }}</div>
+            </div>
+          </div>
+
+          <!-- NIVEAU CHARGE -->
+          <div class="charge-section" *ngIf="!sessionEnCours">
+            <div class="charge-header">
+              <span>Niveau de charge</span>
+              <span class="charge-badge" [style.background]="niveauChargeColor + '18'" [style.color]="niveauChargeColor">
+                {{ niveauCharge }}/10 — {{ niveauChargeLabel }}
+              </span>
+            </div>
+            <input
+              type="range" class="charge-slider"
+              min="1" max="10"
+              [(ngModel)]="niveauCharge"
+              [style.--pct]="(niveauCharge - 1) / 9 * 100 + '%'"
+              [style.--col]="niveauChargeColor">
+            <div class="charge-emojis">
+              <span title="Faible">😌</span>
+              <span title="Modéré">😐</span>
+              <span title="Élevé">😤</span>
+              <span title="Critique">🔥</span>
+            </div>
+          </div>
+
+          <!-- ALERTE TEMPS TROP LONG -->
+          <div class="session-warning" *ngIf="sessionEnCours && niveauCharge >= 8">
+            <i class="ti ti-alert-triangle"></i>
+            Charge critique détectée — une alerte sera générée automatiquement à la fin de la session.
+          </div>
+
+          <!-- BOUTON -->
+          <button
+            class="btn-chrono"
+            [class.stop]="sessionEnCours"
+            [disabled]="!tacheIdParam && !sessionEnCours"
+            (click)="sessionEnCours ? terminerSession() : demarrerSession()">
+            <span class="btn-bg"></span>
+            <i class="ti"
+               [class.ti-player-play]="!sessionEnCours"
+               [class.ti-player-stop]="sessionEnCours"></i>
+            {{ sessionEnCours ? 'Terminer la session' : 'Démarrer' }}
+          </button>
+
+          <div class="no-tache-hint" *ngIf="!tacheIdParam && !sessionEnCours">
+            Sélectionnez d'abord une tâche depuis le Kanban ou le détail projet.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── COLONNE DROITE : HISTORIQUE ── -->
+      <div class="col-history">
+
+        <div class="history-card">
+          <div class="history-header">
+            <i class="ti ti-history"></i>
+            <span>Sessions d'aujourd'hui</span>
+            <span class="count-badge" *ngIf="nbSessionsJour > 0">{{ nbSessionsJour }}</span>
+          </div>
+
+          <!-- LOADING -->
+          <div *ngIf="loadingHistorique" class="hist-loading">
+            <div class="mini-spinner-lg"></div>
+          </div>
+
+          <!-- VIDE -->
+          <div *ngIf="!loadingHistorique && sessionsJour.length === 0" class="hist-empty">
+            <i class="ti ti-calendar-off"></i>
+            <p>Aucune session aujourd'hui.</p>
+          </div>
+
+          <!-- LISTE -->
+          <div *ngIf="!loadingHistorique && sessionsJour.length > 0" class="hist-list">
+            <div class="hist-item" *ngFor="let sc of sessionsJour">
+              <div class="hist-icon"
+                   [style.background]="chargeColor(sc.session.niveauCharge) + '15'"
+                   [style.color]="chargeColor(sc.session.niveauCharge)">
+                <i class="ti ti-player-play"></i>
+              </div>
+              <div class="hist-info">
+                <div class="hist-tache">{{ sc.tacheTitre }}</div>
+                <div class="hist-time">
+                  {{ sc.session.debut | date:'HH:mm' }}
+                  <span *ngIf="sc.session.fin"> → {{ sc.session.fin | date:'HH:mm' }}</span>
+                </div>
+              </div>
+              <div class="hist-right">
+                <div class="hist-duree">{{ dureeLabel(sc.session.dureeMinutes) }}</div>
+                <div class="hist-charge"
+                     [style.color]="chargeColor(sc.session.niveauCharge)">
+                  Charge {{ sc.session.niveauCharge }}/10
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BARRE CHARGE TOTALE -->
+          <div *ngIf="sessionsJour.length > 0" class="charge-totale">
+            <div class="ct-header">
+              <span>Charge totale du jour</span>
+              <span [style.color]="chargeColor(chargeMax)">{{ chargeLabel(chargeMax) }}</span>
+            </div>
+            <div class="ct-bar-outer">
+              <div class="ct-bar-inner"
+                   [style.width.%]="Math.min(totalMinutesJour / 480 * 100, 100)"
+                   [style.background]="chargeColor(chargeMax)">
+              </div>
+            </div>
+            <div class="ct-meta">
+              <span>{{ totalHeuresJour }} / 8h</span>
+              <span *ngIf="totalMinutesJour > 480" class="surcharge-label">
+                ⚠️ Surcharge
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIENS RAPIDES -->
+        <div class="quick-links">
+          <a routerLink="/ms2/projets" class="quick-link">
+            <i class="ti ti-folder"></i>
+            <span>Mes Projets</span>
+            <i class="ti ti-arrow-right"></i>
+          </a>
+          <a routerLink="/ms2/alertes" class="quick-link" [class.has-badge]="nbAlertes > 0">
+            <i class="ti ti-bell"></i>
+            <span>Mes Alertes</span>
+            <span class="ql-badge" *ngIf="nbAlertes > 0">{{ nbAlertes }}</span>
+            <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

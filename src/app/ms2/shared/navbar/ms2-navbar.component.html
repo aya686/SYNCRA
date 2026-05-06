@@ -1,0 +1,36 @@
+<nav class="ms2-nav" [class.scrolled]="true">
+  <div class="nav-container">
+
+    <!-- BRAND -->
+    <a class="brand" routerLink="/">
+      <div class="brand-icon">🫐</div>
+      <span class="brand-name">SYNCRA</span>
+    </a>
+
+    <!-- LIENS -->
+    <div class="nav-links" [class.open]="menuOuvert">
+      <a routerLink="/ms2/projets" class="nav-link" routerLinkActive="active">
+        <i class="ti ti-folder"></i> Projets
+      </a>
+      <a routerLink="/ms2/idees" class="nav-link" routerLinkActive="active">
+        <i class="ti ti-bulb"></i> Idées
+      </a>
+      <a routerLink="/ms2/sessions" class="nav-link" routerLinkActive="active">
+        <i class="ti ti-clock"></i> Sessions
+      </a>
+     <a routerLink="/ms2/alertes" class="nav-link" routerLinkActive="active">
+  <i class="ti ti-bell"></i> Alertes
+  <span class="notif-badge" *ngIf="nbAlertes > 0">{{ nbAlertes }}</span>
+</a>
+      <a routerLink="/default" class="btn-admin">
+        <i class="ti ti-layout-dashboard"></i> Admin
+      </a>
+    </div>
+
+    <!-- BURGER MOBILE -->
+    <button class="burger" (click)="menuOuvert = !menuOuvert">
+      <i class="ti" [class.ti-menu-2]="!menuOuvert" [class.ti-x]="menuOuvert"></i>
+    </button>
+
+  </div>
+</nav>

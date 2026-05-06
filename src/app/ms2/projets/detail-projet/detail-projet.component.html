@@ -1,0 +1,421 @@
+<app-ms2-navbar></app-ms2-navbar>
+
+<div class="detail-projet-page">
+
+  <!-- BG -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <div class="page-inner">
+
+    <!-- TOP BAR -->
+    <div class="top-bar reveal" style="--delay:0s">
+      <a routerLink="/ms2/projets" class="back-link">
+        <i class="ti ti-arrow-left"></i>
+        <span>Retour aux projets</span>
+      </a>
+      <div class="top-actions" *ngIf="projet && !loading">
+        <a [routerLink]="['/ms2/projets', projetId, 'modifier']" class="btn-edit">
+          <i class="ti ti-edit"></i> Modifier
+        </a>
+        <a [routerLink]="['/ms2/taches', projetId, 'kanban']" class="btn-kanban">
+          <i class="ti ti-layout-kanban"></i> Kanban
+        </a>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state reveal">
+      <div class="loader-ring"></div>
+      <span>Chargement du projet...</span>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="error && !loading" class="error-state reveal">
+      <i class="ti ti-alert-circle"></i>{{ error }}
+    </div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <ng-container *ngIf="!loading && !error && projet">
+
+      <!-- HERO HEADER -->
+      <div class="projet-hero reveal" style="--delay:0.05s">
+        <div class="hero-left">
+          <div class="hero-icon-wrap">
+            <i class="ti ti-folder-filled"></i>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-cat" *ngIf="projet.categorie">
+              <i class="ti ti-tag"></i>{{ projet.categorie }}
+            </div>
+            <h1 class="hero-titre">{{ projet.titre }}</h1>
+            <p class="hero-desc" *ngIf="projet.description">{{ projet.description }}</p>
+            <div class="hero-badges">
+              <span class="badge-statut {{ getBadgeProjet(projet.statut) }}">
+                {{ labelStatut(projet.statut) }}
+              </span>
+              <span class="hero-date" *ngIf="projet.dateDebut && projet.dateFin">
+                <i class="ti ti-calendar"></i>
+                {{ projet.dateDebut | date:'dd/MM/yyyy' }} → {{ projet.dateFin | date:'dd/MM/yyyy' }}
+              </span>
+              <span class="hero-budget" *ngIf="projet.budget">
+                <i class="ti ti-coin"></i>
+                {{ projet.budget | number }} TND
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATUT RAPIDE -->
+        <div class="hero-right">
+          <div class="statut-changer">
+            <div class="statut-label">Statut du projet</div>
+            <select class="statut-select {{ getBadgeProjet(projet.statut) }}"
+                    [ngModel]="projet.statut"
+                    (ngModelChange)="changerStatutProjet($event)">
+              <option *ngFor="let s of statutsProjet" [value]="s">{{ labelStatut(s) }}</option>
+            </select>
+          </div>
+          <div class="mode-guidage-wrap">
+  <div class="statut-label">Mode de guidage</div>
+  <div class="mode-badges">
+    <button
+      class="mode-badge"
+      [class.actif]="projet.modeGuidage === 'IA'"
+      (click)="activerModeIA()">
+      <i class="ti ti-robot"></i> IA
+    </button>
+    <button
+      class="mode-badge"
+      [class.actif]="projet.modeGuidage === 'MONITEUR'"
+      (click)="activerModeMoniteur()">
+      <i class="ti ti-user-check"></i> Moniteur
+    </button>
+    <button
+      class="mode-badge"
+      [class.actif]="!projet.modeGuidage || projet.modeGuidage === 'AUCUN'"
+      (click)="desactiverGuidage()">
+      <i class="ti ti-x"></i> Aucun
+    </button>
+  </div>
+  <div class="ia-suggestion" *ngIf="projet.modeGuidage === 'IA' && iaSuggestion">
+    <i class="ti ti-sparkles"></i>
+    <span>{{ iaSuggestion }}</span>
+  </div>
+  <div class="moniteur-info" *ngIf="projet.modeGuidage === 'MONITEUR'">
+    <i class="ti ti-user"></i>
+    <span *ngIf="projet.moniteurId">Moniteur assigné : #{{ projet.moniteurId }}</span>
+    <span *ngIf="!projet.moniteurId">Aucun moniteur assigné</span>
+  </div>
+</div>
+          <div class="hero-avancement">
+            <div class="ha-header">
+              <span>Avancement global</span>
+              <span class="ha-pct" [style.color]="couleurAvancement(avancementPct)">
+                {{ avancementPct | number:'1.0-0' }}%
+              </span>
+            </div>
+            <div class="ha-bar-outer">
+              <div class="ha-bar-inner"
+                   [style.width.%]="avancementPct"
+                   [style.background]="couleurAvancement(avancementPct)">
+              </div>
+            </div>
+            <div class="ha-stats">
+              <span><i class="ti ti-check"></i>{{ tachesTerminees }}/{{ taches.length }} tâches</span>
+              <span><i class="ti ti-flag"></i>{{ jalonAtteints }}/{{ jalons.length }} jalons</span>
+              <span><i class="ti ti-target"></i>{{ objectifsAtteints }}/{{ objectifs.length }} objectifs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ONGLETS -->
+      <div class="onglets-bar reveal" style="--delay:0.1s">
+        <button
+          *ngFor="let o of onglets"
+          class="onglet-btn"
+          [class.actif]="ongletActif === o.id"
+          (click)="allerOnglet(o.id)">
+          <i class="ti {{ o.icon }}"></i>
+          <span>{{ o.label }}</span>
+          <span class="onglet-count" *ngIf="o.id === 'taches'">{{ taches.length }}</span>
+          <span class="onglet-count" *ngIf="o.id === 'sprints'">{{ sprints.length }}</span>
+          <span class="onglet-count" *ngIf="o.id === 'jalons'">{{ jalons.length }}</span>
+        </button>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ONGLET : INFOS GÉNÉRALES               -->
+      <!-- ═══════════════════════════════════════ -->
+      <div *ngIf="ongletActif === 'infos'" class="onglet-content">
+
+        <div class="info-grid">
+
+          <!-- OBJECTIFS -->
+          <div class="info-card reveal" style="--delay:0.05s">
+            <div class="info-card-header">
+              <i class="ti ti-target"></i>
+              <span>Objectifs ({{ objectifs.length }})</span>
+            </div>
+            <div *ngIf="objectifs.length === 0" class="vide-mini">Aucun objectif.</div>
+            <ul class="objectif-list">
+              <li *ngFor="let obj of objectifs"
+                  class="objectif-item"
+                  [class.atteint]="obj.atteint">
+                <button class="obj-toggle"
+                        [class.done]="obj.atteint"
+                        [disabled]="updatingObjectifId === obj.id"
+                        (click)="toggleObjectif(obj)">
+                  <i class="ti" [class.ti-circle-check-filled]="obj.atteint" [class.ti-circle]="!obj.atteint"></i>
+                </button>
+                <div class="obj-text">
+                  <span class="obj-titre">{{ obj.titre }}</span>
+                  <span class="obj-desc" *ngIf="obj.description">{{ obj.description }}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- INFOS CLÉS -->
+          <div class="info-card reveal" style="--delay:0.1s">
+            <div class="info-card-header">
+              <i class="ti ti-info-circle"></i>
+              <span>Informations clés</span>
+            </div>
+            <div class="kv-list">
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-hash"></i>ID</span>
+                <span class="kv-val">#{{ projet.id }}</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-user"></i>Porteur</span>
+                <span class="kv-val">Porteur #{{ projet.porteurId }}</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-tag"></i>Catégorie</span>
+                <span class="kv-val">{{ projet.categorie || '—' }}</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-calendar-event"></i>Début</span>
+                <span class="kv-val">{{ projet.dateDebut | date:'dd MMMM yyyy' }}</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-calendar-due"></i>Fin</span>
+                <span class="kv-val">{{ projet.dateFin | date:'dd MMMM yyyy' }}</span>
+              </div>
+              <div class="kv-item" *ngIf="projet.budget">
+                <span class="kv-key"><i class="ti ti-coin"></i>Budget</span>
+                <span class="kv-val">{{ projet.budget | number }} TND</span>
+              </div>
+              <div class="kv-item">
+                <span class="kv-key"><i class="ti ti-clock-hour-4"></i>Délai</span>
+                <span class="kv-val {{ joursClass(projet.dateFin) }}">{{ joursLabel(projet.dateFin) }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ONGLET : TÂCHES                        -->
+      <!-- ═══════════════════════════════════════ -->
+      <div *ngIf="ongletActif === 'taches'" class="onglet-content">
+
+        <div *ngIf="taches.length === 0" class="empty-onglet reveal">
+          <i class="ti ti-checklist"></i>
+          <p>Aucune tâche générée.</p>
+        </div>
+
+        <div class="taches-list">
+          <div class="tache-row reveal"
+               *ngFor="let t of taches; let i = index"
+               [style.--delay]="i * 0.05 + 's'">
+
+            <div class="tache-left">
+              <div class="tache-icon-wrap">
+                <i class="ti ti-checkbox"></i>
+              </div>
+              <div class="tache-info">
+                <div class="tache-titre">{{ t.titre }}</div>
+                <div class="tache-desc" *ngIf="t.description">{{ t.description }}</div>
+                <div class="tache-meta">
+                  <span class="badge-tache {{ getBadgePriorite(t.priorite) }}">
+                    <i class="ti ti-flame"></i>{{ labelPriorite(t.priorite) }}
+                  </span>
+                  <span class="meta-item" *ngIf="t.estimationHeures">
+                    <i class="ti ti-clock"></i>{{ t.estimationHeures }}h
+                  </span>
+                  <span class="meta-item {{ joursClass(t.deadline) }}" *ngIf="t.deadline">
+                    <i class="ti ti-calendar-due"></i>{{ t.deadline | date:'dd/MM/yyyy' }}
+                  </span>
+                  <span class="meta-item" *ngIf="t.sousTaches?.length">
+                    <i class="ti ti-subtask"></i>{{ t.sousTaches!.length }} sous-tâches
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tache-right">
+              <span class="badge-statut-tache {{ getBadgeTache(t.statut) }}">
+                {{ labelStatutTache(t.statut) }}
+              </span>
+              <select class="statut-tache-select"
+                      [ngModel]="t.statut"
+                      [disabled]="updatingTacheId === t.id"
+                      (ngModelChange)="changerStatutTache(t, $event)">
+                <option *ngFor="let s of statutsTache" [value]="s">{{ labelStatutTache(s) }}</option>
+              </select>
+              <a [routerLink]="['/ms2/taches', t.id]" class="btn-voir-tache">
+                <i class="ti ti-eye"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ONGLET : SPRINTS                       -->
+      <!-- ═══════════════════════════════════════ -->
+      <div *ngIf="ongletActif === 'sprints'" class="onglet-content">
+
+        <div *ngIf="sprints.length === 0" class="empty-onglet reveal">
+          <i class="ti ti-activity"></i>
+          <p>Aucun sprint généré.</p>
+        </div>
+
+        <div class="sprints-grid">
+          <div class="sprint-card reveal"
+               *ngFor="let s of sprints; let i = index"
+               [style.--delay]="i * 0.06 + 's'">
+            <div class="sprint-header">
+              <div class="sprint-nom">{{ s.nom }}</div>
+              <span class="badge-sprint {{ sprintBadge(s.statut) }}">{{ sprintStatutLabel(s.statut) }}</span>
+            </div>
+            <div class="sprint-dates">
+              <i class="ti ti-calendar"></i>
+              {{ s.dateDebut | date:'dd/MM' }} → {{ s.dateFin | date:'dd/MM/yyyy' }}
+            </div>
+            <div class="sprint-meta" *ngIf="s.chargeTotal !== undefined">
+              <span><i class="ti ti-bolt"></i>{{ s.chargeTotal }}h de charge</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ONGLET : JALONS                        -->
+      <!-- ═══════════════════════════════════════ -->
+      <div *ngIf="ongletActif === 'jalons'" class="onglet-content">
+
+        <div *ngIf="jalons.length === 0" class="empty-onglet reveal">
+          <i class="ti ti-flag"></i>
+          <p>Aucun jalon généré.</p>
+        </div>
+
+        <div class="jalons-timeline">
+          <div class="jalon-item reveal"
+               *ngFor="let j of jalons; let i = index"
+               [class.atteint]="j.atteint"
+               [style.--delay]="i * 0.07 + 's'">
+            <div class="jalon-line">
+              <div class="jalon-dot"></div>
+              <div class="jalon-connector" *ngIf="i < jalons.length - 1"></div>
+            </div>
+            <div class="jalon-body">
+              <div class="jalon-date">{{ j.dateEcheance | date:'dd MMMM yyyy' }}</div>
+              <div class="jalon-titre">{{ j.titre }}</div>
+              <div class="jalon-desc" *ngIf="j.description">{{ j.description }}</div>
+              <button class="jalon-toggle"
+                      [class.done]="j.atteint"
+                      [disabled]="updatingJalonId === j.id"
+                      (click)="toggleJalon(j)">
+                <i class="ti" [class.ti-circle-check-filled]="j.atteint" [class.ti-circle]="!j.atteint"></i>
+                {{ j.atteint ? 'Atteint' : 'Marquer atteint' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- ONGLET : AVANCEMENT                    -->
+      <!-- ═══════════════════════════════════════ -->
+      <div *ngIf="ongletActif === 'avancement'" class="onglet-content">
+
+        <div class="avancement-page">
+
+          <!-- SCORE CENTRAL -->
+          <div class="score-card reveal" style="--delay:0.05s">
+            <div class="score-circle-wrap">
+              <svg class="score-svg" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" class="score-track"/>
+                <circle cx="60" cy="60" r="52" class="score-fill"
+                        [style.stroke]="couleurAvancement(avancementPct)"
+                        [style.stroke-dashoffset]="327 - (327 * avancementPct / 100)"/>
+              </svg>
+              <div class="score-center">
+                <span class="score-num" [style.color]="couleurAvancement(avancementPct)">
+                  {{ avancementPct | number:'1.0-0' }}
+                </span>
+                <span class="score-pct">%</span>
+              </div>
+            </div>
+            <div class="score-label">Avancement global</div>
+            <div class="score-note" *ngIf="avancement?.notesSuivi">{{ avancement!.notesSuivi }}</div>
+            <div class="score-date" *ngIf="avancement?.dateCalcul">
+              Calculé le {{ avancement!.dateCalcul | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+
+          <!-- STATS CARDS -->
+          <div class="av-stats-row">
+            <div class="av-stat reveal" style="--delay:0.1s">
+              <div class="av-stat-icon"><i class="ti ti-checklist"></i></div>
+              <div class="av-stat-val">{{ tachesTerminees }}/{{ taches.length }}</div>
+              <div class="av-stat-label">Tâches terminées</div>
+            </div>
+            <div class="av-stat reveal" style="--delay:0.15s">
+              <div class="av-stat-icon"><i class="ti ti-flag"></i></div>
+              <div class="av-stat-val">{{ jalonAtteints }}/{{ jalons.length }}</div>
+              <div class="av-stat-label">Jalons atteints</div>
+            </div>
+            <div class="av-stat reveal" style="--delay:0.2s">
+              <div class="av-stat-icon"><i class="ti ti-target"></i></div>
+              <div class="av-stat-val">{{ objectifsAtteints }}/{{ objectifs.length }}</div>
+              <div class="av-stat-label">Objectifs atteints</div>
+            </div>
+            <div class="av-stat reveal" style="--delay:0.25s">
+              <div class="av-stat-icon"><i class="ti ti-activity"></i></div>
+              <div class="av-stat-val">{{ sprints.length }}</div>
+              <div class="av-stat-label">Sprints générés</div>
+            </div>
+          </div>
+
+          <!-- BARRE PAR STATUT -->
+          <div class="av-repartition reveal" style="--delay:0.3s">
+            <div class="av-section-title">Répartition des tâches</div>
+            <div class="rep-bars">
+              <div class="rep-bar-item" *ngFor="let s of statutsTache">
+                <div class="rep-bar-label">
+                  <span class="badge-statut-tache {{ getBadgeTache(s) }}">{{ labelStatutTache(s) }}</span>
+                  <span class="rep-count">{{ tachesParStatut(s).length }}</span>
+                </div>
+                <div class="rep-bar-outer">
+                  <div class="rep-bar-inner {{ getBadgeTache(s) }}"
+                       [style.width.%]="taches.length ? (tachesParStatut(s).length / taches.length * 100) : 0">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

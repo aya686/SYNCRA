@@ -1,0 +1,152 @@
+.ms2-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  height: 68px;
+
+  .nav-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+
+    .brand-icon { font-size: 26px; }
+
+    .brand-name {
+      font-weight: 900;
+      font-size: 17px;
+      letter-spacing: 3px;
+      color: #1a1a2e;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: all 0.2s;
+
+      i { font-size: 16px; }
+
+      &:hover {
+        color: #5e35b1;
+        background: rgba(94, 53, 177, 0.07);
+      }
+
+      &.active {
+        color: #5e35b1;
+        background: rgba(94, 53, 177, 0.1);
+        font-weight: 700;
+      }
+    }
+
+    .btn-admin {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #5e35b1;
+      color: white;
+      padding: 9px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      margin-left: 8px;
+      transition: all 0.25s;
+      box-shadow: 0 4px 14px rgba(94, 53, 177, 0.25);
+
+      i { font-size: 16px; }
+
+      &:hover {
+        background: #7c4dff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(94, 53, 177, 0.35);
+        color: white;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .burger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #1a1a2e;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+
+    &:hover { background: rgba(0, 0, 0, 0.05); }
+  }
+
+  @media (max-width: 768px) {
+    .burger { display: flex; align-items: center; }
+
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 68px;
+      left: 0;
+      right: 0;
+      background: white;
+      flex-direction: column;
+      padding: 16px 24px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      gap: 4px;
+      align-items: stretch;
+
+      &.open { display: flex; }
+
+      .nav-link, .btn-admin {
+        justify-content: flex-start;
+        width: 100%;
+      }
+    }
+  }
+  .notif-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+  margin-left: 4px;
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+}
