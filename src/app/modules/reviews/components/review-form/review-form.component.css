@@ -1,0 +1,145 @@
+/* src/app/modules/reviews/components/review-form/review-form.component.css */
+
+.review-form-card {
+  border: none;
+  border-radius: 12px;
+  animation: slideDown 0.3s ease-out;
+  background-color: #fff;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rating-option {
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+  min-width: 85px;
+  border: 2px solid transparent;
+}
+
+.rating-option:hover {
+  background-color: #e9ecef;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.rating-option.selected {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+}
+
+.rating-option.selected .rating-stars i {
+  text-shadow: 0 0 5px rgba(255,193,7,0.5);
+}
+
+.rating-stars {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.rating-stars i {
+  transition: transform 0.2s ease;
+}
+
+.rating-option:hover .rating-stars i {
+  transform: scale(1.1);
+}
+
+.rating-value {
+  font-size: 0.75rem;
+}
+
+textarea {
+  resize: none;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+textarea:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 0 0.2rem rgba(255,193,7,0.25);
+}
+
+.form-control.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+
+.btn {
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5c636a;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rating-option {
+    padding: 8px 12px;
+    min-width: 65px;
+  }
+  
+  .rating-stars i {
+    font-size: 1.5rem !important;
+  }
+  
+  .rating-option .small {
+    font-size: 0.7rem;
+  }
+  
+  .btn {
+    padding: 6px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .rating-input .d-flex {
+    gap: 0.5rem !important;
+  }
+  
+  .rating-option {
+    padding: 6px 8px;
+    min-width: 55px;
+  }
+  
+  .rating-stars i {
+    font-size: 1.2rem !important;
+  }
+}

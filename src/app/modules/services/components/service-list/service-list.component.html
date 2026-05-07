@@ -1,0 +1,233 @@
+<!-- src/app/modules/resources/components/service-list/service-list.component.html -->
+<canvas class="particle-canvas" #particleCanvas></canvas>
+
+<div class="services-container">
+
+  <!-- En-tête -->
+  <div class="page-header-glass reveal">
+    <div class="glass-content">
+      <div class="breadcrumb-nav">
+        <span>Accueil</span>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Services</span>
+      </div>
+      <h1 class="page-title">
+        Services &amp; <span class="accent-text">Prestataires</span>
+      </h1>
+      <p class="page-subtitle">Trouvez le prestataire idéal pour votre projet</p>
+      <div class="header-meta">
+        <span class="meta-pill">
+          <i class="bi bi-briefcase"></i>
+          {{ allServices.length }} service(s)
+        </span>
+      </div>
+      <div class="header-actions mt-3">
+        <button class="btn-add-glass" routerLink="/services/create">
+          <i class="bi bi-plus-circle"></i> Ajouter un service
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-card reveal">
+    <div class="filters-top">
+      <span class="filter-title"><i class="bi bi-funnel"></i> Filtrer</span>
+      <button class="btn-reset-filters" (click)="resetFilters()" *ngIf="isFilterActive()">
+        <i class="bi bi-arrow-repeat"></i> Réinitialiser
+      </button>
+    </div>
+    <div class="filters-row">
+      <input class="filter-inp" type="text" placeholder="🔍 Recherche..."
+             [(ngModel)]="filters.searchTerm" (input)="applyFilters()">
+      <select class="filter-inp" [(ngModel)]="filters.category" (change)="applyFilters()">
+        <option value="">Toutes catégories</option>
+        <option *ngFor="let c of categories" [value]="c">{{c}}</option>
+      </select>
+      <select class="filter-inp" [(ngModel)]="filters.serviceType" (change)="applyFilters()">
+        <option value="">Tous les types</option>
+        <option *ngFor="let t of serviceTypes" [value]="t">{{t}}</option>
+      </select>
+      <input class="filter-inp" type="text" placeholder="📍 Localisation"
+             [(ngModel)]="filters.location" (input)="applyFilters()">
+      <input class="filter-inp" type="number" placeholder="Prix min"
+             [(ngModel)]="filters.minPrice" (input)="applyFilters()">
+      <input class="filter-inp" type="number" placeholder="Prix max"
+             [(ngModel)]="filters.maxPrice" (input)="applyFilters()">
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="errorMessage" class="alert-banner error">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+    <button (click)="errorMessage = ''">×</button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="loader-box">
+    <div class="spin-ring"></div>
+    <p>Chargement des services...</p>
+  </div>
+
+  <!-- Liste -->
+  <div *ngIf="!loading && allServices.length > 0">
+    <p class="results-count">{{ filteredServices.length }} résultat(s)</p>
+
+    <div class="services-grid">
+      <div class="service-card"
+           *ngFor="let service of paginatedServices; let i = index"
+           [class.card-rejected]="isRejected(service)"
+           [class.card-pending]="isPending(service)"
+           [style.animation-delay]="(i * 0.06) + 's'">
+
+        <!-- Image -->
+        <div class="card-img-box">
+          <img [src]="service.imageUrls && service.imageUrls.length > 0
+                        ? service.imageUrls[0]
+                        : 'assets/images/default-service.jpg'"
+               [alt]="service.name"
+               [class.img-greyed]="isRejected(service)"
+               (error)="handleImageError($event)">
+
+          <!-- Badge dispo (seulement si approuvé) -->
+          <div class="avail-badge" [class]="getAvailabilityClass(service.availability)"
+               *ngIf="isApproved(service)">
+            <span class="dot"></span>{{ getAvailabilityText(service.availability) }}
+          </div>
+
+          <!-- Badge REJETÉE (propriétaire seulement) -->
+          <div class="status-overlay badge-rejected" *ngIf="isRejected(service) && isOwner(service)">
+            <i class="bi bi-ban-fill"></i> REJETÉ
+          </div>
+
+          <!-- Badge EN ATTENTE (propriétaire seulement) -->
+          <div class="status-overlay badge-pending" *ngIf="isPending(service) && isOwner(service)">
+            <i class="bi bi-clock-fill"></i> EN ATTENTE
+          </div>
+
+          <!-- Overlay quick-view -->
+          <div class="hover-overlay" *ngIf="isApproved(service)"
+               (click)="viewServiceDetails(service.id)">
+            <i class="bi bi-eye"></i>
+          </div>
+        </div>
+
+        <!-- Bannière REJET (propriétaire seulement) -->
+        <div class="reject-banner" *ngIf="isRejected(service) && isOwner(service)">
+          <i class="bi bi-info-circle-fill"></i>
+          <div>
+            <strong>Rejeté par l'administrateur</strong>
+            <span> — {{ getRejectReason(service) }}</span>
+          </div>
+        </div>
+
+        <!-- Bannière EN ATTENTE (propriétaire seulement) -->
+        <div class="pending-banner" *ngIf="isPending(service) && isOwner(service)">
+          <i class="bi bi-clock-history"></i>
+          <div>
+            <strong>En attente de validation</strong>
+            <span> — Visible après approbation de l'administrateur.</span>
+          </div>
+        </div>
+
+        <!-- Corps -->
+        <div class="card-body-content" [class.greyed-out]="isRejected(service)">
+
+          <div class="provider-row">
+            <span class="provider-name">{{ service.providerName }}</span>
+            <span class="service-type-badge">{{ getServiceTypeLabel(service.serviceType) }}</span>
+          </div>
+
+          <h5 class="service-name">{{ service.name }}</h5>
+
+          <div class="location-row">
+            <i class="bi bi-geo-alt"></i>
+            <span>{{ service.location }}</span>
+          </div>
+
+          <!-- Rating (seulement si approuvé) -->
+          <div class="stars-row" *ngIf="isApproved(service)">
+            <i *ngFor="let star of getStars(service.rating)" [class]="'bi ' + star" style="color:#ffc107;font-size:0.8rem;"></i>
+            <span class="review-count">({{ service.reviewCount || 0 }})</span>
+          </div>
+
+          <div class="price-row">
+            <span class="price-val">À partir de {{ service.basePrice | number }} TND</span>
+            <span class="price-unit">/{{ service.priceUnit || 'h' }}</span>
+          </div>
+        </div>
+
+        <!-- Footer actions -->
+        <div class="card-actions">
+
+          <!-- Service APPROUVÉ — actions publiques -->
+          <ng-container *ngIf="isApproved(service)">
+            <button class="btn-profile" (click)="viewServiceDetails(service.id)">
+              Voir Profil
+            </button>
+            <button class="btn-contact"
+                    (click)="createRequest(service)"
+                    [disabled]="service.availability !== 'AVAILABLE'">
+              <i class="bi bi-envelope"></i> Contacter
+            </button>
+          </ng-container>
+
+          <!-- Service PENDING (propriétaire) — modifier / supprimer -->
+          <ng-container *ngIf="isPending(service) && isOwner(service)">
+            <button class="btn-edit-owner" (click)="editService(service)">
+              <i class="bi bi-pencil"></i> Modifier
+            </button>
+            <button class="btn-delete-owner" (click)="deleteService(service)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- Service REJETÉ (propriétaire) — corriger et re-soumettre -->
+          <ng-container *ngIf="isRejected(service) && isOwner(service)">
+            <button class="btn-resubmit" (click)="editService(service)">
+              <i class="bi bi-arrow-repeat"></i> Corriger &amp; re-soumettre
+            </button>
+            <button class="btn-delete-owner" (click)="deleteService(service)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </ng-container>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-row" *ngIf="totalPages > 1">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button class="page-btn" *ngFor="let p of getPageNumbers()"
+              [class.active]="p === currentPage"
+              (click)="onPageChange(p)">{{ p }}</button>
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Vide -->
+  <div *ngIf="!loading && allServices.length === 0 && !errorMessage" class="empty-box">
+    <i class="bi bi-inbox"></i>
+    <h3>Aucun service disponible</h3>
+    <p>Soyez le premier à proposer vos services !</p>
+    <button class="btn-add-glass" routerLink="/services/create">
+      <i class="bi bi-plus-circle"></i> Ajouter un service
+    </button>
+  </div>
+
+  <!-- Aucun résultat après filtre -->
+  <div *ngIf="!loading && allServices.length > 0 && filteredServices.length === 0" class="empty-box">
+    <i class="bi bi-funnel"></i>
+    <h3>Aucun résultat</h3>
+    <p>Modifiez vos critères de recherche.</p>
+    <button class="btn-add-glass" (click)="resetFilters()">
+      <i class="bi bi-arrow-repeat"></i> Réinitialiser les filtres
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,75 @@
+// =======================================
+//     List of variables for layout
+// =======================================
+// src/scss/settings/theme-variables.scss
+
+// =======================================
+//     List of variables for layout
+// =======================================
+
+// Définir les couleurs de base AVANT de les utiliser
+$primary: #0d6efd !default;
+$secondary: #6c757d !default;
+$success: #198754 !default;
+$danger: #dc3545 !default;
+$warning: #ffc107 !default;
+$info: #0dcaf0 !default;
+$light: #f8f9fa !default;
+$dark: #212529 !default;
+
+$header-height: 80px;
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 80px;
+
+// header
+$header-background: #fff;
+$header-color: #525b69;
+$header-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+$brand-color: #161c25;
+
+// Menu
+$sidebar-background: #fff;
+$sidebar-color: #616161;
+$sidebar-active-color: $secondary;
+$sidebar-caption: #212121;
+$sidebar-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+
+// card block
+$card-shadow: none;
+$soft-bg-level: -80%;
+$card-bg: #ffffff;
+$border-color: #eeeeee;
+$border-radius: 8px;
+$body-bg: #f4f7fa;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$header-height: 80px;
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 80px;
+
+// header
+$header-background: #fff;
+$header-color: #525b69;
+$header-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+$brand-color: #161c25;
+
+// Menu
+$sidebar-background: #fff;
+$sidebar-color: #616161;
+$sidebar-active-color: $secondary;
+$sidebar-caption: #212121;
+$sidebar-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+
+// card block
+
+//$card-shadow: inset 0 0 0 1px rgba(144, 202, 249, 0.46);
+$card-shadow: none;
+
+$soft-bg-level: -80%;

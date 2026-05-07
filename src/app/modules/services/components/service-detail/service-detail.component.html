@@ -1,0 +1,309 @@
+<!-- service-detail.component.html — avec services similaires + prestataire -->
+<canvas class="particle-canvas" #particleCanvas></canvas>
+
+<div class="detail-container" *ngIf="!loading && service">
+  <!-- Breadcrumb -->
+  <div class="detail-header reveal">
+    <div class="breadcrumb">
+      <a routerLink="/">Accueil</a>
+      <i class="bi bi-chevron-right"></i>
+      <a routerLink="/services">Services</a>
+      <i class="bi bi-chevron-right"></i>
+      <span class="active">{{ service.name }}</span>
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION PRINCIPALE ══════════ -->
+  <div class="detail-main reveal">
+    <!-- Galerie d'images -->
+    <div class="detail-gallery">
+      <div class="main-image">
+        <img [src]="getCurrentImage()" [alt]="service.name" (error)="handleImageError($event)">
+        <div class="availability-badge" [class]="getAvailabilityClass(service.availability)">
+          <span class="badge-dot"></span>{{ getAvailabilityText(service.availability) }}
+        </div>
+        <button class="gallery-nav prev" (click)="prevImage()"
+                *ngIf="service.imageUrls && service.imageUrls.length > 1">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="gallery-nav next" (click)="nextImage()"
+                *ngIf="service.imageUrls && service.imageUrls.length > 1">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+      <div class="thumbnail-list" *ngIf="service.imageUrls && service.imageUrls.length > 1">
+        <div class="thumbnail" *ngFor="let img of service.imageUrls; let i = index"
+             [class.active]="selectedImageIndex === i" (click)="selectImage(i)">
+          <img [src]="img" [alt]="'Image '+(i+1)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations principales -->
+    <div class="detail-info">
+      <div class="info-header">
+        <h1 class="detail-title">{{ service.name }}</h1>
+        <div class="detail-location">
+          <i class="bi bi-geo-alt"></i><span>{{ service.location }}</span>
+        </div>
+      </div>
+
+      <div class="rating-section">
+        <div class="stars"><i *ngFor="let star of getStars(service.rating)" [class]="star"></i></div>
+        <span class="rating-count">({{ service.reviewCount || 0 }} avis)</span>
+      </div>
+
+      <div class="price-section">
+        <span class="price-value">{{ service.basePrice | number }} TND</span>
+        <span class="price-unit">/ {{ service.priceUnit || 'heure' }}</span>
+      </div>
+
+      <div class="badges-group">
+        <span class="badge primary">{{ getServiceTypeLabel(service.serviceType) }}</span>
+        <span class="badge light">{{ service.category }}</span>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-request" (click)="createRequest()" [disabled]="service.availability !== 'AVAILABLE'">
+          <i class="bi bi-envelope"></i><span>Faire une demande</span>
+        </button>
+        <button class="btn-contact" (click)="showContactModal = true">
+          <i class="bi bi-telephone"></i><span>Contacter</span>
+        </button>
+      </div>
+
+      <div class="admin-actions" *ngIf="isCurrentUserProvider()">
+        <button class="btn-edit" (click)="editService()"><i class="bi bi-pencil"></i> Modifier</button>
+        <button class="btn-delete" (click)="showConfirmDelete = true"><i class="bi bi-trash"></i> Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="detail-section reveal">
+    <div class="section-header">
+      <div class="section-icon"><i class="bi bi-file-text"></i></div>
+      <h2>Description</h2>
+    </div>
+    <div class="section-content"><p>{{ service.description }}</p></div>
+  </div>
+
+  <!-- Caractéristiques -->
+  <div class="tech-specs-section reveal">
+    <div class="tech-header">
+      <div class="section-tag center-tag">CARACTÉRISTIQUES</div>
+      <h2>Détails du service</h2>
+      <p>Informations complètes sur le service</p>
+    </div>
+    <div class="specs-grid-cards">
+      <div class="spec-card">
+        <div class="spec-icon-wrap"><i class="bi bi-briefcase"></i></div>
+        <div class="spec-content"><h3>Type de service</h3><p>{{ getServiceTypeLabel(service.serviceType) }}</p></div>
+        <div class="spec-arrow">→</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon-wrap"><i class="bi bi-tags"></i></div>
+        <div class="spec-content"><h3>Catégorie</h3><p>{{ service.category }}</p></div>
+        <div class="spec-arrow">→</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon-wrap"><i class="bi bi-building"></i></div>
+        <div class="spec-content"><h3>Prestataire</h3><p>{{ service.providerName }}</p></div>
+        <div class="spec-arrow">→</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-icon-wrap"><i class="bi bi-calendar-date"></i></div>
+        <div class="spec-content"><h3>Date d'ajout</h3><p>{{ formatDate(service.createdAt) }}</p></div>
+        <div class="spec-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avis -->
+  <div class="reviews-section reveal">
+    <div class="reviews-header">
+      <div class="section-tag center-tag">AVIS CLIENTS</div>
+      <h2>Ce que disent nos clients</h2>
+      <p>Découvrez les retours d'expérience des utilisateurs</p>
+    </div>
+    <div class="reviews-wrapper">
+      <app-review-list
+        [serviceId]="service.id"
+        [entityName]="service.name"
+        entityType="service">
+      </app-review-list>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ✅ SECTION : SERVICES SIMILAIRES
+       ══════════════════════════════════════════════════════════ -->
+  <div class="related-section" *ngIf="similarServices.length > 0 || loadingSimilar">
+    <div class="related-header">
+      <div class="section-tag center-tag">VOUS POURRIEZ AIMER</div>
+      <h2>Services similaires</h2>
+      <p>Même catégorie ou même type — trouvez le prestataire qui vous convient</p>
+    </div>
+
+    <div class="related-loader" *ngIf="loadingSimilar">
+      <div class="spin-ring-sm"></div>
+    </div>
+
+    <div class="related-grid" *ngIf="!loadingSimilar">
+      <div class="related-card" *ngFor="let s of similarServices; let i = index"
+           [style.animation-delay]="(i * 0.07) + 's'"
+           (click)="viewService(s)">
+
+        <div class="related-img-wrap">
+          <img [src]="getServiceImage(s)" [alt]="s.name" (error)="handleImageError($event)">
+          <div class="related-overlay">
+            <button class="btn-view-related">
+              <i class="bi bi-eye"></i> Voir détails
+            </button>
+          </div>
+        </div>
+
+        <div class="related-info">
+          <div class="related-category">{{ getServiceTypeLabel(s.serviceType) }}</div>
+          <h4 class="related-name">{{ s.name }}</h4>
+          <div class="related-location"><i class="bi bi-geo-alt"></i> {{ s.location }}</div>
+          <div class="related-stars">
+            <i *ngFor="let st of getStars(s.rating)" [class]="'bi ' + st" style="color:#fbbf24;font-size:0.72rem;"></i>
+            <span class="ms-1" style="font-size:0.72rem;color:#64748b;">({{ s.reviewCount || 0 }})</span>
+          </div>
+          <div class="related-footer">
+            <div class="related-price">
+              <span class="price-num">{{ formatPrice(s.basePrice) }} TND</span>
+              <span class="price-u">/{{ s.priceUnit || 'h' }}</span>
+            </div>
+            <button class="btn-add-related btn-request-mini"
+                    [disabled]="s.availability !== 'AVAILABLE'"
+                    (click)="createRequestFor(s); $event.stopPropagation()"
+                    title="Faire une demande">
+              <i class="bi bi-envelope"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ✅ SECTION : PLUS DU MÊME PRESTATAIRE
+       ══════════════════════════════════════════════════════════ -->
+  <div class="supplier-section" *ngIf="providerServices.length > 0 || loadingProvider">
+    <div class="related-header">
+      <div class="section-tag center-tag">CE PRESTATAIRE</div>
+      <h2>
+        <i class="bi bi-building me-2"></i>
+        Plus de services à découvrir de <span class="supplier-accent">{{ service.providerName }}</span>
+      </h2>
+      <p>Explorez d'autres offres de ce prestataire</p>
+    </div>
+
+    <div class="related-loader" *ngIf="loadingProvider">
+      <div class="spin-ring-sm"></div>
+    </div>
+
+    <div class="supplier-grid" *ngIf="!loadingProvider">
+      <div class="supplier-card" *ngFor="let s of providerServices; let i = index"
+           [style.animation-delay]="(i * 0.08) + 's'"
+           (click)="viewService(s)">
+
+        <div class="supplier-img-wrap">
+          <img [src]="getServiceImage(s)" [alt]="s.name" (error)="handleImageError($event)">
+          <div class="supplier-type-tag">{{ getServiceTypeLabel(s.serviceType) }}</div>
+        </div>
+
+        <div class="supplier-info">
+          <div class="supplier-cat">{{ s.category }}</div>
+          <h4 class="supplier-name">{{ s.name }}</h4>
+          <div class="supplier-meta">
+            <span><i class="bi bi-geo-alt"></i> {{ s.location }}</span>
+          </div>
+          <div class="supplier-bottom">
+            <span class="supplier-price">{{ formatPrice(s.basePrice) }} TND/{{ s.priceUnit || 'h' }}</span>
+            <div class="supplier-avail"
+                 [class.avail-yes]="s.availability === 'AVAILABLE'"
+                 [class.avail-no]="s.availability !== 'AVAILABLE'">
+              <span class="avail-dot"></span>
+              {{ getAvailabilityText(s.availability) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voir tout le catalogue du prestataire -->
+    <div class="see-all-supplier" *ngIf="!loadingProvider">
+      <button class="btn-see-all" [routerLink]="['/services']"
+              [queryParams]="{provider: service.providerId}">
+        <i class="bi bi-grid-3x3-gap"></i>
+        Voir tous les services de {{ service.providerName }}
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+</div><!-- end detail-container -->
+
+<!-- Loader -->
+<div *ngIf="loading" class="loader-wrapper">
+  <div class="loader-spinner"></div>
+  <p>Chargement du service...</p>
+</div>
+
+<!-- Modal Contact -->
+<div class="modal-custom" [class.show]="showContactModal" *ngIf="showContactModal">
+  <div class="modal-overlay" (click)="showContactModal = false"></div>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>Contacter {{ service?.providerName }}</h3>
+      <button class="modal-close" (click)="showContactModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="contact-info">
+        <i class="bi bi-telephone"></i>
+        <div><strong>Téléphone</strong><p>{{ service?.contactInfo || 'Non spécifié' }}</p></div>
+      </div>
+      <div class="contact-info">
+        <i class="bi bi-envelope"></i>
+        <div><strong>Email</strong><p>{{ getProviderEmail(service?.providerName) }}</p></div>
+      </div>
+      <div class="contact-info">
+        <i class="bi bi-geo-alt"></i>
+        <div><strong>Localisation</strong><p>{{ service?.location }}</p></div>
+      </div>
+      <div class="message-input">
+        <label>Votre message</label>
+        <textarea [(ngModel)]="contactMessage" rows="4" placeholder="Décrivez votre besoin..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showContactModal = false">Annuler</button>
+      <button class="btn-primary" (click)="sendContactRequest()">
+        <span>Envoyer la demande</span><div class="btn-bg"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Suppression -->
+<div class="modal-custom" [class.show]="showConfirmDelete" *ngIf="showConfirmDelete">
+  <div class="modal-overlay" (click)="showConfirmDelete = false"></div>
+  <div class="modal-container modal-danger">
+    <div class="modal-header">
+      <h3>Confirmer la suppression</h3>
+      <button class="modal-close" (click)="showConfirmDelete = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="warning-icon"><i class="bi bi-exclamation-triangle"></i></div>
+      <p>Supprimer <strong>"{{ service?.name }}"</strong> ?</p>
+      <p class="text-warning">Cette action est irréversible.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showConfirmDelete = false">Annuler</button>
+      <button class="btn-danger" (click)="deleteService()">Supprimer</button>
+    </div>
+  </div>
+</div>
