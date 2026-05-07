@@ -1,0 +1,117 @@
+<div class="detail-candidature-container">
+  <div class="page-header">
+    <a routerLink="/candidatures/mes-candidatures" class="btn-back">
+      ← Retour à mes candidatures
+    </a>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-alert">
+    <div class="error-icon">⚠️</div>
+    <p>{{error}}</p>
+  </div>
+
+  <!-- Candidature Detail -->
+  <div *ngIf="!loading && !error && candidature" class="candidature-detail">
+    <!-- Offre Info -->
+    <div class="section-card offre-section">
+      <h2 class="section-title">Offre</h2>
+      <h3 class="offre-titre">{{candidature.offre?.titre}}</h3>
+      <p class="offre-description">{{candidature.offre?.description}}</p>
+      <div class="offre-meta">
+        <span class="meta-item">
+          <strong>Budget:</strong> {{candidature.offre?.budgetMin}} - {{candidature.offre?.budgetMax || 'N/A'}} TND
+        </span>
+        <span class="meta-item">
+          <strong>Catégorie:</strong> {{candidature.offre?.categorie?.nom || 'N/A'}}
+        </span>
+      </div>
+    </div>
+
+    <!-- Candidature Info -->
+    <div class="section-card candidature-section">
+      <div class="section-header">
+        <h2 class="section-title">Votre candidature</h2>
+        <span [class]="getStatutBadgeClass(candidature.statut)" class="statut-badge">
+          {{getStatutLabel(candidature.statut)}}
+        </span>
+      </div>
+      
+      <div class="candidature-content">
+        <div class="info-row">
+          <span class="info-label">Date de soumission:</span>
+          <span class="info-value">{{candidature.dateSoumission | date:'dd/MM/yyyy à HH:mm'}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Tarif proposé:</span>
+          <span class="info-value">{{candidature.tarifPropose}} TND</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Score IA:</span>
+          <span class="info-value score" [class.score-high]="candidature.scoreIa && candidature.scoreIa > 70">
+            {{candidature.scoreIa ? candidature.scoreIa.toFixed(1) : 'N/A'}}/100
+          </span>
+        </div>
+        
+        <div class="info-row" *ngIf="candidature.portfolioUrl">
+          <span class="info-label">Portfolio:</span>
+          <a [href]="candidature.portfolioUrl" target="_blank" class="info-link">
+            {{candidature.portfolioUrl}}
+          </a>
+        </div>
+        
+        <div class="lettre-section">
+          <h4>Lettre de motivation</h4>
+          <p class="lettre-text">{{candidature.lettreMotivation}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evaluation Info -->
+    <div *ngIf="evaluation" class="section-card evaluation-section">
+      <h2 class="section-title">Évaluation</h2>
+      
+      <div class="evaluation-content">
+        <div class="info-row">
+          <span class="info-label">Note:</span>
+          <span class="info-value note">{{evaluation.note}}/5</span>
+        </div>
+        
+        <div class="info-row" *ngIf="evaluation.commentaire">
+          <span class="info-label">Commentaire:</span>
+          <p class="info-text">{{evaluation.commentaire}}</p>
+        </div>
+        
+        <div class="info-row" *ngIf="evaluation.pointsForts">
+          <span class="info-label">Points forts:</span>
+          <p class="info-text">{{evaluation.pointsForts}}</p>
+        </div>
+        
+        <div class="info-row" *ngIf="evaluation.pointsFaibles">
+          <span class="info-label">Points à améliorer:</span>
+          <p class="info-text">{{evaluation.pointsFaibles}}</p>
+        </div>
+        
+        <div class="info-row" *ngIf="evaluation.feedbackCandidat">
+          <span class="info-label">Feedback:</span>
+          <p class="info-text feedback">{{evaluation.feedbackCandidat}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Evaluation -->
+    <div *ngIf="!evaluation && candidature.statut === 'EN_ATTENTE'" class="section-card no-evaluation">
+      <div class="no-evaluation-icon">⏳</div>
+      <h3>Candidature en attente d'évaluation</h3>
+      <p>Le publieur de l'offre va examiner votre candidature.</p>
+    </div>
+  </div>
+</div>

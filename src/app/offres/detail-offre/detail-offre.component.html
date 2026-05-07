@@ -1,0 +1,175 @@
+<div class="container-fluid py-4">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-2 text-muted">Chargement de l'offre...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{error}}
+  </div>
+
+  <!-- Offre détaillée -->
+  <div *ngIf="!loading && offre && !error">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <button class="btn btn-outline-secondary btn-sm mb-3" (click)="retourMarketplace()">
+          <i class="ti ti-arrow-left me-1"></i>Retour au marketplace
+        </button>
+        
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span [class]="getStatutBadgeClass(offre.statut)">{{getStatutLabel(offre.statut)}}</span>
+            <span class="badge bg-primary ms-2">{{getCategorieNom(offre)}}</span>
+            <h2 class="mt-2 mb-0">{{offre.titre}}</h2>
+          </div>
+          <div class="text-end">
+            <div class="h4 text-primary mb-0">{{formatBudget(offre.budgetMin, offre.budgetMax)}}</div>
+            <small class="text-muted">Budget</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Colonne principale -->
+      <div class="col-lg-8">
+        <!-- Description -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="ti ti-file-description me-2"></i>Description</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-0" style="white-space: pre-line;">{{offre.description}}</p>
+          </div>
+        </div>
+
+        <!-- Critères -->
+        <div class="card mb-4" *ngIf="offre.criteres && offre.criteres.length > 0">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="ti ti-list-check me-2"></i>Critères de sélection ({{offre.criteres.length}})</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Critère</th>
+                    <th>Type</th>
+                    <th>Poids</th>
+                    <th>Importance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let critere of offre.criteres">
+                    <td>
+                      <strong>{{critere.nom}}</strong>
+                      <p *ngIf="critere.description" class="small text-muted mb-0">{{critere.description}}</p>
+                    </td>
+                    <td><span class="badge bg-secondary">{{critere.type}}</span></td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-2" style="height: 8px; width: 60px;">
+                          <div class="progress-bar" [style.width.%]="critere.poids"></div>
+                        </div>
+                        <span class="small">{{critere.poids}}%</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span *ngIf="critere.obligatoire" class="badge bg-danger">Obligatoire</span>
+                      <span *ngIf="!critere.obligatoire" class="badge bg-light text-dark">Facultatif</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Candidatures reçues (visible pour le publieur) -->
+        <div class="card mb-4" *ngIf="isPublieur">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="ti ti-users me-2"></i>Candidatures reçues</h5>
+          </div>
+          <div class="card-body">
+            <div class="text-center text-muted py-3">
+              <i class="ti ti-inbox" style="font-size: 2rem;"></i>
+              <p class="mb-0 mt-2">Aucune candidature reçue pour le moment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne latérale -->
+      <div class="col-lg-4">
+        <!-- Infos clés -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="ti ti-info-circle me-2"></i>Informations clés</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span><i class="ti ti-calendar me-2 text-primary"></i>Deadline</span>
+                <span class="badge bg-warning">{{calculerJoursRestants(offre.deadline)}} jours</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span><i class="ti ti-users me-2 text-info"></i>Postes</span>
+                <span class="badge bg-secondary">{{offre.nombrePostes}}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span><i class="ti ti-send me-2 text-success"></i>Candidatures</span>
+                <span class="badge bg-secondary">0</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span><i class="ti ti-calendar-plus me-2 text-muted"></i>Publiée le</span>
+                <span>{{offre.datePublication | date:'dd/MM/yyyy'}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="ti ti-click me-2"></i>Actions</h5>
+          </div>
+          <div class="card-body">
+            <!-- Bouton Postuler (pour freelance) -->
+            <button *ngIf="isFreelance && offre.statut === 'ACTIVE' && !isPublieur" 
+                    class="btn btn-success w-100 mb-2" (click)="postuler()">
+              <i class="ti ti-send me-2"></i>Postuler à cette offre
+            </button>
+
+            <!-- Boutons pour le publieur -->
+            <div *ngIf="isPublieur">
+              <button *ngIf="offre.statut === 'BROUILLON'" 
+                      class="btn btn-primary w-100 mb-2" (click)="modifierOffre()">
+                <i class="ti ti-edit me-2"></i>Modifier l'offre
+              </button>
+              
+              <button *ngIf="offre.statut === 'ACTIVE'" 
+                      class="btn btn-warning w-100 mb-2" (click)="cloturerOffre()">
+                <i class="ti ti-lock me-2"></i>Clôturer l'offre
+              </button>
+
+              <a href="#" class="btn btn-outline-info w-100">
+                <i class="ti ti-users me-2"></i>Voir les candidatures
+              </a>
+            </div>
+
+            <!-- Message si offre non active -->
+            <div *ngIf="offre.statut !== 'ACTIVE'" class="alert alert-warning mt-2 mb-0">
+              <i class="ti ti-alert-circle me-2"></i>
+              Cette offre n'est plus active. Le statut est : {{getStatutLabel(offre.statut)}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

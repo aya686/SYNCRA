@@ -1,0 +1,81 @@
+<div class="formulaire-negociation-container">
+  <div class="container">
+    <div class="form-card">
+      <h1 class="form-title">🤝 Demande de Négociation</h1>
+      <p class="form-subtitle">Projet : <strong>{{ projetNom }}</strong></p>
+
+      <!-- Success Message -->
+      <div class="alert alert-success" *ngIf="success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+          <h4>Demande envoyée avec succès !</h4>
+          <p>Votre demande de négociation a été envoyée. Nous vous contacterons bientôt.</p>
+        </div>
+        <button class="btn btn-primary" (click)="retour()">Retour aux projets</button>
+      </div>
+
+      <!-- Form -->
+      <form *ngIf="!success" (ngSubmit)="envoyerDemande()">
+        <!-- Error Message -->
+        <div class="alert alert-error" *ngIf="error">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <p>{{ error }}</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nom">Nom *</label>
+          <input
+            type="text"
+            id="nom"
+            name="nom"
+            [(ngModel)]="nom"
+            (input)="onInputChange()"
+            class="form-control"
+            placeholder="Votre nom"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="prenom">Prénom *</label>
+          <input
+            type="text"
+            id="prenom"
+            name="prenom"
+            [(ngModel)]="prenom"
+            (input)="onInputChange()"
+            class="form-control"
+            placeholder="Votre prénom"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="description"
+            (input)="onInputChange()"
+            class="form-control"
+            rows="5"
+            placeholder="Décrivez votre proposition de négociation..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="retour()" [disabled]="loading">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="!loading">Envoyer la demande</span>
+            <span *ngIf="loading">Envoi en cours...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

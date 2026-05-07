@@ -1,0 +1,131 @@
+<div class="admin-paiements-container">
+  <div class="header">
+    <h1>Dashboard Admin Paiements</h1>
+    <p class="subtitle">Surveillance et gestion de tous les paiements</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Statistiques -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>Total Payé</h3>
+          <p>{{ formatMontant(stats.totalPaye) }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💎</div>
+        <div class="stat-content">
+          <h3>Commissions</h3>
+          <p>{{ formatMontant(stats.totalCommissions) }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>En Attente</h3>
+          <p>{{ stats.totalEnAttente }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>Payés</h3>
+          <p>{{ stats.totalPayes }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters">
+      <h3>Filtrer par statut</h3>
+      <div class="filter-buttons">
+        <button class="btn-filter" [class.active]="selectedStatut === null" (click)="filterByStatut(null)">
+          Tous
+        </button>
+        <button class="btn-filter" [class.active]="selectedStatut === 'EN_ATTENTE'" (click)="filterByStatut('EN_ATTENTE')">
+          En attente
+        </button>
+        <button class="btn-filter" [class.active]="selectedStatut === 'PARTIELLEMENT_PAYE'" (click)="filterByStatut('PARTIELLEMENT_PAYE')">
+          Partiellement payé
+        </button>
+        <button class="btn-filter" [class.active]="selectedStatut === 'PAYE'" (click)="filterByStatut('PAYE')">
+          Payés
+        </button>
+        <button class="btn-filter" [class.active]="selectedStatut === 'EN_RETARD'" (click)="filterByStatut('EN_RETARD')">
+          En retard
+        </button>
+        <button class="btn-filter" [class.active]="selectedStatut === 'BLOQUE'" (click)="filterByStatut('BLOQUE')">
+          Bloqués
+        </button>
+      </div>
+    </div>
+
+    <!-- Liste des paiements -->
+    <div class="paiements-table">
+      <h2>Liste des Paiements ({{ getFilteredPaiements().length }})</h2>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Montant Total</th>
+              <th>Payé</th>
+              <th>Restant</th>
+              <th>Commission</th>
+              <th>Payeur ID</th>
+              <th>Bénéficiaire ID</th>
+              <th>Statut</th>
+              <th>Date Création</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let paiement of getFilteredPaiements()">
+              <td>{{ paiement.reference }}</td>
+              <td>{{ formatMontant(paiement.montantTotal) }}</td>
+              <td>{{ formatMontant(paiement.montantPaye) }}</td>
+              <td>{{ formatMontant(paiement.montantRestant) }}</td>
+              <td>{{ formatMontant(paiement.montantCommission || 0) }}</td>
+              <td>{{ paiement.payeurId }}</td>
+              <td>{{ paiement.beneficiaireId }}</td>
+              <td><span [class]="getStatutClass(paiement.statut)">{{ getStatutLabel(paiement.statut) }}</span></td>
+              <td>{{ formatDate(paiement.dateCreation!) }}</td>
+              <td>
+                <button class="btn btn-sm btn-primary" [routerLink]="['/paiements', paiement.id]">
+                  Voir
+                </button>
+                <button class="btn btn-sm btn-warning" (click)="bloquerPaiement(paiement.id!)" *ngIf="paiement.statut !== 'BLOQUE'">
+                  🔒 Bloquer
+                </button>
+                <button class="btn btn-sm btn-success" (click)="debloquerPaiement(paiement.id!)" *ngIf="paiement.statut === 'BLOQUE'">
+                  🔓 Débloquer
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aucun paiement -->
+    <div class="no-paiements" *ngIf="getFilteredPaiements().length === 0">
+      <div class="empty-state">
+        <div class="empty-icon">💳</div>
+        <h3>Aucun paiement trouvé</h3>
+        <p>Aucun paiement ne correspond aux critères de filtrage.</p>
+      </div>
+    </div>
+  </div>
+</div>

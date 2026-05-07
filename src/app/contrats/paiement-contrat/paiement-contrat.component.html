@@ -1,0 +1,170 @@
+<div class="paiement-contrat-container">
+  <div class="page-header">
+    <h1>Paiement du Contrat</h1>
+    <p class="subtitle">Procédez au paiement de votre contrat</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-message" *ngIf="success">
+    <span class="success-icon">✅</span>
+    {{ success }}
+  </div>
+
+  <!-- Contract Info -->
+  <div class="contract-info">
+    <h2>Informations du Contrat</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="label">Titre:</span>
+        <span class="value">{{ contrat?.titre || 'Chargement...' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Montant:</span>
+        <span class="value">{{ contrat?.montant ? contrat.montant + ' TND' : 'Chargement...' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">ID:</span>
+        <span class="value">#{{ contrat?.id || 'Chargement...' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Form -->
+  <div class="payment-form-container" *ngIf="!success">
+    <form (ngSubmit)="onSubmit()">
+      <!-- Mode de paiement -->
+      <div class="form-group">
+        <label>Mode de paiement *</label>
+        <div class="payment-methods">
+          <label class="payment-method" [class.active]="modePaiement === 'CARTE'">
+            <input type="radio" [(ngModel)]="modePaiement" name="modePaiement" value="CARTE">
+            <div class="method-content">
+              <div class="method-icon">💳</div>
+              <div class="method-details">
+                <h3>Carte Bancaire</h3>
+                <p>Visa, Mastercard, etc.</p>
+              </div>
+            </div>
+          </label>
+          <label class="payment-method" [class.active]="modePaiement === 'D17'">
+            <input type="radio" [(ngModel)]="modePaiement" name="modePaiement" value="D17">
+            <div class="method-content">
+              <div class="method-icon">📮</div>
+              <div class="method-details">
+                <h3>D17 (Poste Tunisienne)</h3>
+                <p>Paiement par virement postal</p>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Informations personnelles -->
+      <div class="form-section">
+        <h3>Informations Personnelles</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nom">Nom *</label>
+            <input
+              type="text"
+              id="nom"
+              [(ngModel)]="nom"
+              name="nom"
+              required
+              placeholder="Votre nom"
+            >
+          </div>
+          <div class="form-group">
+            <label for="prenom">Prénom *</label>
+            <input
+              type="text"
+              id="prenom"
+              [(ngModel)]="prenom"
+              name="prenom"
+              required
+              placeholder="Votre prénom"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte bancaire -->
+      <div class="form-section" *ngIf="modePaiement === 'CARTE'">
+        <h3>Informations de la Carte</h3>
+        <div class="form-group">
+          <label for="numeroCarte">Numéro de carte *</label>
+          <input
+            type="text"
+            id="numeroCarte"
+            [(ngModel)]="numeroCarte"
+            name="numeroCarte"
+            required
+            placeholder="1234 5678 9012 3456"
+            maxlength="19"
+          >
+          <small>13-19 chiffres</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dateExpiration">Date d'expiration *</label>
+            <input
+              type="text"
+              id="dateExpiration"
+              [(ngModel)]="dateExpiration"
+              name="dateExpiration"
+              required
+              placeholder="MM/YY"
+              maxlength="5"
+            >
+            <small>Format: MM/YY</small>
+          </div>
+          <div class="form-group">
+            <label for="cvv">CVV *</label>
+            <input
+              type="text"
+              id="cvv"
+              [(ngModel)]="cvv"
+              name="cvv"
+              required
+              placeholder="123"
+              maxlength="4"
+            >
+            <small>3-4 chiffres</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- D17 -->
+      <div class="form-section" *ngIf="modePaiement === 'D17'">
+        <h3>Instructions D17</h3>
+        <div class="d17-instructions">
+          <p>Pour effectuer le paiement via D17 (Poste Tunisienne) :</p>
+          <ol>
+            <li>Rendez-vous au bureau de poste le plus proche</li>
+            <li>Effectuez un virement postal au compte : <strong>12345678901234567890</strong></li>
+            <li>Indiquez la référence : <strong>CONTRAT-{{ contrat?.id }}</strong></li>
+            <li>Montant à payer : <strong>{{ contrat?.montant }} TND</strong></li>
+          </ol>
+          <p class="note">Le paiement sera confirmé après réception du virement (délai: 24-48h)</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="annuler()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary">
+          Confirmer le Paiement
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

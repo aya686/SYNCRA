@@ -1,0 +1,657 @@
+<!-- PARTICLE CANVAS BACKGROUND -->
+<canvas class="particle-canvas" #particleCanvas></canvas>
+
+<!-- CURSOR GLOW -->
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap">
+        <div class="brand-hex">⬡</div>
+      </div>
+      <span class="brand-name">BERRY</span>
+    </a>
+    <div class="nav-links">
+      <a routerLink="/" class="nav-link active">Home</a>
+      <a routerLink="/default" class="nav-link">Dashboard</a>
+      <a href="#" class="nav-link">Documentation</a>
+      <a href="#" class="btn-purchase">
+        <span>Get Started</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <button class="nav-mobile-toggle" (click)="mobileMenuOpen = !mobileMenuOpen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <!-- Decorative geometric blobs -->
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-blob blob-3"></div>
+  <div class="hero-grid-overlay"></div>
+
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow reveal">
+        <span class="eyebrow-pulse"></span>
+        Plateforme d'Investissement & Freelance
+      </div>
+
+      <h1 class="hero-title reveal" style="--delay:0.1s">
+        Investissez.<br>
+        Collaborez.<br>
+        <span class="hero-highlight">
+          Réussissez.
+          <svg class="title-underline" viewBox="0 0 300 12" preserveAspectRatio="none">
+            <path d="M0 8 Q75 2 150 8 Q225 14 300 8" stroke="url(#uGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="uGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#0a6ebd"/>
+                <stop offset="100%" stop-color="#00c2d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+      </h1>
+
+      <p class="hero-desc reveal" style="--delay:0.2s">
+        BERRY est la plateforme unifiée qui connecte investisseurs, freelancers et porteurs de projets.
+        Trouvez des opportunités, gérez vos investissements et collaborez avec des talents exceptionnels.
+      </p>
+
+      <div class="hero-cta reveal" style="--delay:0.3s">
+        <a routerLink="/default" class="btn-primary">
+          <span class="btn-bg"></span>
+          <span class="play-icon">▶</span>
+          Voir le Dashboard
+        </a>
+        <a href="#" class="btn-ghost">
+          En savoir plus
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="tech-badges reveal" style="--delay:0.4s">
+        <div class="tech-badge angular">
+          <svg width="14" height="14" viewBox="0 0 250 250" fill="currentColor"><path d="M125 30L31.9 63.2l14.2 123.1L125 230l78.9-43.7 14.2-123.1z" opacity=".3"/><path d="M125 30v200l78.9-43.7 14.2-123.1z" opacity=".6"/><path d="M125 30L31.9 63.2l14.2 123.1L125 230V30z"/><path d="M125 52.1L66.8 182.6h21.7l11.7-29.2h49.4l11.7 29.2H183L125 52.1zm17 83.3h-34l17-40.9 17 40.9z" fill="white"/></svg>
+          Angular 21
+        </div>
+        <div class="tech-badge typescript">
+          <svg width="14" height="14" viewBox="0 0 400 400" fill="currentColor"><rect width="400" height="400" rx="50" fill="#3178c6"/><path d="M87.7 200.7V217h52v148h36.9V217h52v-16c0-9 0-16.3-.4-16.5-.3-.3-31.7-.4-70-.4l-69.7.3v16.3zm230.6-17c11.4 2.9 20 8.8 26.5 17.9 3.3 4.7 8.3 13.4 8.8 15.5.1.6-15.7 11.1-25.3 17.1-.4.3-2-1.4-3.6-4-5.2-7.4-10.5-10.6-18.8-11.2-12.1-.8-20 5.5-20 16 0 3.1.5 5 1.8 7.6 2.8 5.6 8 9 23 15.6 28.4 12.2 40.5 20.3 48.1 31.7 8.5 12.8 10.4 33.3 4.7 48.5-6.3 16.5-22 27.7-44 31.5-6.8 1.2-22.9 1-30.1-.3-15.9-3-31-12.7-40.3-25.7-3.3-4.7-9.7-17-9.3-17.8.2-.3 1.9-1.3 3.8-2.4 1.9-1 9.1-5.2 16-9.4l12.5-7.7 2.6 3.8c3.7 5.5 11.7 13.1 16.6 15.6 14.6 7.7 34.9 6.6 44.9-2.3 3.2-2.8 4.5-5.9 4.5-10.3 0-4-.5-5.8-2.6-8.8-2.7-3.9-8.1-7.2-23.6-14-17.7-7.8-25.3-12.7-32.3-20.4-4.5-5-8.7-13.5-10.4-20.9-1.8-7.6-1.5-25.5.5-33 5.7-22.2 23-36.2 47.5-38.3 8.2-.7 25.5.3 32.7 1.9z" fill="white"/></svg>
+          TypeScript
+        </div>
+        <div class="tech-badge node">
+          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128 0C93.8 0 61.3 14.3 37.5 39.8L0 96l37.5 56.2C61.3 177.7 93.8 192 128 192s66.7-14.3 90.5-39.8L256 96l-37.5-56.2C194.7 14.3 162.2 0 128 0z" fill="#68a063"/><path d="M128 40c-30.9 0-56 25.1-56 56s25.1 56 56 56 56-25.1 56-56-25.1-56-56-56zm0 88c-17.6 0-32-14.4-32-32s14.4-32 32-32 32 14.4 32 32-14.4 32-32 32z" fill="white"/></svg>
+          Node.js
+        </div>
+      </div>
+
+      <!-- Trust indicators -->
+      <div class="hero-trust reveal" style="--delay:0.5s">
+        <div class="trust-avatars">
+          <div class="ta" style="background:#0a6ebd">KL</div>
+          <div class="ta" style="background:#00a8c6">SM</div>
+          <div class="ta" style="background:#006494">DR</div>
+          <div class="ta" style="background:#007f5f">BK</div>
+        </div>
+        <span class="trust-text">Utilisé par <strong>500+</strong> investisseurs et freelancers</span>
+        <div class="trust-stars">★★★★★</div>
+      </div>
+    </div>
+
+    <!-- HERO VISUAL -->
+    <div class="hero-visual reveal" style="--delay:0.2s">
+      <div class="dashboard-preview" #dashPreview>
+        <div class="preview-card card-earning">
+          <div class="card-label">Network Uptime</div>
+          <div class="card-amount counter" data-target="99.99">99.99%</div>
+          <div class="card-trend">
+            <span class="trend-arrow">↑</span> 0.2% this week
+          </div>
+          <div class="card-sparkline">
+            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+              <polyline points="0,25 15,20 30,22 45,15 60,18 75,10 90,12 100,8" fill="none" stroke="rgba(0,194,212,0.6)" stroke-width="1.5"/>
+              <polyline points="0,25 15,20 30,22 45,15 60,18 75,10 90,12 100,8 100,30 0,30" fill="url(#sparkGrad)" opacity="0.2"/>
+              <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00c2d4"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+            </svg>
+          </div>
+        </div>
+
+        <div class="preview-card card-stats">
+          <div class="card-header-mini">
+            <span class="chm-title">Live Metrics</span>
+            <span class="chm-badge">● LIVE</span>
+          </div>
+          <div class="stat-row"><span class="stat-dot blue"></span><span>Active Nodes</span><span class="stat-val">2,847</span></div>
+          <div class="stat-row"><span class="stat-dot cyan"></span><span>Data Streams</span><span class="stat-val">142</span></div>
+          <div class="stat-row"><span class="stat-dot teal"></span><span>Alerts Today</span><span class="stat-val">3</span></div>
+          <div class="donut-chart">
+            <svg viewBox="0 0 60 60" width="60" height="60">
+              <circle cx="30" cy="30" r="22" fill="none" stroke="#e8f4fd" stroke-width="6"/>
+              <circle cx="30" cy="30" r="22" fill="none" stroke="#0a6ebd" stroke-width="6" stroke-dasharray="62 76" stroke-dashoffset="-7" stroke-linecap="round"/>
+              <circle cx="30" cy="30" r="22" fill="none" stroke="#00c2d4" stroke-width="6" stroke-dasharray="34 104" stroke-dashoffset="-69" stroke-linecap="round"/>
+              <circle cx="30" cy="30" r="22" fill="none" stroke="#00d4a8" stroke-width="6" stroke-dasharray="42 96" stroke-dashoffset="-103" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-label">Live</div>
+          </div>
+        </div>
+
+        <div class="preview-card card-profile">
+          <div class="profile-ring">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar-inner">AC</div>
+            </div>
+          </div>
+          <div class="profile-name">Alex Chen</div>
+          <div class="profile-role">Network Engineer</div>
+          <div class="profile-tags">
+            <span class="ptag">Senior</span>
+            <span class="ptag blue">NOC Team</span>
+          </div>
+          <button class="btn-profile">View Dashboard</button>
+        </div>
+
+        <div class="preview-card card-growth">
+          <div class="growth-label">Throughput</div>
+          <div class="growth-amount">2.4 <span class="growth-unit">GB/s</span></div>
+          <div class="growth-bar">
+            <div class="growth-fill" style="width:74%"></div>
+          </div>
+          <div class="growth-meta">
+            <span class="gm-from">1.2 GB/s</span>
+            <span class="gm-pct">+74%</span>
+          </div>
+        </div>
+
+        <div class="preview-card card-chart">
+          <div class="chart-top">
+            <span class="chart-title">Traffic Overview</span>
+            <span class="chart-period">Last 7 days</span>
+          </div>
+          <div class="mini-chart">
+            <div class="bar-wrap" *ngFor="let b of chartBars; let i = index">
+              <div class="bar" [style.height]="b.h" [style.--i]="i" [style.--c]="b.c"></div>
+              <span class="bar-label">{{b.d}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating notification cards -->
+      <div class="float-notif fn-1 reveal" style="--delay:0.6s">
+        <div class="fn-icon">✓</div>
+        <div class="fn-content">
+          <div class="fn-title">Auto-Healed</div>
+          <div class="fn-sub">Node EU-West-3 restored</div>
+        </div>
+      </div>
+      <div class="float-notif fn-2 reveal" style="--delay:0.7s">
+        <div class="fn-icon alert">⚡</div>
+        <div class="fn-content">
+          <div class="fn-title">Anomaly Detected</div>
+          <div class="fn-sub">Traffic spike — auto-routing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCROLLING MARQUEE -->
+<div class="marquee-divider">
+  <div class="marquee-track">
+    <span>Investissement</span><span class="sep">◆</span>
+    <span>Freelance</span><span class="sep">◆</span>
+    <span>Porteurs de projets</span><span class="sep">◆</span>
+    <span>IA & Analytics</span><span class="sep">◆</span>
+    <span>Marketplace</span><span class="sep">◆</span>
+    <span>Contrats</span><span class="sep">◆</span>
+    <span>Chat</span><span class="sep">◆</span>
+    <span>Investissement</span><span class="sep">◆</span>
+    <span>Freelance</span><span class="sep">◆</span>
+    <span>Porteurs de projets</span><span class="sep">◆</span>
+    <span>IA & Analytics</span><span class="sep">◆</span>
+    <span>Marketplace</span><span class="sep">◆</span>
+    <span>Contrats</span><span class="sep">◆</span>
+    <span>Chat</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- STATS SECTION -->
+<section class="stats-section">
+  <div class="stats-container">
+    <div class="stat-card reveal" [class]="s.color"
+         *ngFor="let s of stats; let i = index"
+         [style.--delay]="i * 0.12 + 's'">
+      <div class="stat-icon-wrap">
+        <div class="stat-icon">{{ s.icon }}</div>
+      </div>
+      <div class="stat-body">
+        <div class="stat-number">{{ s.number }}</div>
+        <div class="stat-label">{{ s.label }}</div>
+      </div>
+      <div class="stat-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEV / ENGINEER SECTION -->
+<section class="dev-section">
+  <div class="dev-container">
+    <div class="dev-visual reveal">
+      <div class="dev-illustration">
+        <div class="dev-orbit orbit-1">
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="dev-orbit orbit-2">
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="dev-orbit orbit-3">
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="dev-center-card">
+          <div class="dcc-icon">⬡</div>
+          <div class="dcc-title">BERRY</div>
+          <div class="dcc-sub">Core Engine</div>
+          <div class="dcc-pulse"></div>
+        </div>
+        <div class="floating-chip fc1">
+          <span class="chip-dot"></span>Angular
+        </div>
+        <div class="floating-chip fc2">
+          <span class="chip-dot"></span>Node.js
+        </div>
+        <div class="floating-chip fc3">
+          <span class="chip-dot"></span>TypeScript
+        </div>
+        <div class="floating-chip fc4">
+          <span class="chip-dot"></span>Docker
+        </div>
+      </div>
+    </div>
+
+    <div class="dev-text reveal" style="--delay:0.1s">
+      <div class="section-tag">Facile à utiliser</div>
+      <h2>Conçu pour<br><em>Tous les utilisateurs</em></h2>
+      <p>BERRY est conçu pour s'intégrer parfaitement dans votre flux de travail. Déployez en quelques minutes, gérez vos investissements et vos projets sans friction.</p>
+      <ul class="dev-list">
+        <li>
+          <span class="check-icon">✓</span>
+          <div><strong>Marketplace intuitive</strong> — trouvez les meilleures opportunités.</div>
+        </li>
+        <li>
+          <span class="check-icon">✓</span>
+          <div><strong>API REST + WebSocket</strong> pour les intégrations en temps réel.</div>
+        </li>
+        <li>
+          <span class="check-icon">✓</span>
+          <div><strong>Support multi-rôles</strong> pour investisseurs, freelancers et porteurs.</div>
+        </li>
+        <li>
+          <span class="check-icon">✓</span>
+          <div><strong>Accès basé sur les rôles</strong> avec SSO et MFA intégrés.</div>
+        </li>
+      </ul>
+      <div class="dev-cta">
+        <a href="#" class="btn-primary small">
+          <span class="btn-bg"></span>
+          Voir la Documentation
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#" class="inline-link">Voir l'API →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INFRASTRUCTURE / FIGMA SECTION -->
+<section class="figma-section">
+  <div class="figma-container">
+    <div class="figma-text reveal">
+      <div class="section-tag">Architecture</div>
+      <h2>Infrastructure<br><em>de niveau entreprise</em></h2>
+      <p>Chaque composant est conçu avec la scalabilité et la sécurité à l'esprit — de l'investissement au freelance, de la startup à la grande entreprise.</p>
+      <ul class="dev-list light">
+        <li><span class="check-icon">✓</span><div>Pipeline de données chiffré de bout en bout</div></li>
+        <li><span class="check-icon">✓</span><div>Conforme SOC2 Type II & ISO 27001</div></li>
+        <li><span class="check-icon">✓</span><div>Dashboard mode sombre / clair</div></li>
+        <li><span class="check-icon">✓</span><div>Bibliothèque de composants basée sur Material Design</div></li>
+        <li><span class="check-icon">✓</span><div>Alertes configurables & règles d'escalade</div></li>
+      </ul>
+      <div class="figma-btns">
+        <a href="#" class="btn-primary small">
+          <span class="btn-bg"></span>
+          ⬇ Essai gratuit
+        </a>
+        <a href="#" class="btn-outline-primary">🛒 Acheter une licence</a>
+      </div>
+    </div>
+
+    <div class="figma-visual reveal" style="--delay:0.15s">
+      <div class="figma-card-stack">
+        <div class="fcs-bg-card bc-1"></div>
+        <div class="fcs-bg-card bc-2"></div>
+        <div class="fcs-main-card">
+          <div class="fmc-topbar">
+            <div class="fmtb-dots">
+              <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+            </div>
+            <div class="fmtb-title">Infrastructure Overview</div>
+            <div class="fmtb-action">Export</div>
+          </div>
+          <div class="fmc-content">
+            <div class="fmc-sidebar">
+              <div class="fms-item active">
+                <span>◈</span> Dashboard
+              </div>
+              <div class="fms-item" *ngFor="let item of ['Topology', 'Alerts', 'Analytics', 'Security']">
+                <span>›</span> {{item}}
+              </div>
+            </div>
+            <div class="fmc-body">
+              <div class="fmb-grid">
+                <div class="fmb-card blue"></div>
+                <div class="fmb-card teal"></div>
+                <div class="fmb-card full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating badge -->
+        <div class="fcs-badge">
+          <div class="fcsb-icon">🔒</div>
+          <div>
+            <div class="fcsb-title">SOC2 Compliant</div>
+            <div class="fcsb-sub">Verified · 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES GRID -->
+<section class="offer-section">
+  <div class="offer-inner">
+    <div class="offer-header reveal">
+      <div class="section-tag center-tag">Fonctionnalités</div>
+      <h2>Que propose BERRY ?</h2>
+      <p>Une plateforme complète pour l'investissement et le freelance — de la découverte à la collaboration, le tout dans un espace de travail unifié.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal"
+           *ngFor="let f of features; let i = index"
+           [style.--delay]="i * 0.08 + 's'">
+        <div class="feature-icon-wrap">
+          <div class="feature-icon">{{ f.icon }}</div>
+        </div>
+        <div class="feature-content">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.desc }}</p>
+        </div>
+        <div class="feature-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPS CAROUSEL -->
+<section class="apps-section">
+  <div class="apps-inner">
+    <div class="apps-header reveal">
+      <div class="section-tag center-tag">Applications</div>
+      <h2>Explorez les modules intégrés</h2>
+      <p>BERRY inclut des modules pré-construits pour l'investissement, le freelance, les contrats, le chat, et l'analyse IA.</p>
+    </div>
+
+    <div class="apps-carousel">
+      <button class="carousel-btn prev" (click)="prevApp()">&#8249;</button>
+      <div class="apps-track">
+        <div class="app-slide"
+          *ngFor="let app of apps; let i = index"
+          [class.active]="i === currentAppIndex()"
+          [class.prev-slide]="i === (currentAppIndex() - 1 + apps.length) % apps.length"
+          [class.next-slide]="i === (currentAppIndex() + 1) % apps.length">
+          <div class="app-mockup">
+            <div class="mockup-bar">
+              <div class="mb-dots">
+                <span class="mbd r"></span>
+                <span class="mbd y"></span>
+                <span class="mbd g"></span>
+              </div>
+              <div class="mockup-url">syncra.io/{{ app.slug }}</div>
+              <div class="mb-controls">
+                <span class="mbc"></span>
+                <span class="mbc"></span>
+              </div>
+            </div>
+            <div class="mockup-content">
+              <div class="mockup-sidebar">
+                <div class="ms-logo">⬡</div>
+                <div class="sidebar-item active-item"></div>
+                <div class="sidebar-item" *ngFor="let x of [1,2,3,4,5,6,7]"></div>
+                <div class="ms-avatar">AC</div>
+              </div>
+              <div class="mockup-main">
+                <div class="mockup-header-bar">
+                  <div class="mhb-left">
+                    <div class="mhb-title"></div>
+                    <div class="mhb-breadcrumb"></div>
+                  </div>
+                  <div class="mhb-right">
+                    <div class="mhb-btn"></div>
+                    <div class="mhb-avatar"></div>
+                  </div>
+                </div>
+                <div class="mockup-stats-row">
+                  <div class="msr-card" *ngFor="let c of [1,2,3,4]"></div>
+                </div>
+                <div class="mockup-body">
+                  <div class="mockup-col">
+                    <div class="mc-card tall"></div>
+                    <div class="mc-card"></div>
+                  </div>
+                  <div class="mockup-col">
+                    <div class="mc-card"></div>
+                    <div class="mc-card"></div>
+                    <div class="mc-card small"></div>
+                  </div>
+                  <div class="mockup-col">
+                    <div class="mc-card tall"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="app-overlay-icon">{{ app.icon }}</div>
+          </div>
+          <div class="app-label">
+            <span class="app-name">{{ app.name }}</span>
+            <a href="#" class="app-link">View module ↗</a>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-btn next" (click)="nextApp()">&#8250;</button>
+    </div>
+
+    <div class="carousel-dots">
+      <span *ngFor="let app of apps; let i = index"
+        class="dot" [class.active]="i === currentAppIndex()"
+        (click)="currentAppIndex.set(i)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="testi-inner">
+    <div class="testimonials-header reveal">
+      <div class="section-tag center-tag">Témoignages</div>
+      <h2>Approuvé mondialement</h2>
+      <p>Les investisseurs et freelancers font confiance à BERRY chaque jour pour gérer leurs opportunités critiques.</p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal"
+           *ngFor="let t of testimonials; let i = index"
+           [style.--delay]="i * 0.07 + 's'">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"{{ t.text }}"</p>
+        <div class="testi-footer">
+          <div class="testimonial-avatar" [style.background]="t.color">{{ t.avatar }}</div>
+          <div class="testi-info">
+            <div class="testimonial-name">{{ t.name }}</div>
+            <div class="testimonial-handle">{{ t.handle }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHOOSE SECTION -->
+<section class="choose-section">
+  <div class="choose-bg-grid"></div>
+  <div class="choose-inner">
+    <div class="choose-left reveal">
+      <div class="section-tag light-tag">Pourquoi BERRY</div>
+      <h2 class="choose-title">Choisissez BERRY<br><em>pour</em></h2>
+      <p class="choose-sub">Des milliers d'utilisateurs ont fait le choix. Voici pourquoi ils restent.</p>
+      <a href="#" class="btn-white">
+        Commencer l'essai gratuit
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="choose-right">
+      <div class="reason-item reveal"
+           *ngFor="let r of reasons; let i = index"
+           [style.--delay]="i * 0.09 + 's'">
+        <span class="reason-num">0{{ i + 1 }}</span>
+        <span class="reason-text">{{ r }}</span>
+        <span class="reason-icon">→</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section class="frameworks-section">
+  <div class="fw-inner">
+    <div class="frameworks-header reveal">
+      <div class="section-tag center-tag">Écosystème</div>
+      <h2>BERRY s'intègre à votre stack*</h2>
+      <p>Connectez-vous à vos outils existants en quelques minutes. <a href="#">Voir toutes les intégrations →</a></p>
+    </div>
+    <div class="frameworks-carousel">
+      <button class="carousel-btn prev" (click)="prevFrameworkPage()">&#8249;</button>
+      <div class="frameworks-grid">
+        <div class="framework-card reveal"
+             *ngFor="let f of visibleFrameworks; let i = index"
+             [style.--delay]="i * 0.06 + 's'">
+          <div class="framework-icon" [style.background]="f.bg" [style.color]="f.color">{{ f.icon }}</div>
+          <div class="framework-name">{{ f.name }}</div>
+        </div>
+      </div>
+      <button class="carousel-btn next" (click)="nextFrameworkPage()">&#8250;</button>
+    </div>
+    <div class="carousel-dots">
+      <span class="dot" [class.active]="currentFrameworkPage() === 0" (click)="currentFrameworkPage.set(0)"></span>
+      <span class="dot" [class.active]="currentFrameworkPage() === 1" (click)="currentFrameworkPage.set(1)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-blob"></div>
+  <div class="cta-inner reveal">
+    <div class="section-tag light-tag">Commencer</div>
+    <h2>Prêt à réussir<br>votre projet ?</h2>
+    <p>Rejoignez 500+ investisseurs et freelancers qui font confiance à BERRY pour gérer leurs opportunités.</p>
+    <div class="cta-actions">
+      <a href="#" class="btn-white large">
+        Commencer l'essai gratuit
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="btn-ghost-white">Contacter les ventes</a>
+    </div>
+    <p class="cta-fine">Pas de carte de crédit requise · Essai gratuit de 30 jours · Annulation à tout moment</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="syncra-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="brand-icon-wrap small">
+          <div class="brand-hex">⬡</div>
+        </div>
+        <span class="brand-name">BERRY</span>
+      </div>
+      <p>BERRY est la plateforme unifiée d'investissement et de freelance construite pour les entreprises qui exigent une visibilité en temps réel, un contrôle automatisé et des insights alimentés par l'IA.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" title="Facebook">f</a>
+        <a href="#" class="social-btn" title="Twitter">𝕏</a>
+        <a href="#" class="social-btn" title="LinkedIn">in</a>
+        <a href="#" class="social-btn" title="GitHub">◈</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Monitoring</a></li>
+          <li><a href="#">Topology</a></li>
+          <li><a href="#">Automation</a></li>
+          <li><a href="#">Analytics</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Case Studies</a></li>
+          <li><a href="#">Status Page</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Integrations</h4>
+        <ul>
+          <li><a href="#">Kubernetes</a></li>
+          <li><a href="#">Terraform</a></li>
+          <li><a href="#">Prometheus</a></li>
+          <li><a href="#">Grafana</a></li>
+          <li><a href="#">PagerDuty <span class="badge-new">New</span></a></li>
+          <li><a href="#">Datadog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Partners</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Legal</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 BERRY — All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Security</a>
+    </div>
+  </div>
+</footer>

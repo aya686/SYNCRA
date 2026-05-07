@@ -1,0 +1,125 @@
+<div class="mes-contrats-container">
+  <div class="page-header">
+    <h1>Mes Contrats</h1>
+    <p class="subtitle">Gérez tous vos contrats en cours</p>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total Contrats</div>
+      </div>
+    </div>
+    <div class="stat-card stat-en-cours">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.enCours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+    </div>
+    <div class="stat-card stat-termines">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.termines }}</div>
+        <div class="stat-label">Terminés</div>
+      </div>
+    </div>
+    <div class="stat-card stat-litige">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.enLitige }}</div>
+        <div class="stat-label">En litige</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Rechercher par titre..."
+      [(ngModel)]="searchTitre"
+      (input)="onSearchChange()"
+    >
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des contrats...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Contracts Table -->
+  <div class="contracts-table" *ngIf="!loading && !error">
+    <table *ngIf="filteredContrats.length > 0">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Avec qui</th>
+          <th>Montant</th>
+          <th>Date signature</th>
+          <th>Expiration</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contrat of filteredContrats">
+          <td class="titre-cell">{{ contrat.titre }}</td>
+          <td class="partenaire-cell">{{ getPartenaireName(contrat) }}</td>
+          <td class="montant-cell">{{ contrat.montant }} TND</td>
+          <td class="date-cell">{{ formatDate(contrat.dateGeneration) }}</td>
+          <td class="date-cell">{{ formatDate(contrat.dateFin) }}</td>
+          <td class="actions-cell">
+            <button
+              class="btn-action btn-view"
+              [routerLink]="['/contrats', contrat.id]"
+              title="Voir détail"
+            >
+              👁️
+            </button>
+            <button
+              class="btn-action btn-download"
+              (click)="telechargerPDF(contrat)"
+              title="Télécharger PDF"
+            >
+              📥
+            </button>
+            <button
+              *ngIf="!contrat.paiementEffectue"
+              class="btn-action btn-payment"
+              [routerLink]="['/contrats/paiement', contrat.id]"
+              title="Paiement"
+            >
+              💳
+            </button>
+            <span
+              *ngIf="contrat.paiementEffectue"
+              class="payment-status-paid"
+              title="Déjà payé"
+            >
+              Déjà payé
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredContrats.length === 0">
+      <div class="empty-icon">📄</div>
+      <h3>Aucun contrat trouvé</h3>
+      <p *ngIf="!searchTitre">Vous n'avez pas encore de contrats.</p>
+      <p *ngIf="searchTitre">Aucun contrat ne correspond à votre recherche.</p>
+    </div>
+  </div>
+</div>

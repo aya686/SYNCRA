@@ -1,0 +1,131 @@
+<div class="creer-contrat-container">
+  <div class="page-header">
+    <h1>Créer un Contrat</h1>
+    <p class="subtitle">Créez un nouveau contrat manuellement</p>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-message" *ngIf="success">
+    <span class="success-icon">✅</span>
+    {{ success }}
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Form -->
+  <div class="form-container">
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="titre">Titre du contrat *</label>
+        <input 
+          type="text" 
+          id="titre" 
+          [(ngModel)]="contrat.titre" 
+          name="titre" 
+          required
+          placeholder="Ex: Développement Application React"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea 
+          id="description" 
+          [(ngModel)]="contrat.description" 
+          name="description" 
+          rows="4"
+          placeholder="Description détaillée du contrat..."
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="montant">Montant (TND) *</label>
+          <input 
+            type="number" 
+            id="montant" 
+            [(ngModel)]="contrat.montant" 
+            name="montant" 
+            required
+            min="0"
+            step="0.01"
+            placeholder="3500"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="modalitePaiement">Modalité de paiement</label>
+          <input 
+            type="text" 
+            id="modalitePaiement" 
+            [(ngModel)]="contrat.modalitePaiement" 
+            name="modalitePaiement" 
+            placeholder="50% à la signature, 50% à la livraison"
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateDebut">Date de début</label>
+          <input 
+            type="date" 
+            id="dateDebut" 
+            [(ngModel)]="contrat.dateDebut" 
+            name="dateDebut"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="dateFin">Date de fin</label>
+          <input 
+            type="date" 
+            id="dateFin" 
+            [(ngModel)]="contrat.dateFin" 
+            name="dateFin"
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="clientId">ID Client *</label>
+          <input 
+            type="number" 
+            id="clientId" 
+            [(ngModel)]="contrat.clientId" 
+            name="clientId" 
+            required
+            placeholder="1"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="prestataireId">ID Prestataire *</label>
+          <input 
+            type="number" 
+            id="prestataireId" 
+            [(ngModel)]="contrat.prestataireId" 
+            name="prestataireId" 
+            required
+            placeholder="1"
+          >
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">Créer le contrat</span>
+          <span *ngIf="loading">Création en cours...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

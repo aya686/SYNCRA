@@ -1,0 +1,231 @@
+<div class="soumettre-mise-fonds-container">
+  <div class="container">
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="success">
+      <div class="alert alert-success">
+        <h4>✅ Mise de fonds soumise avec succès !</h4>
+        <p>Votre proposition a été envoyée au porteur de projet. Vous serez notifié dès qu'il y aura une réponse.</p>
+        <button class="btn btn-primary" routerLink="/investissements/dashboard-investisseur">Retour à mon dashboard</button>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container" *ngIf="!success">
+      <h1>Soumettre une Mise de Fonds</h1>
+
+      <!-- Project Recap -->
+      <div class="project-recap">
+        <h2>Vous investissez dans :</h2>
+        <div class="project-details">
+          <div class="detail-item">
+            <span class="label">📦 Projet :</span>
+            <span class="value">{{ projet.titre }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🏢 Porteur :</span>
+            <span class="value">{{ projet.porteur }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">💰 Montant total recherché :</span>
+            <span class="value">{{ formatMontant(projet.montantTotal) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">✅ Déjà financé :</span>
+            <span class="value">{{ formatMontant(projet.dejaFinance) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">⏳ Reste à financer :</span>
+            <span class="value">{{ formatMontant(projet.resteAFinancer) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step" [class.active]="currentStep >= 1">
+          <div class="step-number">1</div>
+          <div class="step-label">Mon investissement</div>
+        </div>
+        <div class="step-line" [class.completed]="currentStep >= 2"></div>
+        <div class="step" [class.active]="currentStep >= 2">
+          <div class="step-number">2</div>
+          <div class="step-label">Preuve de fonds</div>
+        </div>
+        <div class="step-line" [class.completed]="currentStep >= 3"></div>
+        <div class="step" [class.active]="currentStep >= 3">
+          <div class="step-number">3</div>
+          <div class="step-label">Confirmation</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Investment Details -->
+      <div class="step-content" *ngIf="currentStep === 1">
+        <h3>ÉTAPE 1 - Mon investissement</h3>
+        
+        <div class="form-group">
+          <label>Montant de ma mise de fonds (TND) :</label>
+          <input type="number" class="form-control" [(ngModel)]="miseFonds.montant" placeholder="Ex: 50000" min="1000">
+          <small class="form-text text-muted">Maximum disponible : {{ formatMontant(projet.resteAFinancer) }}</small>
+        </div>
+
+        <div class="form-group">
+          <label>Pourcentage de participation souhaité (%) :</label>
+          <input type="number" class="form-control" [(ngModel)]="miseFonds.pourcentageParticipation" placeholder="Ex: 10" min="1" max="50">
+        </div>
+
+        <div class="form-group">
+          <label>Durée de l'investissement souhaitée (mois) :</label>
+          <select class="form-select" [(ngModel)]="miseFonds.dureeMois">
+            <option [ngValue]="12">12 mois</option>
+            <option [ngValue]="24">24 mois</option>
+            <option [ngValue]="36">36 mois</option>
+            <option [ngValue]="48">48 mois</option>
+            <option [ngValue]="60">60 mois</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Type d'investissement :</label>
+          <div class="investment-types">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="miseFonds.typeInvestissement" [value]="'PRISE_PARTICIPATION'">
+              <span>Prise de participation</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="miseFonds.typeInvestissement" [value]="'PRET'">
+              <span>Prêt</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="miseFonds.typeInvestissement" [value]="'DON'">
+              <span>Don</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-primary" (click)="nextStep()">Suivant →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Proof of Funds -->
+      <div class="step-content" *ngIf="currentStep === 2">
+        <h3>ÉTAPE 2 - Preuve de fonds</h3>
+        
+        <div class="form-group">
+          <label>Document justificatif :</label>
+          <input type="file" class="form-control" (change)="onFileUpload($event)" accept=".pdf,.jpg,.jpeg,.png">
+          <small class="form-text text-muted">Uploader relevé bancaire ou attestation</small>
+          <div class="file-preview" *ngIf="miseFonds.preuveFonds">
+            <span>✅ Fichier sélectionné</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>RIB bancaire :</label>
+          <input type="text" class="form-control" [(ngModel)]="miseFonds.ribBancaire" placeholder="TN59 0000 0000 0000 0000 0000" maxlength="50">
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-secondary" (click)="previousStep()">← Précédent</button>
+          <button class="btn btn-primary" (click)="nextStep()">Suivant →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div class="step-content" *ngIf="currentStep === 3">
+        <h3>ÉTAPE 3 - Confirmation</h3>
+        
+        <!-- AI Analysis -->
+        <div class="ai-analysis-card">
+          <h4>🤖 ANALYSE IA DE VOTRE INVESTISSEMENT</h4>
+          
+          <div class="analysis-grid">
+            <div class="analysis-item">
+              <span class="label">Score viabilité projet :</span>
+              <span class="value" [style.color]="getScoreColor(aiAnalysis.scoreViabilite)">
+                {{ aiAnalysis.scoreViabilite }} / 100 ✅
+              </span>
+            </div>
+            <div class="analysis-item">
+              <span class="label">ROI estimé :</span>
+              <span class="value">{{ aiAnalysis.roiEstime }}</span>
+            </div>
+            <div class="analysis-item">
+              <span class="label">Niveau de risque :</span>
+              <span class="value">{{ aiAnalysis.niveauRisque }}</span>
+            </div>
+            <div class="analysis-item">
+              <span class="label">Recommandation :</span>
+              <span class="value success">{{ aiAnalysis.recommandation }}</span>
+            </div>
+          </div>
+
+          <div class="analysis-sections">
+            <div class="analysis-section">
+              <h5>Points forts du projet :</h5>
+              <ul>
+                <li *ngFor="let point of aiAnalysis.pointsForts">✅ {{ point }}</li>
+              </ul>
+            </div>
+            <div class="analysis-section">
+              <h5>Points de risque :</h5>
+              <ul>
+                <li *ngFor="let point of aiAnalysis.pointsRisque">⚠️ {{ point }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recap -->
+        <div class="recap-card">
+          <h4>Récapitulatif de votre investissement</h4>
+          <div class="recap-details">
+            <div class="recap-item">
+              <span>Projet :</span>
+              <strong>{{ projet.titre }}</strong>
+            </div>
+            <div class="recap-item">
+              <span>Montant :</span>
+              <strong>{{ formatMontant(miseFonds.montant) }}</strong>
+            </div>
+            <div class="recap-item">
+              <span>Participation :</span>
+              <strong>{{ miseFonds.pourcentageParticipation }}%</strong>
+            </div>
+            <div class="recap-item">
+              <span>Durée :</span>
+              <strong>{{ miseFonds.dureeMois }} mois</strong>
+            </div>
+            <div class="recap-item">
+              <span>Type :</span>
+              <strong>{{ miseFonds.typeInvestissement }}</strong>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="conditionsAcceptees">
+              <span>J'accepte les conditions générales</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="informationsExactes">
+              <span>Je confirme l'exactitude des informations</span>
+            </label>
+          </div>
+
+          <div class="error-message" *ngIf="error">
+            <div class="alert alert-danger">{{ error }}</div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn-secondary" (click)="previousStep()" [disabled]="loading">← Précédent</button>
+            <button class="btn btn-primary" (click)="soumettreMiseFonds()" [disabled]="loading || !conditionsAcceptees || !informationsExactes">
+              <span *ngIf="!loading">Soumettre ma proposition</span>
+              <span *ngIf="loading">Soumission en cours...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

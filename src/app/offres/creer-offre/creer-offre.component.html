@@ -1,0 +1,318 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-2">Créer une Offre</h2>
+      <p class="text-muted">Publiez une nouvelle offre en 3 étapes simples.</p>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="progress" style="height: 8px;">
+        <div class="progress-bar" role="progressbar" [style.width.%]="getProgress()"></div>
+      </div>
+      <div class="d-flex justify-content-between mt-2">
+        <span [class.fw-bold]="currentStep >= 1">1. Informations</span>
+        <span [class.fw-bold]="currentStep >= 2">2. Critères</span>
+        <span [class.fw-bold]="currentStep >= 3">3. Confirmation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertes -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{error}}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="offreForm">
+        
+        <!-- ÉTAPE 1: Informations générales -->
+        <div *ngIf="currentStep === 1">
+          <h4 class="mb-4">Étape 1 : Informations générales</h4>
+          
+          <div class="row g-3">
+            <div class="col-md-12">
+              <label class="form-label">Titre de l'offre *</label>
+              <input type="text" class="form-control" formControlName="titre" 
+                     placeholder="Ex: Développeur Full Stack Angular/Spring Boot">
+              <div *ngIf="offreForm.get('titre')?.invalid && offreForm.get('titre')?.touched" 
+                   class="text-danger small mt-1">
+                Le titre est obligatoire (max 200 caractères)
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label">Description *</label>
+              <textarea class="form-control" formControlName="description" rows="5"
+                        placeholder="Décrivez en détail l'offre, les missions, les compétences requises..."></textarea>
+              <div *ngIf="offreForm.get('description')?.invalid && offreForm.get('description')?.touched" 
+                   class="text-danger small mt-1">
+                La description est obligatoire
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Catégorie *</label>
+              <select class="form-select" formControlName="categorieId">
+                <option [ngValue]="null">Sélectionnez une catégorie</option>
+                <option *ngFor="let cat of categories" [ngValue]="cat.id">{{cat.nom}}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Nombre de postes *</label>
+              <input type="number" class="form-control" formControlName="nombrePostes" min="1">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Statut *</label>
+              <select class="form-select" formControlName="statut">
+                <option *ngFor="let statut of statutsOffres" [ngValue]="statut">{{statut}}</option>
+              </select>
+              <div class="form-text">Choisissez le statut initial de l'offre</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Budget minimum (TND) *</label>
+              <input type="number" class="form-control" formControlName="budgetMin" min="0">
+              <button type="button" class="btn btn-primary btn-sm mt-2 w-100" (click)="predireBudget()" [disabled]="loadingPrediction">
+                <span *ngIf="!loadingPrediction">
+                  <i class="ti ti-magic-wand me-1"></i>
+                  Prédire le budget recommandé
+                </span>
+                <span *ngIf="loadingPrediction" class="d-flex align-items-center justify-content-center">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <span>Calcul en cours...</span>
+                </span>
+              </button>
+
+              <!-- Résultat de la prédiction avec animation -->
+              <div *ngIf="budgetPrediction && budgetPrediction.success"
+                   class="mt-3 p-4 rounded-3 border-2 border-success bg-success bg-opacity-10 animate-fade-in">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="bg-success text-white rounded-circle p-2 me-3">
+                    <i class="ti ti-check fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 text-success fw-bold">Budget recommandé par l'IA</h6>
+                    <small class="text-muted">Basé sur l'analyse de votre offre</small>
+                  </div>
+                </div>
+                <div class="text-center py-3 bg-white rounded-2 shadow-sm">
+                  <div class="display-6 fw-bold text-success">
+                    {{ budgetPrediction.budgetMin | number:'0.0' }} - {{ budgetPrediction.budgetMax | number:'0.0' }} TND
+                  </div>
+                  <div class="text-muted small mt-1">
+                    <i class="ti ti-info-circle me-1"></i>
+                    Fourchette recommandée avec marge de ±15%
+                  </div>
+                </div>
+              </div>
+
+              <!-- Erreur de prédiction -->
+              <div *ngIf="budgetPrediction && !budgetPrediction.success" class="alert alert-danger mt-2 animate-fade-in">
+                <i class="ti ti-alert-triangle me-1"></i>
+                <strong>Erreur :</strong> {{ budgetPrediction.message || 'Impossible de prédire le budget' }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Budget maximum (TND)</label>
+              <input type="number" class="form-control" formControlName="budgetMax" min="0"
+                     placeholder="Optionnel">
+              <div class="form-text">Laissez vide pour "À partir de X TND"</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Date de clôture *</label>
+              <input type="datetime-local" class="form-control" formControlName="deadline">
+              <div *ngIf="offreForm.get('deadline')?.invalid && offreForm.get('deadline')?.touched" 
+                   class="text-danger small mt-1">
+                La deadline est obligatoire
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 2: Critères -->
+        <div *ngIf="currentStep === 2">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4>Étape 2 : Critères de sélection</h4>
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="addCritere()">
+              <i class="ti ti-plus me-1"></i>Ajouter un critère
+            </button>
+          </div>
+
+          <div class="alert alert-info">
+            <i class="ti ti-info-circle me-2"></i>
+            Définissez les critères d'évaluation. La somme des poids ne doit pas dépasser 100%.
+          </div>
+
+          <div formArrayName="criteres">
+            <div *ngFor="let critere of criteres.controls; let i = index" [formGroupName]="i" 
+                 class="card mb-3 border">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Nom du critère *</label>
+                    <input type="text" class="form-control" formControlName="nom"
+                           placeholder="Ex: Expérience Angular">
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Type *</label>
+                    <select class="form-select" formControlName="type">
+                      <option *ngFor="let type of typeCriteres" [ngValue]="type">{{type}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Poids (%) *</label>
+                    <input type="number" class="form-control" formControlName="poids" min="0" max="100">
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Obligatoire</label>
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="checkbox" formControlName="obligatoire">
+                      <label class="form-check-label">Oui</label>
+                    </div>
+                  </div>
+                  <div class="col-md-1 d-flex align-items-end justify-content-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            (click)="removeCritere(i)" [disabled]="criteres.length === 1">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-control" formControlName="description"
+                           placeholder="Description détaillée du critère (optionnel)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total poids -->
+          <div class="alert" [class.alert-warning]="getTotalPoids() > 100" [class.alert-success]="getTotalPoids() <= 100">
+            <strong>Total des poids : {{getTotalPoids()}}%</strong>
+            <span *ngIf="getTotalPoids() > 100" class="text-danger ms-2">
+              ⚠️ Le total ne doit pas dépasser 100%
+            </span>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 3: Confirmation -->
+        <div *ngIf="currentStep === 3">
+          <h4 class="mb-4">Étape 3 : Confirmation</h4>
+
+          <div class="alert alert-info">
+            <i class="ti ti-eye me-2"></i> Vérifiez les informations avant de publier l'offre.
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="mb-0">Informations générales</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-borderless">
+                <tr>
+                  <td width="30%"><strong>Titre</strong></td>
+                  <td>{{offreForm.get('titre')?.value}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Description</strong></td>
+                  <td>{{offreForm.get('description')?.value}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Catégorie</strong></td>
+                  <td>{{getCategorieNom(offreForm.get('categorieId')?.value)}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Budget</strong></td>
+                  <td>{{formatBudget(offreForm.get('budgetMin')?.value, offreForm.get('budgetMax')?.value)}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Deadline</strong></td>
+                  <td>{{offreForm.get('deadline')?.value | date:'dd/MM/yyyy HH:mm'}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Nombre de postes</strong></td>
+                  <td>{{offreForm.get('nombrePostes')?.value}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Statut</strong></td>
+                  <td>
+                    <span class="badge" 
+                          [class.bg-success]="offreForm.get('statut')?.value === 'ACTIVE'"
+                          [class.bg-secondary]="offreForm.get('statut')?.value === 'BROUILLON'"
+                          [class.bg-warning]="offreForm.get('statut')?.value === 'SUSPENDUE'"
+                          [class.bg-danger]="offreForm.get('statut')?.value === 'CLOTUREE'"
+                          [class.bg-dark]="offreForm.get('statut')?.value === 'ARCHIVEE'">
+                      {{offreForm.get('statut')?.value}}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Critères de sélection ({{criteres.length}})</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Poids</th>
+                    <th>Obligatoire</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let critere of criteres.controls">
+                    <td>{{critere.get('nom')?.value}}</td>
+                    <td><span class="badge bg-secondary">{{critere.get('type')?.value}}</span></td>
+                    <td>{{critere.get('poids')?.value}}%</td>
+                    <td>
+                      <i *ngIf="critere.get('obligatoire')?.value" class="ti ti-check text-success"></i>
+                      <i *ngIf="!critere.get('obligatoire')?.value" class="ti ti-minus text-muted"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boutons navigation -->
+        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+          <button type="button" class="btn btn-outline-secondary" (click)="previousStep()" 
+                  [disabled]="currentStep === 1">
+            <i class="ti ti-arrow-left me-1"></i>Précédent
+          </button>
+          
+          <div>
+            <button *ngIf="currentStep < 3" type="button" class="btn btn-primary" (click)="nextStep()">
+              Suivant<i class="ti ti-arrow-right ms-1"></i>
+            </button>
+            
+            <button *ngIf="currentStep === 3" type="button" class="btn btn-success" 
+                    (click)="submitOffre()" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!loading" class="ti ti-send me-1"></i>
+              Publier l'offre
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

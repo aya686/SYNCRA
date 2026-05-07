@@ -1,0 +1,380 @@
+.investisseurs-partenaires-container {
+  .hero-section {
+    background: linear-gradient(135deg, #0a6ebd 0%, #1e88e5 100%);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+
+    .hero-content {
+      h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+
+        .btn {
+          padding: 0.75rem 2rem;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  .statistics-section {
+    padding: 60px 0;
+    background: #f8f9fa;
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0a6ebd;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .filters-section {
+    padding: 40px 0;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+
+    .filters-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .filter-group {
+        flex: 1;
+        min-width: 150px;
+
+        .form-control,
+        .form-select {
+          border-radius: 8px;
+          border: 1px solid #ced4da;
+          padding: 0.5rem 1rem;
+
+          &:focus {
+            border-color: #0a6ebd;
+            box-shadow: 0 0 0 0.2rem rgba(10, 110, 189, 0.25);
+          }
+        }
+      }
+    }
+  }
+
+  .projects-section {
+    padding: 60px 0;
+    background: #f8f9fa;
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 3rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+
+      .project-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-badge {
+          display: inline-block;
+          background: #e3f2fd;
+          color: #0a6ebd;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
+        }
+
+        .project-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #212529;
+          margin-bottom: 0.5rem;
+        }
+
+        .project-porteur {
+          color: #6c757d;
+          font-size: 0.9rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .project-details {
+          margin-bottom: 1.5rem;
+
+          .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+
+            span {
+              color: #6c757d;
+            }
+
+            strong {
+              color: #212529;
+            }
+          }
+
+          .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+
+            .progress {
+              height: 100%;
+              background: linear-gradient(90deg, #0a6ebd, #1e88e5);
+              border-radius: 4px;
+              transition: width 0.3s ease;
+            }
+          }
+        }
+
+        .project-ai-score {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 8px;
+          margin-bottom: 1.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .score-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+          }
+
+          .score-value {
+            font-weight: 700;
+            color: #0a6ebd;
+          }
+        }
+
+        .project-actions {
+          display: flex;
+          gap: 1rem;
+
+          .btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            &.btn-primary {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+
+              &:hover {
+                background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+              }
+            }
+
+            &.btn-secondary {
+              background: #6c757d;
+              color: white;
+
+              &:hover {
+                background: #5a6268;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 3rem;
+
+      .spinner-border {
+        width: 3rem;
+        height: 3rem;
+      }
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 3rem;
+    }
+  }
+
+  .partners-section {
+    padding: 60px 0;
+    background: white;
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 3rem;
+    }
+
+    .partners-table {
+      .table {
+        margin-bottom: 0;
+
+        thead {
+          th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #212529;
+            border-bottom: 2px solid #0a6ebd;
+          }
+        }
+
+        tbody {
+          tr {
+            &:hover {
+              background: #f8f9fa;
+            }
+
+            td {
+              vertical-align: middle;
+
+              .partner-name {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                .partner-logo {
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 8px;
+                  overflow: hidden;
+
+                  img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                  }
+                }
+
+                strong {
+                  color: #212529;
+                }
+              }
+
+              .badge {
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+              }
+
+              .text-success {
+                background: #d4edda;
+                color: #155724;
+              }
+
+              .text-warning {
+                background: #fff3cd;
+                color: #856404;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      .hero-content {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+
+          .btn {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .filters-section {
+      .filters-container {
+        .filter-group {
+          min-width: 100%;
+        }
+      }
+    }
+
+    .projects-section {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

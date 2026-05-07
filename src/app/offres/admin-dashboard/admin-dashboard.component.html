@@ -1,0 +1,185 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-0">Dashboard Admin - Offres</h2>
+      <p class="text-muted mb-0">Vue globale de toutes les offres de la plateforme</p>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h6 class="card-title text-white-50">Total Offres</h6>
+          <h3 class="mb-0">{{stats.totalOffres}}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h6 class="card-title text-white-50">Offres Actives</h6>
+          <h3 class="mb-0">{{stats.offresActives}}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark">
+        <div class="card-body">
+          <h6 class="card-title text-dark-50">Offres Clôturées</h6>
+          <h3 class="mb-0">{{stats.offresCloturees}}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-danger text-white">
+        <div class="card-body">
+          <h6 class="card-title text-white-50">Offres Suspectes</h6>
+          <h3 class="mb-0">{{stats.offresSuspectes}}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Répartition par catégorie -->
+  <div class="row mb-4" *ngIf="stats.offresParCategorie.length > 0">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="ti ti-chart-pie me-2"></i>Répartition par catégorie</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div *ngFor="let cat of stats.offresParCategorie" class="col-md-3 mb-3">
+              <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                <span>{{cat.nom}}</span>
+                <span class="badge bg-primary">{{cat.count}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et Actions -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="searchText"
+             placeholder="Rechercher..." (keyup)="getFilteredOffres()">
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" [(ngModel)]="selectedStatut" (change)="getFilteredOffres()">
+        <option value="">Tous les statuts</option>
+        <option value="BROUILLON">Brouillon</option>
+        <option value="ACTIVE">Active</option>
+        <option value="CLOTUREE">Clôturée</option>
+        <option value="ARCHIVEE">Archivée</option>
+        <option value="SUSPENDUE">Suspendue</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" [(ngModel)]="selectedCategorie" (change)="getFilteredOffres()">
+        <option [ngValue]="null">Toutes les catégories</option>
+        <option *ngFor="let cat of categories" [ngValue]="cat.id">{{cat.nom}}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" [(ngModel)]="selectedEtatClient" (change)="getFilteredOffres()">
+        <option [ngValue]="null">État client : Tous</option>
+        <option [ngValue]="true">⚠️ Suspectes</option>
+        <option [ngValue]="false">✅ Normales</option>
+      </select>
+    </div>
+    <div class="col-md-3 text-end">
+      <button class="btn btn-outline-danger" (click)="exportPDF()">
+        <i class="ti ti-file-pdf me-1"></i>Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{error}}
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Budget</th>
+              <th>Statut</th>
+              <th>État client</th>
+              <th>Publieur</th>
+              <th>Date Publication</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let offre of getFilteredOffres()">
+              <td>{{offre.id}}</td>
+              <td>{{offre.titre}}</td>
+              <td><span class="badge bg-primary">{{offre.categorieNom}}</span></td>
+              <td>{{offre.budgetMin | number}} TND</td>
+              <td><span [class]="getStatutBadgeClass(offre.statut)">{{getStatutLabel(offre.statut)}}</span></td>
+              <td>
+                <span *ngIf="offre.estSuspecte" class="badge bg-danger">
+                  <i class="ti ti-alert-triangle me-1"></i>Suspecte
+                </span>
+                <span *ngIf="!offre.estSuspecte" class="badge bg-success">
+                  <i class="ti ti-check me-1"></i>Normal
+                </span>
+              </td>
+              <td>{{offre.publieurId}}</td>
+              <td>{{offre.datePublication | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td class="text-end">
+                <div class="d-flex align-items-center gap-2">
+                  <select class="form-select form-select-sm" style="width: auto;"
+                          (change)="changerStatut(offre, $event)">
+                    <option value="" disabled selected>Statut: {{getStatutLabel(offre.statut)}}</option>
+                    <option value="BROUILLON">Brouillon</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="CLOTUREE">Clôturée</option>
+                    <option value="ARCHIVEE">Archivée</option>
+                    <option value="SUSPENDUE">Suspendue</option>
+                  </select>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" (click)="modifierOffre(offre)" title="Modifier">
+                      <i class="ti ti-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="exportOffrePDF(offre)" title="Exporter PDF">
+                      <i class="ti ti-file-pdf"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="supprimerOffre(offre)" title="Supprimer">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="getFilteredOffres().length === 0" class="text-center py-5 text-muted">
+        <i class="ti ti-inbox" style="font-size: 2rem;"></i>
+        <p class="mt-2">Aucune offre ne correspond aux critères</p>
+      </div>
+    </div>
+  </div>
+</div>

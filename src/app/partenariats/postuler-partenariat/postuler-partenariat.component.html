@@ -1,0 +1,172 @@
+<div class="postuler-partenariat-container">
+  <div class="header">
+    <h1>Postuler un Partenariat</h1>
+    <p>Remplissez le formulaire ci-dessous pour soumettre votre demande de partenariat</p>
+  </div>
+
+  <div class="form-container" *ngIf="!success; else successMessage">
+    <form [formGroup]="partenariatForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nom">Nom *</label>
+          <input
+            id="nom"
+            type="text"
+            formControlName="nom"
+            placeholder="Votre nom"
+          />
+          <div class="error-message" *ngIf="partenariatForm.get('nom')?.invalid && partenariatForm.get('nom')?.touched">
+            Le nom est requis (minimum 2 caractères)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prenom">Prénom *</label>
+          <input
+            id="prenom"
+            type="text"
+            formControlName="prenom"
+            placeholder="Votre prénom"
+          />
+          <div class="error-message" *ngIf="partenariatForm.get('prenom')?.invalid && partenariatForm.get('prenom')?.touched">
+            Le prénom est requis (minimum 2 caractères)
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nomSociete">Nom de la société *</label>
+        <input
+          id="nomSociete"
+          type="text"
+          formControlName="nomSociete"
+          placeholder="Nom de votre entreprise"
+        />
+        <div class="error-message" *ngIf="partenariatForm.get('nomSociete')?.invalid && partenariatForm.get('nomSociete')?.touched">
+          Le nom de la société est requis (minimum 2 caractères)
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dateCreationSociete">Date de création de la société *</label>
+        <input
+          id="dateCreationSociete"
+          type="date"
+          formControlName="dateCreationSociete"
+        />
+        <div class="error-message" *ngIf="partenariatForm.get('dateCreationSociete')?.invalid && partenariatForm.get('dateCreationSociete')?.touched">
+          La date de création est requise
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          placeholder="Décrivez votre entreprise et les raisons pour lesquelles vous souhaitez un partenariat..."
+        ></textarea>
+        <div class="error-message" *ngIf="partenariatForm.get('description')?.invalid && partenariatForm.get('description')?.touched">
+          La description est requise (minimum 10 caractères)
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="votre.email@exemple.com"
+          />
+          <div class="error-message" *ngIf="partenariatForm.get('email')?.invalid && partenariatForm.get('email')?.touched">
+            Veuillez entrer une adresse email valide
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="telephone">Téléphone</label>
+          <input
+            id="telephone"
+            type="tel"
+            formControlName="telephone"
+            placeholder="+33 6 12 34 56 78"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Image de la société</label>
+        <div
+          class="upload-zone"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="triggerFileInput()"
+        >
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;"
+          />
+          <div *ngIf="!imageUrl" class="upload-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p>Glissez-déposez une image ici ou cliquez pour sélectionner</p>
+            <span class="upload-hint">PNG, JPG jusqu'à 5MB</span>
+          </div>
+          <div *ngIf="imageUrl" class="upload-preview">
+            <img [src]="imageUrl" alt="Aperçu de l'image" />
+            <button type="button" class="remove-image" (click)="$event.stopPropagation(); imageUrl = ''; partenariatForm.patchValue({ imageUrl: '' })">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-banner" #errorBanner>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="annuler()" [disabled]="loading">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">Soumettre la demande</span>
+          <span *ngIf="loading">Envoi en cours...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #successMessage>
+    <div class="success-container">
+      <div class="success-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h2>Demande envoyée avec succès !</h2>
+      <p>Votre demande de partenariat a été soumise et sera examinée par notre équipe.</p>
+      <p>Vous serez redirigé vers la page de recherche de partenariats...</p>
+    </div>
+  </ng-template>
+</div>

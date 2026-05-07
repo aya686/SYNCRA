@@ -1,0 +1,155 @@
+.creer-contrat-container {
+  padding: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #0d1f33;
+    margin: 0 0 8px 0;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #607a96;
+    margin: 0;
+  }
+}
+
+.success-message {
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 16px;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  .success-icon {
+    font-size: 20px;
+  }
+}
+
+.error-message {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  .error-icon {
+    font-size: 20px;
+  }
+}
+
+.form-container {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0d1f33;
+    }
+
+    input,
+    textarea,
+    select {
+      padding: 12px;
+      border: 1px solid #d4e4f4;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #0a6ebd;
+        box-shadow: 0 0 0 3px rgba(10, 110, 189, 0.1);
+      }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-primary {
+        background: #0a6ebd;
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: #085a96;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+
+      &.btn-secondary {
+        background: #f4f8fd;
+        color: #0a6ebd;
+
+        &:hover:not(:disabled) {
+          background: #e0e7ff;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

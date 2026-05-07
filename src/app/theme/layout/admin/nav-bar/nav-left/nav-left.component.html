@@ -1,0 +1,85 @@
+<div class="me-auto pc-mob-drp">
+  <ul class="list-unstyled">
+    <li class="pc-h-item header-mobile-collapse">
+      <a
+        href="javascript:"
+        class="pc-head-link head-link-secondary ms-0 mobile-menu"
+        id="mobile-collapse mobile-collapse1"
+        (click)="navCollapsedMob()"
+      >
+        <i class="ti ti-menu-2"></i>
+      </a>
+    </li>
+    <li class="dropdown pc-h-item d-inline-flex d-md-none" ngbDropdown>
+      <a
+        class="pc-head-link head-link-secondary dropdown-toggle arrow-none m-0"
+        data-bs-toggle="dropdown"
+        href="javascript:"
+        ngbDropdownToggle
+      >
+        <i class="ti ti-search"></i>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown drp-search" ngbDropdownMenu>
+        <form class="px-3">
+          <div class="form-group mb-0 d-flex align-items-center">
+            <i class="ti ti-search"></i>
+            <input type="search" class="form-control border-0 shadow-none" placeholder="Search here. . ." />
+          </div>
+        </form>
+      </div>
+    </li>
+    <li class="pc-h-item d-none d-md-inline-flex">
+      <form class="header-search">
+        <div class="search-btn">
+          <i class="ti ti-search"></i>
+        </div>
+        <input type="search" class="form-control" placeholder="Search here. . ." />
+        <button class="btn btn-light-secondary btn-search">
+          <i class="ti ti-adjustments-horizontal"></i>
+        </button>
+      </form>
+    </li>
+    <li class="dropdown pc-h-item d-none d-md-inline-flex" ngbDropdown>
+      <a
+        class="pc-head-link head-link-primary dropdown-toggle arrow-none"
+        data-bs-toggle="dropdown"
+        href="javascript:"
+        ngbDropdownToggle
+      >
+        <i class="ti ti-handshake"></i>
+        <span>Partenaire</span>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown" ngbDropdownMenu>
+        <a routerLink="/partenariats/postuler-partenariat" class="dropdown-item">
+          <i class="ti ti-file-plus"></i>
+          <span>Postuler votre partenariat</span>
+        </a>
+        <a routerLink="/partenariats/recherche-partenariat" class="dropdown-item">
+          <i class="ti ti-search"></i>
+          <span>Recherche partenariat</span>
+        </a>
+      </div>
+    </li>
+    <li class="dropdown pc-h-item d-none d-md-inline-flex" ngbDropdown>
+      <a
+        class="pc-head-link head-link-success dropdown-toggle arrow-none"
+        data-bs-toggle="dropdown"
+        href="javascript:"
+        ngbDropdownToggle
+      >
+        <i class="ti ti-credit-card"></i>
+        <span>Paiement</span>
+      </a>
+      <div class="dropdown-menu pc-h-dropdown" ngbDropdownMenu>
+        <a routerLink="/paiements" class="dropdown-item">
+          <i class="ti ti-list-details"></i>
+          <span>Mes Paiements</span>
+        </a>
+        <a routerLink="/paiements/admin" class="dropdown-item">
+          <i class="ti ti-dashboard"></i>
+          <span>Dashboard Admin</span>
+        </a>
+      </div>
+    </li>
+  </ul>
+</div>

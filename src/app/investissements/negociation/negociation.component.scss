@@ -1,0 +1,296 @@
+.negociation-container {
+  padding: 40px 0;
+  min-height: 100vh;
+  background: #f8f9fa;
+
+  .container {
+    max-width: 1000px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 2rem;
+  }
+
+  .negociation-header {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .negociation-info {
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.5rem;
+      }
+
+      .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .badge-success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .badge-warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .badge-danger {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .badge-secondary {
+        background: #e2e3e5;
+        color: #383d41;
+      }
+    }
+
+    .negociation-actions {
+      display: flex;
+      gap: 0.75rem;
+
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .current-terms,
+  .final-terms {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #0a6ebd;
+    }
+
+    .terms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .term-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+
+        &.success {
+          background: #d4edda;
+        }
+
+        .term-label {
+          font-size: 0.85rem;
+          color: #6c757d;
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .term-value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #212529;
+        }
+      }
+    }
+
+    .success-message {
+      text-align: center;
+      padding: 1.5rem;
+      background: #d4edda;
+      border-radius: 8px;
+      color: #155724;
+
+      p {
+        margin-bottom: 1rem;
+      }
+
+      .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .messages-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #212529;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #0a6ebd;
+    }
+
+    .messages-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+      padding-right: 1rem;
+
+      .message {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        animation: fadeIn 0.3s ease;
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        &.message-sent {
+          background: #e3f2fd;
+          margin-left: 20%;
+        }
+
+        &.message-received {
+          background: #f8f9fa;
+          margin-right: 20%;
+        }
+
+        .message-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+
+          .message-role {
+            font-weight: 600;
+            color: #0a6ebd;
+          }
+
+          .message-date {
+            color: #6c757d;
+          }
+        }
+
+        .message-content {
+          color: #212529;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    .message-input {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+
+      .form-control {
+        flex: 1;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+
+        &:focus {
+          border-color: #0a6ebd;
+          box-shadow: 0 0 0 0.2rem rgba(10, 110, 189, 0.25);
+        }
+      }
+
+      .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 0;
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .negociation-header {
+      flex-direction: column;
+      gap: 1rem;
+
+      .negociation-actions {
+        width: 100%;
+
+        .btn {
+          flex: 1;
+        }
+      }
+    }
+
+    .current-terms,
+    .final-terms {
+      .terms-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .messages-section {
+      .messages-list {
+        .message {
+          &.message-sent {
+            margin-left: 0;
+          }
+
+          &.message-received {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .message-input {
+        flex-direction: column;
+
+        .btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
