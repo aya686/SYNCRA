@@ -1,0 +1,106 @@
+.nav-tabs .nav-link {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link i {
+  margin-right: 5px;
+}
+
+.list-group-item.active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.list-group-item {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.card-header {
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.85em;
+  padding: 0.4em 0.6em;
+}
+
+.alert {
+  border-radius: 8px;
+}
+
+.table-sm td, .table-sm th {
+  font-size: 0.9rem;
+}
+
+/* Animation pour les résultats */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-pane.show {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Stats cards */
+.card h2, .card h3, .card h4 {
+  margin-bottom: 0;
+}
+
+/* Formulaire focus */
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .col-md-3, .col-md-9 {
+    margin-bottom: 1rem;
+  }
+  
+  .row .col-md-3,
+  .row .col-md-4,
+  .row .col-md-6 {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Custom scrollbar */
+.list-group {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

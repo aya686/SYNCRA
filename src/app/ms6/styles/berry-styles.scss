@@ -1,0 +1,347 @@
+/* ==========================================================================
+   BERRY DESIGN SYSTEM - Global Styles
+   Modern, clean UI components for PI_Angular
+   ========================================================================== */
+
+/* CSS Custom Properties (Variables)
+   ========================================================================== */
+:root {
+  /* Primary Colors */
+  --berry-primary: #3b82f6;
+  --berry-primary-dark: #2563eb;
+  --berry-primary-light: #eff6ff;
+  
+  /* Secondary Colors */
+  --berry-success: #10b981;
+  --berry-success-light: #ecfdf5;
+  --berry-warning: #f59e0b;
+  --berry-warning-light: #fffbeb;
+  --berry-danger: #ef4444;
+  --berry-danger-light: #fef2f2;
+  --berry-info: #3b82f6;
+  --berry-info-light: #eff6ff;
+  
+  /* Neutral Colors */
+  --berry-gray-50: #f9fafb;
+  --berry-gray-100: #f3f4f6;
+  --berry-gray-200: #e5e7eb;
+  --berry-gray-300: #d1d5db;
+  --berry-gray-400: #9ca3af;
+  --berry-gray-500: #6b7280;
+  --berry-gray-600: #4b5563;
+  --berry-gray-700: #374151;
+  --berry-gray-800: #1f2937;
+  --berry-gray-900: #111827;
+  
+  /* Background */
+  --berry-bg: #f1f5f9;
+  --berry-bg-white: #ffffff;
+  
+  /* Text */
+  --berry-text-primary: #1f2937;
+  --berry-text-secondary: #6b7280;
+  --berry-text-muted: #9ca3af;
+  
+  /* Shadows */
+  --berry-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --berry-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --berry-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --berry-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Border Radius */
+  --berry-radius-sm: 6px;
+  --berry-radius: 8px;
+  --berry-radius-md: 12px;
+  --berry-radius-lg: 16px;
+  
+  /* Spacing */
+  --berry-space-1: 0.25rem;
+  --berry-space-2: 0.5rem;
+  --berry-space-3: 0.75rem;
+  --berry-space-4: 1rem;
+  --berry-space-5: 1.25rem;
+  --berry-space-6: 1.5rem;
+  --berry-space-8: 2rem;
+  --berry-space-10: 2.5rem;
+  --berry-space-12: 3rem;
+}
+
+/* Global Reset & Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--berry-bg);
+  color: var(--berry-text-primary);
+}
+
+/* Button Styles
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--berry-space-2);
+  padding: var(--berry-space-2) var(--berry-space-4);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: var(--berry-radius);
+  transition: all 0.2s ease-in-out;
+  
+  &:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Button Variants */
+.btn-primary {
+  background-color: var(--berry-primary);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: var(--berry-primary-dark);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--berry-gray-200);
+  color: var(--berry-gray-700);
+  
+  &:hover:not(:disabled) {
+    background-color: var(--berry-gray-300);
+  }
+}
+
+.btn-success {
+  background-color: var(--berry-success);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: #059669;
+  }
+}
+
+.btn-warning {
+  background-color: var(--berry-warning);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: #d97706;
+  }
+}
+
+.btn-danger {
+  background-color: var(--berry-danger);
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: #dc2626;
+  }
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--berry-gray-300);
+  color: var(--berry-gray-700);
+  
+  &:hover:not(:disabled) {
+    background-color: var(--berry-gray-100);
+  }
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--berry-space-1) var(--berry-space-3);
+  font-size: 0.8125rem;
+}
+
+.btn-lg {
+  padding: var(--berry-space-3) var(--berry-space-6);
+  font-size: 1rem;
+}
+
+/* Form Elements
+   ========================================================================== */
+.form-input {
+  display: block;
+  width: 100%;
+  padding: var(--berry-space-2) var(--berry-space-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--berry-text-primary);
+  background-color: white;
+  border: 1px solid var(--berry-gray-300);
+  border-radius: var(--berry-radius);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  
+  &:focus {
+    outline: 0;
+    border-color: var(--berry-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  &::placeholder {
+    color: var(--berry-text-muted);
+  }
+}
+
+.form-select {
+  @extend .form-input;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--berry-space-1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--berry-text-secondary);
+}
+
+/* Card Component
+   ========================================================================== */
+.berry-card-base {
+  background: var(--berry-bg-white);
+  border-radius: var(--berry-radius-md);
+  box-shadow: var(--berry-shadow);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--berry-shadow-lg);
+  }
+}
+
+/* Badge Component
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--berry-space-1) var(--berry-space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 9999px;
+}
+
+.badge-primary {
+  background-color: var(--berry-primary-light);
+  color: var(--berry-primary);
+}
+
+.badge-success {
+  background-color: var(--berry-success-light);
+  color: var(--berry-success);
+}
+
+.badge-warning {
+  background-color: var(--berry-warning-light);
+  color: var(--berry-warning);
+}
+
+.badge-danger {
+  background-color: var(--berry-danger-light);
+  color: var(--berry-danger);
+}
+
+/* Status Dots
+   ========================================================================== */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  
+  &.active {
+    background-color: var(--berry-success);
+    box-shadow: 0 0 0 2px var(--berry-success-light);
+  }
+  
+  &.inactive {
+    background-color: var(--berry-gray-400);
+  }
+  
+  &.pending {
+    background-color: var(--berry-warning);
+    box-shadow: 0 0 0 2px var(--berry-warning-light);
+  }
+  
+  &.error {
+    background-color: var(--berry-danger);
+    box-shadow: 0 0 0 2px var(--berry-danger-light);
+  }
+}
+
+/* Utility Classes
+   ========================================================================== */
+.text-primary { color: var(--berry-primary); }
+.text-success { color: var(--berry-success); }
+.text-warning { color: var(--berry-warning); }
+.text-danger { color: var(--berry-danger); }
+.text-muted { color: var(--berry-text-muted); }
+
+.bg-primary { background-color: var(--berry-primary-light); }
+.bg-success { background-color: var(--berry-success-light); }
+.bg-warning { background-color: var(--berry-warning-light); }
+.bg-danger { background-color: var(--berry-danger-light); }
+
+/* Animation Classes
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Utilities
+   ========================================================================== */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+}

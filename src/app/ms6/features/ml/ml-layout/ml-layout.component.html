@@ -1,0 +1,37 @@
+<div class="ml-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="ml-sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🤖</span>
+        <h2>ML Dashboard</h2>
+      </div>
+      <p class="subtitle">Machine Learning</p>
+    </div>
+
+    <nav class="nav-menu">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.route"
+         class="nav-item"
+         [class.active]="isActive(item.route)"
+         [style.--item-color]="item.color">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <div class="nav-content">
+          <span class="nav-label">{{ item.label }}</span>
+          <span class="nav-desc">{{ item.description }}</span>
+        </div>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/admin/dashboard" class="back-link">
+        <span>←</span> Retour Admin
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="ml-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

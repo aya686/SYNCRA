@@ -1,0 +1,177 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1><i class="bi bi-bullseye"></i> Système de Recommandation</h1>
+    <p class="subtitle">Collaborative Filtering (k-NN) avec Cosine Similarity - Recommande des produits basé sur les utilisateurs similaires</p>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="stats-bar" *ngIf="stats">
+    <div class="stat-item" [class.trained]="stats.modelTrained">
+      <span class="stat-label">Status</span>
+      <span class="stat-value">{{ stats.modelTrained ? 'Entraîné' : 'Non entraîné' }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Utilisateurs</span>
+      <span class="stat-value">{{ stats.totalUsers || 0 }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Interactions</span>
+      <span class="stat-value">{{ stats.totalInteractions || 0 }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Produits</span>
+      <span class="stat-value">{{ stats.totalProducts || 0 }}</span>
+    </div>
+    <div class="stat-item algorithm">
+      <span class="stat-label">Algorithme</span>
+      <span class="stat-value">{{ stats.algorithm }}</span>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- User Recommendations -->
+    <div class="section-card">
+      <h2>Recommandations Personnalisées</h2>
+      <p class="section-desc">Obtenez des recommandations basées sur les utilisateurs similaires à vous</p>
+
+      <div class="form-inline">
+        <div class="form-group">
+          <label>ID Utilisateur</label>
+          <input type="number" [(ngModel)]="userId" min="1" placeholder="1">
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-container" *ngIf="recommendations">
+        <div class="results-header">
+          <h3>Recommandations pour Utilisateur #{{ recommendations.userId }}</h3>
+          <span class="badge">{{ recommendations.count }} produits</span>
+        </div>
+
+        <div class="recommendations-list">
+          <div class="rec-item" *ngFor="let rec of recommendations.recommendations">
+            <div class="rec-icon">📦</div>
+            <div class="rec-details">
+              <h4 class="product-name">{{ rec.productName || 'Produit #' + rec.productId }}</h4>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="(rec.score / 5) * 100"></div>
+                <span class="score-value">{{ rec.score.toFixed(2) }}/5.0</span>
+              </div>
+              <p class="rec-reason">{{ rec.reason }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="model-info" *ngIf="recommendations.modelStats">
+          <p>📊 Modèle entraîné sur {{ recommendations.modelStats.totalUsers }} utilisateurs, {{ recommendations.modelStats.totalInteractions }} interactions</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Similar Products - Search by Name -->
+    <div class="section-card">
+      <h2>🔍 Produits Similaires</h2>
+      <p class="section-desc">Recherchez par nom de produit pour trouver des articles connexes</p>
+
+      <div class="form-inline">
+        <div class="form-group">
+          <label>Nom du Produit</label>
+          <input type="text" [(ngModel)]="searchProductName" placeholder="ex: iPhone, Laptop, Chaussures...">
+        </div>
+        <button class="btn btn-secondary" (click)="getSimilarProducts()" [disabled]="loadingSimilar">
+          <span *ngIf="loadingSimilar">⏳...</span>
+          <span *ngIf="!loadingSimilar">🔍 Chercher</span>
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div class="results-container" *ngIf="similarProducts">
+        <div class="results-header">
+          <h3>Produits similaires à <span class="source-product">{{ similarProducts.productName || 'Produit #' + similarProducts.productId }}</span></h3>
+        </div>
+
+        <div class="similar-list">
+          <div class="similar-item" *ngFor="let sim of similarProducts.similarProducts">
+            <span class="similar-icon">🛍️</span>
+            <span class="similar-name">{{ sim.productName || 'Produit #' + sim.productId }}</span>
+            <div class="similar-score">
+              <div class="score-bar-small">
+                <div class="score-fill" [style.width.%]="sim.score * 100"></div>
+              </div>
+              <span>{{ (sim.score * 100).toFixed(0) }}% similarité</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Products -->
+  <div class="section-card full-width" *ngIf="popularProducts?.products?.length > 0">
+    <div class="results-header">
+      <h2>🔥 Produits Populaires</h2>
+      <span class="badge">{{ popularProducts.count }} produits</span>
+    </div>
+    <p class="section-desc">{{ popularProducts.description }}</p>
+
+    <div class="recommendations-list popular-grid">
+      <div class="rec-item popular-item" *ngFor="let prod of popularProducts.products; let i = index">
+        <div class="popular-rank">#{{ i + 1 }}</div>
+        <div class="rec-icon">📦</div>
+        <div class="rec-details">
+          <h4 class="product-name">{{ prod.productName || 'Produit #' + prod.productId }}</h4>
+          <div class="score-bar">
+            <div class="score-fill" [style.width.%]="(prod.score / 5) * 100"></div>
+            <span class="score-value">{{ prod.score.toFixed(1) }}</span>
+          </div>
+          <p class="rec-reason">{{ prod.reason }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Algorithm Explanation -->
+  <div class="info-section">
+    <h3>🔬 Comment fonctionne le Collaborative Filtering?</h3>
+    
+    <div class="algo-grid">
+      <div class="algo-card">
+        <h4>1. Matrice Utilisateur-Produit</h4>
+        <div class="matrix-demo">
+          <table>
+            <tr><th></th><th>P1</th><th>P2</th><th>P3</th></tr>
+            <tr><td>UserA</td><td>⭐⭐⭐</td><td>⭐⭐</td><td>-</td></tr>
+            <tr><td>UserB</td><td>⭐⭐⭐</td><td>⭐⭐</td><td>⭐⭐⭐</td></tr>
+          </table>
+        </div>
+        <p>Chaque utilisateur a des notes implicites basées sur ses actions</p>
+      </div>
+
+      <div class="algo-card">
+        <h4>2. Similarité Cosinus</h4>
+        <div class="formula">
+          sim(A,B) = (A·B) / (||A|| × ||B||)
+        </div>
+        <p>On calcule la similarité entre vecteurs utilisateurs</p>
+      </div>
+
+      <div class="algo-card">
+        <h4>3. k-NN (k Plus Proches Voisins)</h4>
+        <p>On trouve les k utilisateurs les plus similaires</p>
+        <ul>
+          <li>k=5: 5 voisins les plus proches</li>
+          <li>Similarité > 0.5: seuil minimum</li>
+        </ul>
+      </div>
+
+      <div class="algo-card">
+        <h4>4. Recommandation</h4>
+        <p>On recommande ce que les voisins ont aimé mais pas l'utilisateur cible</p>
+        <div class="example">
+          UserA reçoit P3 recommandé car UserB (similaire) l'a acheté!
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,454 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-graph-up-arrow"></i> 💰 Pricing Dynamique Algorithmique</h2>
+    <button class="btn btn-outline-primary" (click)="loadConfigurations()">
+      <i class="bi bi-arrow-clockwise"></i> Rafraîchir
+    </button>
+  </div>
+
+  <!-- Alertes -->
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="success">
+    <i class="bi bi-check-circle"></i> {{ success }}
+    <button type="button" class="btn-close" (click)="success = null"></button>
+  </div>
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="error">
+    <i class="bi bi-exclamation-triangle"></i> {{ error }}
+    <button type="button" class="btn-close" (click)="error = null"></button>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2">Calcul en cours...</p>
+  </div>
+
+  <div class="row" *ngIf="!loading">
+    <!-- Sidebar: Produits configurés -->
+    <div class="col-md-3">
+      <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-box-seam"></i> Produits</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <button *ngFor="let config of configurations" 
+                    class="list-group-item list-group-item-action"
+                    [class.active]="selectedConfig?.configId === config.configId"
+                    (click)="selectProduct(config)">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">{{ config.nomProduit }}</span>
+                <span class="badge" [ngClass]="getStrategieBadgeClass(config.strategie)">
+                  {{ config.strategie }}
+                </span>
+              </div>
+              <small class="text-muted">
+                Prix: {{ config.prixBase }} DT | 
+                <span [ngClass]="getElasticityClass(config.elasticitePrix)">
+                  {{ getElasticityLabel(config.elasticitePrix) }}
+                </span>
+              </small>
+            </button>
+          </div>
+          <div class="p-3 text-center text-muted" *ngIf="configurations.length === 0">
+            Aucun produit configuré
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics rapide -->
+      <div class="card" *ngIf="analytics">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Analytics 24h</h6>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6 border-end">
+              <h4 class="text-primary">{{ analytics.totalProduitsDynamiques }}</h4>
+              <small class="text-muted">Produits</small>
+            </div>
+            <div class="col-6">
+              <h4 class="text-success">{{ analytics.totalChangements24h }}</h4>
+              <small class="text-muted">Changements</small>
+            </div>
+          </div>
+          <hr>
+          <div class="text-center">
+            <span class="text-muted">Variation moyenne:</span>
+            <span class="fw-bold" [ngClass]="getVariationClass(analytics.variationPrixMoyenne)">
+              {{ analytics.variationPrixMoyenne > 0 ? '+' : '' }}{{ analytics.variationPrixMoyenne | number:'1.1-1' }}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <!-- Navigation tabs -->
+      <ul class="nav nav-tabs mb-3" id="pricingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="config-tab" data-bs-toggle="tab" data-bs-target="#config" type="button" role="tab">
+            <i class="bi bi-gear"></i> Configuration
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="elasticity-tab" data-bs-toggle="tab" data-bs-target="#elasticity" type="button" role="tab">
+            <i class="bi bi-calculator"></i> Élasticité
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="optimize-tab" data-bs-toggle="tab" data-bs-target="#optimize" type="button" role="tab">
+            <i class="bi bi-magic"></i> Optimisation Prix
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="simulate-tab" data-bs-toggle="tab" data-bs-target="#simulate" type="button" role="tab">
+            <i class="bi bi-cash-coin"></i> Simulation
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="pricingTabsContent">
+        
+        <!-- Tab: Configuration -->
+        <div class="tab-pane fade show active" id="config" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nouvelle Configuration</h5>
+            </div>
+            <div class="card-body">
+              <form (ngSubmit)="createConfiguration()">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">ID Produit</label>
+                    <input type="number" class="form-control" [(ngModel)]="newConfig.produitId" name="produitId" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Stratégie</label>
+                    <select class="form-select" [(ngModel)]="newConfig.strategie" name="strategie">
+                      <option *ngFor="let s of strategies" [value]="s.value">{{ s.label }} - {{ s.desc }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Prix Base (DT)</label>
+                    <input type="number" class="form-control" [(ngModel)]="newConfig.prixBase" name="prixBase" required>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Prix Min (DT)</label>
+                    <input type="number" class="form-control" [(ngModel)]="newConfig.prixMin" name="prixMin">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Prix Max (DT)</label>
+                    <input type="number" class="form-control" [(ngModel)]="newConfig.prixMax" name="prixMax">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Coeff. Demande</label>
+                    <input type="number" step="0.1" class="form-control" [(ngModel)]="newConfig.coefficientDemande" name="coeffDemande">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Coeff. Concurrence</label>
+                    <input type="number" step="0.1" class="form-control" [(ngModel)]="newConfig.coefficientConcurrence" name="coeffConcurrence">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Coeff. Saisonnalité</label>
+                    <input type="number" step="0.1" class="form-control" [(ngModel)]="newConfig.coefficientSaisonnalite" name="coeffSaison">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="loadingConfig">
+                  <span *ngIf="loadingConfig" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <i class="bi bi-save" *ngIf="!loadingConfig"></i> 
+                  {{ loadingConfig ? 'Création...' : 'Créer Configuration' }}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Élasticité -->
+        <div class="tab-pane fade" id="elasticity" role="tabpanel">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="bi bi-calculator"></i> Calcul d'Élasticité-Prix</h5>
+              <button class="btn btn-sm btn-primary" (click)="calculateElasticity(selectedConfig?.produitId || 1)" [disabled]="loading">
+                <i class="bi bi-play"></i> Calculer
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info" *ngIf="!elasticityResult">
+                <i class="bi bi-info-circle"></i> L'élasticité mesure la sensibilité de la demande aux variations de prix.
+                <br>Formule: <strong>ln(Q) = α + β·ln(P)</strong> où β = élasticité
+              </div>
+
+              <div *ngIf="elasticityResult">
+                <div class="row mb-4">
+                  <div class="col-md-4">
+                    <div class="card bg-light">
+                      <div class="card-body text-center">
+                        <h2 [ngClass]="getElasticityClass(elasticityResult.elasticiteCalculee)">
+                          {{ elasticityResult.elasticiteCalculee | number:'1.2-2' }}
+                        </h2>
+                        <small>Élasticité calculée</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card bg-light">
+                      <div class="card-body text-center">
+                        <h2>{{ elasticityResult.coefficientDetermination | number:'1.2-2' }}</h2>
+                        <small>R² (fiabilité)</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card bg-light">
+                      <div class="card-body text-center">
+                        <h3>{{ elasticityResult.pointsDonnees.length || 0 }}</h3>
+                        <small>Points de données</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert" [ngClass]="elasticityResult.elasticiteCalculee && elasticityResult.elasticiteCalculee < -1 ? 'alert-warning' : 'alert-success'">
+                  <h6><i class="bi bi-lightbulb"></i> Interprétation:</h6>
+                  {{ elasticityResult.interpretation }}
+                </div>
+
+                <!-- Tableau des données -->
+                <h6 class="mt-3">Données historiques utilisées:</h6>
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Prix (DT)</th>
+                        <th>Quantité vendue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let point of elasticityResult.pointsDonnees | slice:0:10">
+                        <td>{{ point.date | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ point.prix }}</td>
+                        <td>{{ point.quantite }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Optimisation -->
+        <div class="tab-pane fade" id="optimize" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="bi bi-magic"></i> Calcul du Prix Optimal</h5>
+            </div>
+            <div class="card-body">
+              <form (ngSubmit)="calculateOptimalPrice()" class="mb-4">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">ID Produit</label>
+                    <input type="number" class="form-control" [(ngModel)]="priceCalcRequest.produitId" name="produitId">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Stock disponible</label>
+                    <input type="number" class="form-control" [(ngModel)]="priceCalcRequest.stockDisponible" name="stock">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Vues dernière heure</label>
+                    <input type="number" class="form-control" [(ngModel)]="priceCalcRequest.vuesDerniereHeure" name="vues">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Ventes dernière heure</label>
+                    <input type="number" class="form-control" [(ngModel)]="priceCalcRequest.ventesDerniereHeure" name="ventes">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Prix concurrent (DT)</label>
+                    <input type="number" class="form-control" [(ngModel)]="priceCalcRequest.prixConcurrent" name="prixConc">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                  <i class="bi bi-calculator"></i> Calculer Prix Optimal
+                </button>
+              </form>
+
+              <!-- Résultat -->
+              <div *ngIf="priceCalculationResult">
+                <hr>
+                <h6 class="text-primary"><i class="bi bi-check-circle"></i> Résultat du calcul:</h6>
+                
+                <div class="row mb-3">
+                  <div class="col-md-3">
+                    <div class="card border-primary">
+                      <div class="card-body text-center">
+                        <h4 class="text-muted"><del>{{ priceCalculationResult.prixActuel | number:'1.2-2' }} DT</del></h4>
+                        <small>Prix actuel</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card border-success">
+                      <div class="card-body text-center">
+                        <h4 class="text-success">{{ priceCalculationResult.prixCalcule | number:'1.2-2' }} DT</h4>
+                        <small>Prix optimal</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card" [ngClass]="priceCalculationResult.variationPercent > 0 ? 'border-success' : 'border-danger'">
+                      <div class="card-body text-center">
+                        <h4 [ngClass]="getVariationClass(priceCalculationResult.variationPercent)">
+                          {{ priceCalculationResult.variationPercent > 0 ? '+' : '' }}{{ priceCalculationResult.variationPercent | number:'1.1-1' }}%
+                        </h4>
+                        <small>Variation</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="card border-info">
+                      <div class="card-body text-center">
+                        <h4 class="text-info">+{{ priceCalculationResult.gainRevenuPotentiel | number:'1.2-2' }} DT</h4>
+                        <small>Gain potentiel</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert alert-info">
+                  <strong>Raison:</strong> {{ priceCalculationResult.raisonAjustement }}
+                </div>
+
+                <div class="mb-3">
+                  <strong>Facteurs considérés:</strong>
+                  <span *ngFor="let facteur of priceCalculationResult.facteursConsideres" class="badge bg-secondary me-1">
+                    {{ facteur }}
+                  </span>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="card bg-light">
+                      <div class="card-body">
+                        <h6>Revenu estimé (prix actuel)</h6>
+                        <p class="mb-0">{{ priceCalculationResult.revenuEstimeAncienPrix | number:'1.2-2' }} DT</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card bg-success text-white">
+                      <div class="card-body">
+                        <h6>Revenu estimé (prix optimal)</h6>
+                        <p class="mb-0 fw-bold">{{ priceCalculationResult.revenuEstimeNouveauPrix | number:'1.2-2' }} DT</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-3" *ngIf="priceCalculationResult.appliquable">
+                  <button class="btn btn-success btn-lg" (click)="applyPrice()" [disabled]="loading">
+                    <i class="bi bi-check-lg"></i> Appliquer ce prix
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Simulation -->
+        <div class="tab-pane fade" id="simulate" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Simuler un Changement de Prix</h5>
+            </div>
+            <div class="card-body">
+              <form (ngSubmit)="simulatePriceChange()" class="mb-4">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">ID Produit</label>
+                    <input type="number" class="form-control" [(ngModel)]="simulationRequest.produitId" name="simProduitId">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Nouveau prix à tester (DT)</label>
+                    <input type="number" class="form-control" [(ngModel)]="simulationRequest.nouveauPrix" name="nouveauPrix">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                  <i class="bi bi-play-circle"></i> Lancer Simulation
+                </button>
+              </form>
+
+              <!-- Résultat Simulation -->
+              <div *ngIf="simulationResult">
+                <hr>
+                <h6 class="text-primary"><i class="bi bi-graph-up"></i> Résultat de la simulation:</h6>
+                
+                <div class="alert" [ngClass]="simulationResult.margeEstimee > 0 ? 'alert-success' : 'alert-warning'">
+                  <h5>{{ simulationResult.recommandation }}</h5>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header bg-light">Scénario Actuel</div>
+                      <div class="card-body">
+                        <p><strong>Prix:</strong> {{ simulationResult.prixActuel | number:'1.2-2' }} DT</p>
+                        <p><strong>Quantité estimée:</strong> {{ simulationResult.quantiteEstimeeAncienPrix }}</p>
+                        <p><strong>Revenu:</strong> {{ simulationResult.revenuAncienPrix | number:'1.2-2' }} DT</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card" [ngClass]="simulationResult.margeEstimee > 0 ? 'border-success' : 'border-warning'">
+                      <div class="card-header" [ngClass]="simulationResult.margeEstimee > 0 ? 'bg-success text-white' : 'bg-warning'">
+                        Scénario Simulé
+                      </div>
+                      <div class="card-body">
+                        <p><strong>Prix:</strong> {{ simulationResult.prixSimule | number:'1.2-2' }} DT</p>
+                        <p><strong>Quantité estimée:</strong> {{ simulationResult.quantiteEstimeeNouveauPrix }}</p>
+                        <p><strong>Revenu:</strong> {{ simulationResult.revenuNouveauPrix | number:'1.2-2' }} DT</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5>Impact sur le revenu:</h5>
+                    <h3 [ngClass]="simulationResult.margeEstimee > 0 ? 'text-success' : 'text-danger'">
+                      {{ simulationResult.margeEstimee > 0 ? '+' : '' }}{{ simulationResult.margeEstimee | number:'1.2-2' }} DT
+                    </h3>
+                    <p class="text-muted mb-0">
+                      Variation: {{ simulationResult.variationPercent | number:'1.1-1' }}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer explicatif -->
+  <div class="card mt-4 bg-light">
+    <div class="card-body">
+      <h6><i class="bi bi-info-circle"></i> À propos du Pricing Dynamique</h6>
+      <p class="small text-muted mb-0">
+        Ce module utilise des <strong>algorithmes de recherche opérationnelle</strong> pour optimiser les prix en temps réel.
+        L'<strong>élasticité-prix</strong> est calculée par régression linéaire logarithmique (ln(Q) = α + β·ln(P)).
+        Le <strong>prix optimal</strong> est déterminé par optimisation multi-critères pondérée (élasticité 40%, demande 30%, concurrence 20%, stock 10%).
+      </p>
+    </div>
+  </div>
+</div>

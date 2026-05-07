@@ -1,0 +1,138 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1><i class="bi bi-truck"></i> Prédiction de Retards de Livraison</h1>
+    <p class="subtitle">Régression Logistique avec Gradient Descent - Prédit le risque basé sur la météo, transporteur et saison</p>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="stats-bar" *ngIf="stats">
+    <div class="stat-item" [class.trained]="stats.stats?.trained">
+      <span class="stat-label">Status</span>
+      <span class="stat-value">{{ stats.stats?.trained ? 'Entraîné' : 'Non entraîné' }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Échantillons</span>
+      <span class="stat-value">{{ stats.stats?.samples || 0 }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Précision</span>
+      <span class="stat-value">{{ ((stats.stats?.accuracy || 0) * 100).toFixed(1) }}%</span>
+    </div>
+    <div class="stat-item algorithm">
+      <span class="stat-label">Algorithme</span>
+      <span class="stat-value">{{ stats.algorithm }}</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-grid">
+    <!-- Form Section -->
+    <div class="form-section">
+      <h2>Paramètres de Prédiction</h2>
+      
+      <div class="form-group">
+        <label>Ville</label>
+        <input type="text" [(ngModel)]="deliveryForm.city" placeholder="Tunis, Sfax, Sousse...">
+      </div>
+
+      <div class="form-group">
+        <label>Transporteur</label>
+        <select [(ngModel)]="deliveryForm.transporteur">
+          <option *ngFor="let t of transporteurs" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Date d'expédition</label>
+        <input type="datetime-local" [(ngModel)]="deliveryForm.dateExpedition">
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" (click)="predict()" [disabled]="loading">
+          <span *ngIf="loading">⏳ Prédiction...</span>
+          <span *ngIf="!loading">🔮 Prédire le Risque</span>
+        </button>
+      </div>
+
+      <div class="quick-tests">
+        <h3>Tests Rapides</h3>
+        <button class="btn btn-secondary" (click)="testWinter()">❄️ Test Hiver (Risque Élevé)</button>
+        <button class="btn btn-secondary" (click)="testSummer()">☀️ Test Été (Risque Faible)</button>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="result-section" *ngIf="deliveryResult">
+      <h2>Résultat de la Prédiction</h2>
+      
+      <div class="prediction-card">
+        <div class="probability-display">
+          <div class="gauge" [class]="'risk-' + (deliveryResult.riskLevel?.toLowerCase() || 'medium')">
+            <span class="gauge-value">{{ deliveryResult.probability }}%</span>
+            <span class="gauge-label">Probabilité de Retard</span>
+          </div>
+        </div>
+
+        <div class="risk-info">
+          <div class="risk-badge" [class]="'risk-' + (deliveryResult.riskLevel?.toLowerCase() || 'medium')">
+            {{ deliveryResult.riskLabel }}
+          </div>
+          <p class="risk-description">{{ deliveryResult.riskDescription }}</p>
+          <p class="explanation">{{ deliveryResult.explanation }}</p>
+
+          <div class="risk-factors" *ngIf="deliveryResult.riskFactors?.length > 0">
+            <h4>Facteurs de Risque Identifiés:</h4>
+            <ul>
+              <li *ngFor="let factor of deliveryResult.riskFactors">
+                <strong>{{ factor.name }}</strong>
+                <span *ngIf="factor.description">: {{ factor.description }}</span>
+                <span class="impact" *ngIf="factor.impact">(+{{ (factor.impact * 100).toFixed(0) }}%)</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Algorithm Info -->
+  <div class="info-section">
+    <h3>🔬 Comment ça marche?</h3>
+    <div class="algorithm-steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <h4>Features d'entrée</h4>
+          <p>Température, condition météo, transporteur, saison, ville</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <h4>Régression Logistique</h4>
+          <p>P(retard) = 1 / (1 + e^-(w·x + b))</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <h4>Gradient Descent</h4>
+          <p>Optimisation des poids pour minimiser l'erreur</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <h4>Prédiction</h4>
+          <p>Probabilité entre 0 et 100%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,569 @@
+/* ========================================
+   CLIENT THEME - SYNCRA DESIGN SYSTEM
+   Fichier partagé pour tous les pages client
+   ======================================== */
+
+// ── VARIABLES SYNCRA ─────────────────────
+:host {
+  --primary: #6366f1;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --accent: #f472b6;
+  --accent-2: #14b8a6;
+  --white: #ffffff;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --bg-dark: #0f172a;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(99, 102, 241, 0.5);
+  
+  // Gradients
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-success: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  
+  // Shadows
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.3);
+  --shadow-glow-hover: 0 0 40px rgba(99, 102, 241, 0.5);
+  
+  // Radius
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+// ── BASE PAGE STYLES ─────────────────────
+.client-page {
+  padding: 1rem 0;
+  color: var(--text-primary);
+}
+
+// ── PAGE HEADER ──────────────────────────
+.page-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  font-weight: 400;
+}
+
+// ── SEARCH & FILTERS ─────────────────────
+.search-bar,
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+  
+  i.bi-search {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  
+  input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+  
+  .clear-btn {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.3s;
+    
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+}
+
+.filter-group {
+  position: relative;
+  min-width: 200px;
+  
+  i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    appearance: none;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+    }
+  }
+  
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+}
+
+// ── BUTTONS ──────────────────────────────
+.btn-primary,
+.btn-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--gradient-primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-glow);
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow-hover);
+  }
+  
+  i {
+    font-size: 1rem;
+  }
+}
+
+.btn-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-light);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+  }
+  
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+  }
+}
+
+.btn-reset-full {
+  @extend .btn-reset;
+  padding: 0.875rem 1.5rem;
+}
+
+// ── CARDS GRID ───────────────────────────
+.boutiques-grid,
+.produits-grid,
+.commandes-list,
+.livraisons-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.boutiques-grid,
+.produits-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+// ── CARD STYLES ──────────────────────────
+.boutique-card,
+.produit-card,
+.commande-card,
+.livraison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-5px);
+    background: var(--bg-card-hover);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// ── CARD HEADER ──────────────────────────
+.boutique-header,
+.produit-header,
+.commande-header,
+.livraison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.boutique-icon,
+.produit-icon,
+.empty-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--white);
+  overflow: hidden;
+  box-shadow: var(--shadow-glow);
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// ── STATUS BADGES ────────────────────────
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.active,
+  &.ACTIF,
+  &.CONFIRMEE,
+  &.LIVREE {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+  }
+  
+  &.inactive,
+  &.INACTIF,
+  &.ANNULEE {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+  
+  &.pending,
+  &.EN_ATTENTE,
+  &.EN_COURS {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+  }
+}
+
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  
+  &.low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+  
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+// ── TYPOGRAPHY ───────────────────────────
+.boutique-name,
+.produit-name,
+.commande-id,
+.livraison-id {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.boutique-desc,
+.produit-boutique {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  min-height: 2.7rem;
+}
+
+// ── CARD FOOTER ──────────────────────────
+.boutique-footer,
+.produit-footer,
+.commande-footer,
+.livraison-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+// ── PRICE SECTION ────────────────────────
+.price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  .current-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  
+  .original-price {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+}
+
+// ── INFO ROWS ────────────────────────────
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &.total {
+    .label,
+    .value {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+  }
+  
+  .label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  
+  .value {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+}
+
+// ── EMPTY STATE ──────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--bg-card);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    box-shadow: none;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+}
+
+// ── COMMANDE/LIVRAISON CARDS ─────────────
+.commande-card,
+.livraison-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.commande-info,
+.livraison-info {
+  flex: 1;
+}
+
+.commande-actions,
+.livraison-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+// ── RESPONSIVE ───────────────────────────
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .boutiques-grid,
+  .produits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    min-width: 100%;
+  }
+  
+  .search-bar {
+    max-width: 100%;
+  }
+}
