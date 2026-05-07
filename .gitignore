@@ -123,3 +123,4 @@ dist/
 # Variables d'environnement
 .env
 src/environments/environment.local.ts
+src/environments/environment.ts
