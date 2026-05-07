@@ -128,30 +128,23 @@
           </div>
           
           <div class="formations-masonry" *ngIf="!loading">
-            <div *ngFor="let formation of popularFormations" class="formation-item">
-              <div class="formation-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (formation.imageUrl || '') + ')'" 
-                   [style.backgroundSize]="'cover'" [style.backgroundPosition]="'center'">
-                <div class="formation-level" [class]="formation.niveau">
-                  {{formation.niveau}}
-                </div>
-                <div class="formation-overlay"></div>
-              </div>
-              <div class="formation-details">
-                <h3>{{formation.titre}}</h3>
-                <p>{{formation.description | slice:0:80}}...</p>
-                <div class="formation-meta-row">
-                  <span>⏱️ {{formation.dureeTotale}} heures</span>
-                  <span>💰 {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
-                  <span *ngIf="formation.certificate">🎓 Certifiante</span>
-                </div>
-                <div class="formation-footer-row">
-                  <a [routerLink]="['/formations', formation.id]" class="formation-link">
-                    Découvrir →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+  <div *ngFor="let formation of popularFormations" class="formation-item">
+    <div class="formation-details">
+      <h3>{{formation.titre}}</h3>
+      <p>{{formation.description | slice:0:80}}...</p>
+      <div class="formation-meta-row">
+        <span>⏱️ {{formation.dureeTotale}} heures</span>
+        <span>💰 {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
+        <span *ngIf="formation.certificate">🎓 Certifiante</span>
+      </div>
+      <div class="formation-footer-row">
+        <a [routerLink]="['/formations', formation.id]" class="formation-link">
+          Découvrir →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </section>
     </div>
