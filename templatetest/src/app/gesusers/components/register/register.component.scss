@@ -1,0 +1,283 @@
+.register-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.register-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// ============ EN-TÊTE ============
+.header-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.step-badge {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+}
+
+.main-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.info-card {
+  max-width: 460px;
+  margin: 0 auto 1.5rem auto;
+  background: white;
+  border-radius: 20px;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f6;
+  
+  .info-icon {
+    width: 40px;
+    height: 40px;
+    background: #eff6ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    i {
+      font-size: 1.3rem;
+      color: #3b82f6;
+    }
+  }
+  
+  .info-content {
+    text-align: left;
+  }
+  
+  .info-text {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  
+  .info-subtext {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.multi-select-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #475569;
+  
+  i {
+    color: #10b981;
+    font-size: 0.9rem;
+  }
+}
+
+// ============ GRILLE ============
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.role-card {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 1.8rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid #eef2f6;
+  
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #3b82f6;
+    box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.2);
+  }
+  
+  &.selected {
+    border-color: #3b82f6;
+    background: #f8faff;
+    box-shadow: 0 12px 24px -8px rgba(59, 130, 246, 0.25);
+    
+    .card-icon {
+      background: #3b82f6;
+      
+      i {
+        color: white;
+      }
+    }
+    
+    .card-title {
+      color: #1e40af;
+    }
+  }
+}
+
+.selection-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    color: white;
+    font-size: 12px;
+  }
+}
+
+.card-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  background: #f1f5f9;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  i {
+    font-size: 1.8rem;
+    color: #3b82f6;
+    transition: all 0.2s ease;
+  }
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.card-description {
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+// ============ SECTION ACTION ============
+.action-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.continue-btn {
+  background: #e2e8f0;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+  
+  &.active {
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+    
+    &:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.selection-hint {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  
+  i {
+    font-size: 0.9rem;
+  }
+  
+  &.success {
+    color: #10b981;
+  }
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eef2f6;
+
+  p {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ============ RESPONSIVE ============
+@media (max-width: 900px) {
+  .roles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .main-title {
+    font-size: 2rem;
+  }
+}

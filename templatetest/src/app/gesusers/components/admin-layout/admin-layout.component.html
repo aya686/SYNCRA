@@ -1,0 +1,107 @@
+<div class="app-container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="ti ti-shield-lock"></i>
+        <span *ngIf="!isSidebarCollapsed">Syncra</span>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <i class="ti ti-menu-2"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a routerLink="/admin/dashboard" routerLinkActive="active">
+            <i class="ti ti-dashboard"></i>
+            <span *ngIf="!isSidebarCollapsed">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/users" routerLinkActive="active">
+            <i class="ti ti-users"></i>
+            <span *ngIf="!isSidebarCollapsed">Utilisateurs</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/security" routerLinkActive="active">
+            <i class="ti ti-shield"></i>
+            <span *ngIf="!isSidebarCollapsed">Sécurité</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/my-login" (click)="logout()">
+        <i class="ti ti-logout"></i>
+        <span *ngIf="!isSidebarCollapsed">Déconnexion</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="header-left">
+        <h2>{{ pageTitle }}</h2>
+      </div>
+      <div class="header-right">
+        
+        <!-- 🔔 NOTIFICATION ICON -->
+        <div class="notification-icon" (click)="toggleNotifications()">
+          <i class="ti ti-bell"></i>
+          <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </div>
+        
+        <!-- NOTIFICATION DROPDOWN -->
+        <div class="notification-dropdown" *ngIf="showNotifications">
+          <div class="dropdown-header">
+            <span>Notifications</span>
+            <button (click)="clearNotifications()" *ngIf="notifications.length > 0">Tout effacer</button>
+          </div>
+          <div class="dropdown-list">
+            <div *ngIf="notifications.length === 0" class="empty-notifications">
+              <i class="ti ti-bell-off"></i>
+              <span>Aucune notification</span>
+            </div>
+            <div *ngFor="let notif of notifications" class="notification-item" [ngClass]="'notif-' + notif.type">
+              <div class="notif-content">
+                <div class="notif-message">{{ notif.message }}</div>
+                <div class="notif-time">{{ notif.time | date:'HH:mm:ss' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="admin-info" (click)="goToProfile()">
+          <div class="admin-avatar">
+            <i class="ti ti-user-circle"></i>
+          </div>
+          <div class="admin-details" *ngIf="!isSidebarCollapsed">
+            <span class="admin-name">{{ adminName }}</span>
+            <span class="admin-role">Administrateur</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="main-footer">
+      <div class="footer-left">
+        <span>© 2026 Syncra · Sécurité & Innovation</span>
+      </div>
+      <div class="footer-right">
+        <span>Équipe Resolvo</span>
+      </div>
+    </footer>
+  </main>
+</div>

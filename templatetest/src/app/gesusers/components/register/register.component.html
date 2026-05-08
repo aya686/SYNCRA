@@ -1,0 +1,115 @@
+<div class="register-page">
+  <div class="register-container">
+    
+    <!-- ============ EN-TÊTE ============ -->
+    <div class="header-section">
+      
+      <!-- Étape (simple, une ligne) -->
+      <div class="step-badge">Étape 1 sur 2</div>
+      
+      <!-- Titre -->
+      <h1 class="main-title">Créer un compte</h1>
+      
+      <!-- Sous-titre dans une belle carte -->
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="ti ti-sparkles"></i>
+        </div>
+        <div class="info-content">
+          <p class="info-text">Choisissez votre rôle principal</p>
+          <p class="info-subtext">Vous pourrez en ajouter d'autres plus tard</p>
+        </div>
+      </div>
+      
+      <!-- Badge sélection multiple -->
+      <div class="multi-select-badge">
+        <i class="ti ti-checks"></i>
+        <span>Sélection multiple possible</span>
+      </div>
+    </div>
+
+    <!-- ============ GRILLE DES RÔLES ============ -->
+    <div class="roles-grid">
+      
+      <!-- Freelancer -->
+      <div class="role-card" 
+           [class.selected]="isSelected('FREELANCER')"
+           (click)="toggleRole('FREELANCER')">
+        <div class="selection-check" *ngIf="isSelected('FREELANCER')">
+          <i class="ti ti-check"></i>
+        </div>
+        <div class="card-icon">
+          <i class="ti ti-briefcase"></i>
+        </div>
+        <h3 class="card-title">Freelancer</h3>
+        <p class="card-description">Proposer des services et répondre à des offres</p>
+      </div>
+
+      <!-- Client -->
+      <div class="role-card" 
+           [class.selected]="isSelected('CLIENT')"
+           (click)="toggleRole('CLIENT')">
+        <div class="selection-check" *ngIf="isSelected('CLIENT')">
+          <i class="ti ti-check"></i>
+        </div>
+        <div class="card-icon">
+          <i class="ti ti-building-store"></i>
+        </div>
+        <h3 class="card-title">Client</h3>
+        <p class="card-description">Publier des projets et recruter des talents</p>
+      </div>
+
+      <!-- Étudiant -->
+      <div class="role-card" 
+           [class.selected]="isSelected('ETUDIANT')"
+           (click)="toggleRole('ETUDIANT')">
+        <div class="selection-check" *ngIf="isSelected('ETUDIANT')">
+          <i class="ti ti-check"></i>
+        </div>
+        <div class="card-icon">
+          <i class="ti ti-school"></i>
+        </div>
+        <h3 class="card-title">Étudiant</h3>
+        <p class="card-description">Accès gratuit 30 jours avec email académique</p>
+      </div>
+
+      <!-- Investisseur -->
+      <div class="role-card" 
+           [class.selected]="isSelected('INVESTISSEUR')"
+           (click)="toggleRole('INVESTISSEUR')">
+        <div class="selection-check" *ngIf="isSelected('INVESTISSEUR')">
+          <i class="ti ti-check"></i>
+        </div>
+        <div class="card-icon">
+          <i class="ti ti-chart-line"></i>
+        </div>
+        <h3 class="card-title">Investisseur</h3>
+        <p class="card-description">Financer et suivre des projets prometteurs</p>
+      </div>
+    </div>
+
+    <!-- ============ BOUTON CONTINUER ============ -->
+    <div class="action-section">
+      <button class="continue-btn" 
+              [class.active]="selectedRoles.size > 0"
+              [disabled]="selectedRoles.size === 0"
+              (click)="nextStep()">
+        <span>Continuer</span>
+        <i class="ti ti-arrow-right"></i>
+      </button>
+      
+      <p class="selection-hint" *ngIf="selectedRoles.size === 0">
+        <i class="ti ti-info-circle"></i> Sélectionnez au moins un rôle
+      </p>
+      <p class="selection-hint success" *ngIf="selectedRoles.size > 0">
+        <i class="ti ti-check-circle"></i> {{ selectedRoles.size }} rôle{{ selectedRoles.size > 1 ? 's' : '' }} sélectionné{{ selectedRoles.size > 1 ? 's' : '' }}
+      </p>
+    </div>
+
+
+    <div class="register-footer">
+      <p>Déjà un compte ? <a routerLink="/my-login">Se connecter</a></p>
+    </div>
+
+  </div>
+</div>

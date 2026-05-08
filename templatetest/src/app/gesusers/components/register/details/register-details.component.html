@@ -1,0 +1,255 @@
+<div class="register-details-page">
+  <div class="register-details-container">
+    
+    <div class="header-section">
+      <div class="step-badge">Étape 2 sur 2</div>
+      <h1 class="main-title">Créer votre compte</h1>
+      <p class="subtitle">Remplissez vos informations</p>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="details-form">
+      
+      <!-- SECTION 1 : INFORMATIONS GÉNÉRALES -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><i class="ti ti-user-circle"></i></div>
+          <h3 class="section-title">Informations générales</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Nom *</label>
+            <input type="text" formControlName="nom" placeholder="Dupont">
+            <small class="error" *ngIf="userForm.get('nom')?.invalid && userForm.get('nom')?.touched">Nom requis</small>
+          </div>
+          <div class="form-field">
+            <label>Prénom *</label>
+            <input type="text" formControlName="prenom" placeholder="Alice">
+            <small class="error" *ngIf="userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched">Prénom requis</small>
+          </div>
+          <div class="form-field">
+            <label>Email *</label>
+            <input type="email" formControlName="email" placeholder="alice@email.com">
+            <small class="error" *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">Email valide requis</small>
+          </div>
+          <div class="form-field">
+            <label>Mot de passe *</label>
+            <input type="password" formControlName="password" placeholder="********">
+            <small class="error" *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched">Minimum 6 caractères</small>
+          </div>
+          <div class="form-field">
+            <label>Téléphone</label>
+            <input type="tel" formControlName="telephone" placeholder="+33 6 00 00 00 00">
+          </div>
+          <div class="form-field photo-field">
+            <label>Photo de profil</label>
+            <div class="upload-area" (click)="photoInput.click()">
+              <input type="file" #photoInput (change)="onPhotoSelected($event)" accept="image/*" hidden>
+              <div class="upload-content" *ngIf="!photoPreview">
+                <i class="ti ti-cloud-upload"></i>
+                <span>Glissez une image ou cliquez pour parcourir</span>
+              </div>
+              <div class="photo-preview" *ngIf="photoPreview">
+                <img [src]="photoPreview" alt="Aperçu">
+                <span class="change-photo">Changer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 : ÉTUDIANT -->
+      <div class="form-section" *ngIf="hasRole('ETUDIANT')" [formGroup]="etudiantForm">
+        <div class="section-header">
+          <div class="section-icon"><i class="ti ti-school"></i></div>
+          <h3 class="section-title">Étudiant</h3>
+          <div class="info-badge">
+            <i class="ti ti-info-circle"></i> Accès gratuit 30 jours après vérification
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Université *</label>
+            <input type="text" formControlName="universite" placeholder="Université Paris-Saclay">
+            <small class="error" *ngIf="etudiantForm.get('universite')?.invalid && etudiantForm.get('universite')?.touched">Université requise</small>
+          </div>
+          <div class="form-field">
+            <label>Filière *</label>
+            <input type="text" formControlName="filiere" placeholder="Informatique">
+            <small class="error" *ngIf="etudiantForm.get('filiere')?.invalid && etudiantForm.get('filiere')?.touched">Filière requise</small>
+          </div>
+          <div class="form-field">
+            <label>Année d'étude *</label>
+            <input type="text" formControlName="anneeEtude" placeholder="1ère année">
+            <small class="error" *ngIf="etudiantForm.get('anneeEtude')?.invalid && etudiantForm.get('anneeEtude')?.touched">Année d'étude requise</small>
+          </div>
+
+          <!-- Email universitaire -->
+          <div class="form-field">
+            <label>Email universitaire *</label>
+            <div style="display:flex; gap:8px; align-items:flex-start;">
+              <input type="email" formControlName="emailUniversitaire"
+                     placeholder="alice@univ-paris.fr"
+                     [class.verified]="emailVerified"
+                     [attr.readonly]="emailVerified ? true : null"
+                     style="flex:1;">
+              <button type="button"
+                      (click)="sendVerificationCode()"
+                      [disabled]="emailVerifStep === 'sending' || emailVerified"
+                      class="btn-secondary"
+                      style="white-space:nowrap; padding:8px 12px; font-size:13px;">
+                <ng-container [ngSwitch]="emailVerifStep">
+                  <span *ngSwitchCase="'idle'">Envoyer le code</span>
+                  <span *ngSwitchCase="'sending'">Envoi...</span>
+                  <span *ngSwitchCase="'code_sent'">Renvoyer</span>
+                  <span *ngSwitchCase="'verified'">✅ Vérifié</span>
+                  <span *ngSwitchCase="'error'">Réessayer</span>
+                </ng-container>
+              </button>
+            </div>
+
+            <!-- Bandeau message statut -->
+            <div *ngIf="emailVerifMessage"
+                 style="margin-top:8px; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:500; display:block;"
+                 [ngStyle]="{
+                   'background': emailVerifStep === 'error' ? '#fef2f2' : emailVerifStep === 'verified' ? '#f0fdf4' : emailVerifStep === 'code_sent' ? '#f0fdf4' : '#eff6ff',
+                   'color':      emailVerifStep === 'error' ? '#dc2626' : emailVerifStep === 'verified' ? '#16a34a' : emailVerifStep === 'code_sent' ? '#16a34a' : '#2563eb',
+                   'border':     emailVerifStep === 'error' ? '1px solid #fecaca' : emailVerifStep === 'verified' ? '1px solid #bbf7d0' : emailVerifStep === 'code_sent' ? '1px solid #bbf7d0' : '1px solid #bfdbfe'
+                 }">
+              {{ emailVerifMessage }}
+            </div>
+          </div>
+
+          <!-- Champ code - CORRIGÉ -->
+          <div class="form-field" *ngIf="emailVerifStep === 'code_sent' && !emailVerified">
+            <label>Code de vérification *</label>
+            <div style="display:flex; gap:8px; align-items:flex-start;">
+              <input type="text"
+                     formControlName="codeVerification"
+                     placeholder="123456"
+                     maxlength="6"
+                     style="flex:1; letter-spacing:6px; font-size:18px; text-align:center;">
+              <button type="button"
+                      (click)="verifyCode()"
+                      class="btn-primary"
+                      style="padding:8px 12px; font-size:13px;">
+                Vérifier
+              </button>
+            </div>
+            <small style="color:#3b82f6; font-size:0.75rem; margin-top:4px; display:block;">
+              Entrez le code à 6 chiffres reçu par email
+            </small>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 3 : FREELANCER -->
+      <div class="form-section" *ngIf="hasRole('FREELANCER')" [formGroup]="freelancerForm">
+        <div class="section-header">
+          <div class="section-icon"><i class="ti ti-briefcase"></i></div>
+          <h3 class="section-title">Freelancer</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label>Présentation</label>
+            <textarea formControlName="description" rows="4" placeholder="Décrivez vos compétences, votre expérience..."></textarea>
+          </div>
+          <div class="form-field">
+            <label>CV (optionnel)</label>
+            <div class="upload-area small" (click)="cvInput.click()">
+              <input type="file" #cvInput (change)="onCvSelected($event)" accept=".pdf,.doc" hidden>
+              <div class="upload-content" *ngIf="!cvFileName">
+                <i class="ti ti-file-upload"></i>
+                <span>PDF, DOC — max 5 Mo</span>
+              </div>
+              <div class="file-selected" *ngIf="cvFileName">
+                <i class="ti ti-file"></i>
+                <span>{{ cvFileName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4 : CLIENT -->
+      <div class="form-section" *ngIf="hasRole('CLIENT')" [formGroup]="clientForm">
+        <div class="section-header">
+          <div class="section-icon"><i class="ti ti-building-store"></i></div>
+          <h3 class="section-title">Client</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Nom entreprise</label>
+            <input type="text" formControlName="nomEntreprise" placeholder="Ma Société">
+          </div>
+          <div class="form-field">
+            <label>Type *</label>
+            <select formControlName="type">
+              <option value="PARTICULIER">Particulier</option>
+              <option value="ENTREPRISE">Entreprise</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Secteur d'activité</label>
+            <input type="text" formControlName="secteurActivite" placeholder="Tech / Finance / ...">
+          </div>
+          <div class="form-field">
+            <label>Site web</label>
+            <input type="url" formControlName="siteWeb" placeholder="https://...">
+          </div>
+          <div class="form-field full-width">
+            <label>Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Décrivez votre activité, vos besoins..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5 : INVESTISSEUR -->
+      <div class="form-section" *ngIf="hasRole('INVESTISSEUR')" [formGroup]="investisseurForm">
+        <div class="section-header">
+          <div class="section-icon"><i class="ti ti-chart-line"></i></div>
+          <h3 class="section-title">Investisseur</h3>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Budget min *</label>
+            <input type="number" formControlName="budgetMin" placeholder="0">
+            <small class="error" *ngIf="investisseurForm.get('budgetMin')?.invalid && investisseurForm.get('budgetMin')?.touched">Budget minimum requis</small>
+          </div>
+          <div class="form-field">
+            <label>Budget max *</label>
+            <input type="number" formControlName="budgetMax" placeholder="100000">
+            <small class="error" *ngIf="investisseurForm.get('budgetMax')?.invalid && investisseurForm.get('budgetMax')?.touched">Budget maximum requis</small>
+          </div>
+          <div class="form-field full-width">
+            <label>Domaines d'intérêt</label>
+            <textarea formControlName="domainesInteret" rows="3" placeholder="ex: Tech, Immobilier, Green Energy..."></textarea>
+          </div>
+          <div class="form-field full-width">
+            <label>Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Présentez-vous, votre parcours, vos objectifs..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOUTONS -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="goBack()">
+          <i class="ti ti-arrow-left"></i> Retour
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">Créer mon compte</span>
+          <span *ngIf="loading"><i class="ti ti-loader ti-spin"></i> Création...</span>
+        </button>
+      </div>
+
+      <div class="register-footer">
+        <p>Déjà un compte ? <a routerLink="/my-login">Se connecter</a></p>
+      </div>
+
+      
+  
+
+    </form>
+  </div>
+</div>

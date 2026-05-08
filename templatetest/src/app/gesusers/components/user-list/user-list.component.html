@@ -1,0 +1,86 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex align-items-center justify-content-between">
+          <h5>Liste des Utilisateurs</h5>
+          <a routerLink="/gesusers/users/create" class="btn btn-secondary">
+            <i class="ti ti-plus me-1"></i>
+            Ajouter
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <!-- Erreur -->
+        @if (error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+
+        <!-- Loading -->
+        @if (loading) {
+          <div class="text-center py-4">
+            <div class="spinner-border text-secondary" role="status"></div>
+          </div>
+        }
+
+        <!-- Table -->
+        @if (!loading) {
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of users; track user.id) {
+                  <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.nom }}</td>
+                    <td>{{ user.prenom }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.telephone }}</td>
+                    <td>
+                      <span class="badge 
+                        {{ user.statut === 'ACTIF' ? 'bg-light-success text-success' : 
+                           user.statut === 'BANNI' ? 'bg-light-danger text-danger' :
+                           user.statut === 'SUSPENDU' ? 'bg-light-warning text-warning' :
+                           'bg-light-secondary text-secondary' }}">
+                        {{ user.statut }}
+                      </span>
+                    </td>
+                    <td>
+                      <a [routerLink]="['/gesusers/users/edit', user.id]"
+                         class="btn btn-sm btn-light-primary me-1">
+                        <i class="ti ti-edit"></i>
+                      </a>
+                      <button (click)="deleteUser(user.id!)"
+                              class="btn btn-sm btn-light-danger">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                @empty {
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                      Aucun utilisateur trouvé
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>

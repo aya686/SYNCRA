@@ -1,0 +1,50 @@
+<header class="pc-header coded-header">
+  <app-nav-logo [navCollapsed]="navCollapsed" (NavCollapse)="navCollapse()" />
+  <div class="header-wrapper">
+    <app-nav-left (NavCollapsedMob)="navCollapseMob()" />
+    <app-nav-right />
+
+    <!-- ============================================================ -->
+    <!-- AJOUT GESUSERS — Notifications temps réel (SSE)              -->
+    <!-- ============================================================ -->
+    <div class="gesusers-notif-wrapper">
+
+      <!-- Icône cloche + badge -->
+      <div class="notification-icon" (click)="toggleNotifications()">
+        <i class="ti ti-bell"></i>
+        <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </div>
+
+      <!-- Dropdown notifications -->
+      <div class="notification-dropdown" *ngIf="showNotifications">
+        <div class="dropdown-header">
+          <span>Notifications</span>
+          <button (click)="clearNotifications()" *ngIf="notifications.length > 0">
+            Tout effacer
+          </button>
+        </div>
+        <div class="dropdown-list">
+          <div *ngIf="notifications.length === 0" class="empty-notifications">
+            <i class="ti ti-bell-off"></i>
+            <span>Aucune notification</span>
+          </div>
+          <div
+            *ngFor="let notif of notifications"
+            class="notification-item"
+            [ngClass]="'notif-' + notif.type"
+          >
+            <div class="notif-content">
+              <div class="notif-message">{{ notif.message }}</div>
+              <div class="notif-time">{{ notif.time | date:'HH:mm:ss' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ============================================================ -->
+    <!-- FIN AJOUT GESUSERS                                           -->
+    <!-- ============================================================ -->
+
+  </div>
+</header>

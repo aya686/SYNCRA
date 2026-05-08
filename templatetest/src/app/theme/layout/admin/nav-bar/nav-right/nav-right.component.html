@@ -1,0 +1,180 @@
+<div class="ms-auto">
+  <ul class="list-unstyled">
+
+    <!-- Lien GitHub -->
+    <li>
+      <div class="dropdown pc-h-item">
+        <a
+          class="pc-head-link head-link-primary arrow-none me-0"
+          href="https://github.com/codedthemes/berry-free-angular-admin-template/"
+          target="_blank"
+        >
+          <i class="ti ti-brand-github"></i>
+        </a>
+      </div>
+    </li>
+
+    <!-- ================= NOTIFICATIONS ================= -->
+    <li>
+      <div class="dropdown pc-h-item" ngbDropdown>
+
+        <!-- Toggle -->
+        <a
+          class="pc-head-link head-link-secondary dropdown-toggle arrow-none me-0"
+          href="javascript:"
+          ngbDropdownToggle
+          (click)="toggleNotifications()"
+        >
+          <i class="ti ti-bell"></i>
+
+          <!-- Badge -->
+          <span
+            *ngIf="unreadCount > 0"
+            class="badge bg-danger rounded-pill"
+            style="position:absolute; top:6px; right:6px; font-size:10px; padding:2px 5px;"
+          >
+            {{ unreadCount }}
+          </span>
+        </a>
+
+        <!-- Dropdown -->
+        <div
+          class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown"
+          ngbDropdownMenu
+        >
+          <div class="dropdown-header">
+            <h5>
+              Notifications
+              <span class="badge bg-warning rounded-pill ms-1">
+                {{ notifications.length }}
+              </span>
+            </h5>
+
+            <a
+              href="javascript:"
+              class="link-primary float-end text-decoration-underline"
+              (click)="clearNotifications()"
+              *ngIf="notifications.length > 0"
+            >
+              Tout effacer
+            </a>
+          </div>
+
+          <ng-scrollbar style="height: 300px" visibility="hover">
+            <div class="dropdown-header px-0 text-wrap">
+              <div class="list-group list-group-flush w-100">
+
+                <!-- Aucun notif -->
+                <div
+                  *ngIf="notifications.length === 0"
+                  class="list-group-item text-center text-muted py-4"
+                >
+                  <i class="ti ti-bell-off" style="font-size:24px"></i>
+                  <p class="mt-2 mb-0">Aucune notification</p>
+                </div>
+
+                <!-- Liste notif -->
+                <div
+                  *ngFor="let notif of notifications"
+                  class="list-group-item list-group-item-action"
+                >
+                  <div class="d-flex">
+
+                    <!-- Icon -->
+                    <div class="flex-shrink-0">
+                      <div
+                        class="user-avtar"
+                        [ngClass]="notif.type === 'blocked' ? 'bg-light-danger' : 'bg-light-success'"
+                      >
+                        <i
+                          class="ti"
+                          [ngClass]="notif.type === 'blocked' ? 'ti-ban' : 'ti-check'"
+                        ></i>
+                      </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-grow-1 ms-1">
+                      <span class="float-end text-muted">
+                        {{ notif.time | date:'HH:mm:ss' }}
+                      </span>
+
+                      <p class="text-body fs-6 mb-1">
+                        {{ notif.message }}
+                      </p>
+
+                      <div
+                        class="badge rounded-pill"
+                        [ngClass]="notif.type === 'blocked' ? 'bg-light-danger' : 'bg-light-success'"
+                      >
+                        {{ notif.type === 'blocked' ? 'Bloqué' : 'Réactivé' }}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </ng-scrollbar>
+        </div>
+      </div>
+    </li>
+
+    <!-- ================= PROFIL ================= -->
+    <li>
+      <div class="dropdown pc-h-item header-user-profile" ngbDropdown>
+
+        <!-- Toggle -->
+        <a
+          class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0"
+          href="javascript:"
+          ngbDropdownToggle
+        >
+          <!-- Icône utilisateur uniquement -->
+          <div class="user-avtar bg-light-primary"
+            style="display:flex; align-items:center; justify-content:center;">
+            <i class="ti ti-user-circle" style="font-size: 20px;"></i>
+          </div>
+        </a>
+
+        <!-- Menu -->
+        <div
+          class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown"
+          ngbDropdownMenu
+        >
+          <div class="dropdown-header">
+            <h4>
+              Bonjour,
+              <span class="small text-muted">{{ adminName }}</span>
+            </h4>
+
+            <p class="text-muted">Administrateur</p>
+            <hr />
+
+            <!-- Profil -->
+            <a
+              [routerLink]="['/profile', adminId]"
+              class="dropdown-item"
+            >
+              <i class="ti ti-user"></i>
+              <span>Mon profil</span>
+            </a>
+
+            <!-- Logout -->
+            <a
+              href="javascript:"
+              class="dropdown-item text-danger"
+              (click)="logout()"
+            >
+              <i class="ti ti-logout"></i>
+              <span>Déconnexion</span>
+            </a>
+
+          </div>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+</div>
