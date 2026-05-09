@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import Chart from 'chart.js/auto';
 
 @Component({
-  selector: 'app-analytics-dashboard',
-  templateUrl: './analytics-dashboard.component.html',
-  styleUrls: ['./analytics-dashboard.component.css']
+    selector: 'app-analytics-dashboard',
+    templateUrl: './analytics-dashboard.component.html',
+    styleUrls: ['./analytics-dashboard.component.css'],
+    standalone: false
 })
 export class AnalyticsDashboardComponent implements OnInit, AfterViewInit {
   stats = {

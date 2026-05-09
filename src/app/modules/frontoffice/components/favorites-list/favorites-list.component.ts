@@ -6,9 +6,10 @@ import { DataCollectorService } from '../../../shared/services/data-collector.se
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
-  selector: 'app-favorites-list',
-  templateUrl: './favorites-list.component.html',
-  styleUrls: ['./favorites-list.component.scss']
+    selector: 'app-favorites-list',
+    templateUrl: './favorites-list.component.html',
+    styleUrls: ['./favorites-list.component.scss'],
+    standalone: false
 })
 export class FavoritesListComponent implements OnInit {
   favoriteEvents: PublicEvent[] = [];  // ✅ Utiliser le bon type

@@ -5,9 +5,10 @@ import { FormationService } from '../../services/formation.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
-  selector: 'app-session-form',
-  templateUrl: './session-form.component.html',
-  styleUrls: ['./session-form.component.css']
+    selector: 'app-session-form',
+    templateUrl: './session-form.component.html',
+    styleUrls: ['./session-form.component.css'],
+    standalone: false
 })
 export class SessionFormComponent implements OnInit {
   session: any = {

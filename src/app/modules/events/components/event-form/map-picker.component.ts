@@ -3,8 +3,8 @@ import { Component, Output, EventEmitter, AfterViewInit, ElementRef, ViewChild }
 declare var L: any;
 
 @Component({
-  selector: 'app-map-picker',
-  template: `
+    selector: 'app-map-picker',
+    template: `
     <div class="map-container">
       <button type="button" class="btn-open-map" (click)="openMapModal()">
         🗺️ Ouvrir la carte pour choisir un lieu
@@ -33,7 +33,7 @@ declare var L: any;
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .map-container {
       margin: 10px 0;
     }
@@ -126,7 +126,8 @@ declare var L: any;
       color: #666;
       margin-top: 5px;
     }
-  `]
+  `],
+    standalone: false
 })
 export class MapPickerComponent implements AfterViewInit {
   @Output() locationSelected = new EventEmitter<{lat: number, lng: number, address: string}>();

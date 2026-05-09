@@ -2,9 +2,10 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-jitsi-meet',
-  template: `<div #jitsiContainer class="jitsi-container"></div>`,
-  styles: [`.jitsi-container { width: 100%; height: 100%; min-height: 500px; border-radius: 16px; overflow: hidden; }`]
+    selector: 'app-jitsi-meet',
+    template: `<div #jitsiContainer class="jitsi-container"></div>`,
+    styles: [`.jitsi-container { width: 100%; height: 100%; min-height: 500px; border-radius: 16px; overflow: hidden; }`],
+    standalone: false
 })
 export class JitsiMeetComponent implements AfterViewInit, OnDestroy {
   @ViewChild('jitsiContainer') jitsiContainer!: ElementRef;

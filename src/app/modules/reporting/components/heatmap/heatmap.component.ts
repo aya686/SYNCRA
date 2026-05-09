@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import Chart from 'chart.js/auto';
 
 @Component({
-  selector: 'app-heatmap',
-  templateUrl: './heatmap.component.html',
-  styleUrls: ['./heatmap.component.css']
+    selector: 'app-heatmap',
+    templateUrl: './heatmap.component.html',
+    styleUrls: ['./heatmap.component.css'],
+    standalone: false
 })
 export class HeatmapComponent implements OnInit, AfterViewInit {
   loading = true;

@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-secret-code-modal',
-  template: `
+    selector: 'app-secret-code-modal',
+    template: `
     <div class="modal-overlay">
       <div class="modal-content">
         <div class="modal-icon">🔐</div>
@@ -28,7 +28,7 @@ import { FormsModule } from '@angular/forms';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -92,7 +92,8 @@ import { FormsModule } from '@angular/forms';
       color: #e74c3c;
       font-size: 13px;
     }
-  `]
+  `],
+    standalone: false
 })
 export class SecretCodeModalComponent {
   @Output() onSuccess = new EventEmitter<void>();

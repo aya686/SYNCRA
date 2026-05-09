@@ -4,9 +4,10 @@ import { Router } from '@angular/router';
 import { SimpleAuthService } from '../../services/simple-auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent {
   userId: number | null = null;

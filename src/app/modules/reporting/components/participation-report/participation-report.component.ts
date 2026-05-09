@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
-  selector: 'app-participation-report',
-  templateUrl: './participation-report.component.html',
-  styleUrls: ['./participation-report.component.css']
+    selector: 'app-participation-report',
+    templateUrl: './participation-report.component.html',
+    styleUrls: ['./participation-report.component.css'],
+    standalone: false
 })
 export class ParticipationReportComponent implements OnInit {
   stats: any = {

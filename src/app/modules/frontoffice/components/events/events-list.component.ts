@@ -9,9 +9,10 @@ import { UserType } from '../../../shared/components/user-type-modal/user-type-m
 import { environment } from '../../../shared/environments/environments';
 
 @Component({
-  selector: 'app-events-list',
-  templateUrl: './events-list.component.html',
-  styleUrls: ['./events-list.component.scss']
+    selector: 'app-events-list',
+    templateUrl: './events-list.component.html',
+    styleUrls: ['./events-list.component.scss'],
+    standalone: false
 })
 export class EventsListComponent implements OnInit, OnDestroy {
   events: any[] = [];

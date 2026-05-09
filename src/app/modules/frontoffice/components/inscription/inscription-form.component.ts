@@ -6,9 +6,10 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { DesktopNotificationService } from '../../../shared/services/notification-desktop.service';
 
 @Component({
-  selector: 'app-inscription-form',
-  templateUrl: './inscription-form.component.html',
-  styleUrls: ['./inscription-form.component.css']
+    selector: 'app-inscription-form',
+    templateUrl: './inscription-form.component.html',
+    styleUrls: ['./inscription-form.component.css'],
+    standalone: false
 })
 export class InscriptionFormComponent implements OnInit {
   eventId: number = 0;

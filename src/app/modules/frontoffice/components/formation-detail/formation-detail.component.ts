@@ -9,9 +9,10 @@ import { SimpleAuthService } from '../../../auth/services/simple-auth.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-formation-detail',
-  templateUrl: './formation-detail.component.html',
-  styleUrls: ['./formation-detail.component.css']
+    selector: 'app-formation-detail',
+    templateUrl: './formation-detail.component.html',
+    styleUrls: ['./formation-detail.component.css'],
+    standalone: false
 })
 export class FormationDetailComponent implements OnInit {
   formation: any = null;

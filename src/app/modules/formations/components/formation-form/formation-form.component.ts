@@ -6,9 +6,10 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-formation-form',
-  templateUrl: './formation-form.component.html',
-  styleUrls: ['./formation-form.component.css']
+    selector: 'app-formation-form',
+    templateUrl: './formation-form.component.html',
+    styleUrls: ['./formation-form.component.css'],
+    standalone: false
 })
 export class FormationFormComponent implements OnInit {
   formation: any = {

@@ -3,9 +3,10 @@ import { SimpleAuthService } from '../../modules/auth/services/simple-auth.servi
 import { FavoritesService } from '../../modules/shared/services/favorites.service';
 
 @Component({
-  selector: 'app-public-layout',
-  templateUrl: './public-layout.component.html',
-  styleUrls: ['./public-layout.component.scss']
+    selector: 'app-public-layout',
+    templateUrl: './public-layout.component.html',
+    styleUrls: ['./public-layout.component.scss'],
+    standalone: false
 })
 export class PublicLayoutComponent {
   navScrolled = false;

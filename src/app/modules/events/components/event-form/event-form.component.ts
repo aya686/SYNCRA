@@ -7,9 +7,10 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { MapPickerComponent } from './map-picker.component';
 
 @Component({
-  selector: 'app-event-form',
-  templateUrl: './event-form.component.html',
-  styleUrls: ['./event-form.component.css']
+    selector: 'app-event-form',
+    templateUrl: './event-form.component.html',
+    styleUrls: ['./event-form.component.css'],
+    standalone: false
 })
 export class EventFormComponent implements OnInit {
   event: any = {

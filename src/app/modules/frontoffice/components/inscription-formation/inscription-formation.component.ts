@@ -7,9 +7,10 @@ import { DesktopNotificationService } from '../../../shared/services/notificatio
 import { SimpleAuthService } from '../../../auth/services/simple-auth.service';
 
 @Component({
-  selector: 'app-inscription-formation',
-  templateUrl: './inscription-formation.component.html',
-  styleUrls: ['./inscription-formation.component.css']
+    selector: 'app-inscription-formation',
+    templateUrl: './inscription-formation.component.html',
+    styleUrls: ['./inscription-formation.component.css'],
+    standalone: false
 })
 export class InscriptionFormationComponent implements OnInit {
   formationId: number = 0;

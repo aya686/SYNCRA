@@ -5,9 +5,10 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { Session, Participation, Competence } from '../../../shared/models/formation.model';
 
 @Component({
-  selector: 'app-session-detail',
-  templateUrl: './session-detail.component.html',
-  styleUrls: ['./session-detail.component.css']
+    selector: 'app-session-detail',
+    templateUrl: './session-detail.component.html',
+    styleUrls: ['./session-detail.component.css'],
+    standalone: false
 })
 export class SessionDetailComponent implements OnInit {
   session: Session | undefined;

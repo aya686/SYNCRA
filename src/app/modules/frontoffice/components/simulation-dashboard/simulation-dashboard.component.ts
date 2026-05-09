@@ -8,9 +8,10 @@ import { NeuralNetworkService } from '../../../shared/services/neural-network.se
 import { DataCollectorService } from '../../../shared/services/data-collector.service';
 
 @Component({
-  selector: 'app-simulation-dashboard',
-  templateUrl: './simulation-dashboard.component.html',
-  styleUrls: ['./simulation-dashboard.component.scss']
+    selector: 'app-simulation-dashboard',
+    templateUrl: './simulation-dashboard.component.html',
+    styleUrls: ['./simulation-dashboard.component.scss'],
+    standalone: false
 })
 export class SimulationDashboardComponent implements OnInit {
   simulationResult: SimulationResult | null = null;

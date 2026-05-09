@@ -6,9 +6,10 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-event-generator',
-  templateUrl: './event-generator.component.html',
-  styleUrls: ['./event-generator.component.scss']
+    selector: 'app-event-generator',
+    templateUrl: './event-generator.component.html',
+    styleUrls: ['./event-generator.component.scss'],
+    standalone: false
 })
 export class EventGeneratorComponent implements OnInit {
   categories = [

@@ -4,9 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-formateur-form',
-  templateUrl: './formateur-form.component.html',
-  styleUrls: ['./formateur-form.component.css']
+    selector: 'app-formateur-form',
+    templateUrl: './formateur-form.component.html',
+    styleUrls: ['./formateur-form.component.css'],
+    standalone: false
 })
 export class FormateurFormComponent implements OnInit {
   formateur: any = {

@@ -14,9 +14,10 @@ interface EvaluationStats {
 }
 
 @Component({
-  selector: 'app-evaluation-report',
-  templateUrl: './evaluation-report.component.html',
-  styleUrls: ['./evaluation-report.component.css']
+    selector: 'app-evaluation-report',
+    templateUrl: './evaluation-report.component.html',
+    styleUrls: ['./evaluation-report.component.css'],
+    standalone: false
 })
 export class EvaluationReportComponent implements OnInit {
 

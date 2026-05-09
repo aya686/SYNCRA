@@ -3,9 +3,10 @@ import { PublicFormationService } from '../../services/public-formation.service'
 import { ThemeService } from '../../../shared/services/theme.service';
 
 @Component({
-  selector: 'app-formations-list',
-  templateUrl: './formations-list.component.html',
-  styleUrls: ['./formations-list.component.css']
+    selector: 'app-formations-list',
+    templateUrl: './formations-list.component.html',
+    styleUrls: ['./formations-list.component.css'],
+    standalone: false
 })
 export class FormationsListComponent implements OnInit {
   formations: any[] = [];

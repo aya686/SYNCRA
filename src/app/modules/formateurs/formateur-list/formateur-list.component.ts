@@ -4,9 +4,10 @@ import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-formateur-list',
-  templateUrl: './formateur-list.component.html',
-  styleUrls: ['./formateur-list.component.css']
+    selector: 'app-formateur-list',
+    templateUrl: './formateur-list.component.html',
+    styleUrls: ['./formateur-list.component.css'],
+    standalone: false
 })
 export class FormateurListComponent implements OnInit {
   formateurs: any[] = [];

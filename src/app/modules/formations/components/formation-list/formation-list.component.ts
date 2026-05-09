@@ -4,9 +4,10 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { FormationDisplay } from '../../../shared/models/formation.model';
 
 @Component({
-  selector: 'app-formation-list',
-  templateUrl: './formation-list.component.html',
-  styleUrls: ['./formation-list.component.css']
+    selector: 'app-formation-list',
+    templateUrl: './formation-list.component.html',
+    styleUrls: ['./formation-list.component.css'],
+    standalone: false
 })
 export class FormationListComponent implements OnInit {
   formations: FormationDisplay[] = [];

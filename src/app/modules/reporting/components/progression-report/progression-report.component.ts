@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ReportingService } from '../../services/reporting.service';
 
 @Component({
-  selector: 'app-progression-report',
-  templateUrl: './progression-report.component.html',
-  styleUrls: ['./progression-report.component.css']
+    selector: 'app-progression-report',
+    templateUrl: './progression-report.component.html',
+    styleUrls: ['./progression-report.component.css'],
+    standalone: false
 })
 export class ProgressionReportComponent implements OnInit {
   stats: any = {};

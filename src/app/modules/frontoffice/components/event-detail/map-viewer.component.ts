@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
 
 @Component({
-  selector: 'app-map-viewer',
-  template: `
+    selector: 'app-map-viewer',
+    template: `
     <div class="map-viewer-container">
       <div id="viewer-map" style="height: 250px; width: 100%; border-radius: 12px;"></div>
       <div class="map-link">
@@ -12,7 +12,7 @@ import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .map-viewer-container {
       margin: 15px 0;
     }
@@ -33,7 +33,8 @@ import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
     .btn-map-link:hover {
       background: #4338ca;
     }
-  `]
+  `],
+    standalone: false
 })
 export class MapViewerComponent implements OnInit, AfterViewInit {
   @Input() latitude: number = 48.8566;

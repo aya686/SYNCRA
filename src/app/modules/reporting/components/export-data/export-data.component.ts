@@ -5,9 +5,10 @@ import { ExportService } from '../../../shared/services/export.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
-  selector: 'app-export-data',
-  templateUrl: './export-data.component.html',
-  styleUrls: ['./export-data.component.css']
+    selector: 'app-export-data',
+    templateUrl: './export-data.component.html',
+    styleUrls: ['./export-data.component.css'],
+    standalone: false
 })
 export class ExportDataComponent implements OnInit {
   exportType: string = 'excel';

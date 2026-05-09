@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
 export type UserType = 'etudiant' | 'professionnel' | 'curieux' | 'expert';
 
 @Component({
-  selector: 'app-user-type-modal',
-  template: `
+    selector: 'app-user-type-modal',
+    template: `
     <div class="modal-overlay" *ngIf="visible" (click)="close()">
       <div class="modal-container" (click)="$event.stopPropagation()">
         <div class="modal-header">
@@ -58,7 +58,7 @@ export type UserType = 'etudiant' | 'professionnel' | 'curieux' | 'expert';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -215,7 +215,8 @@ export type UserType = 'etudiant' | 'professionnel' | 'curieux' | 'expert';
         padding: 24px;
       }
     }
-  `]
+  `],
+    standalone: false
 })
 export class UserTypeModalComponent {
   @Output() typeSelected = new EventEmitter<UserType>();
