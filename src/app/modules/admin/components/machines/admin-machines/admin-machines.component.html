@@ -1,0 +1,401 @@
+<!-- admin-machines.component.html — avec onglet AUTO_REJECTED (rejet ML) -->
+
+<div class="admin-machines">
+
+  <!-- Toast -->
+  @if (showToastFlag) {
+    <div class="toast-notification" [class]="'toast-' + toastType">
+      <i class="ti" [class.ti-check]="toastType==='success'" [class.ti-x]="toastType==='error'"
+      [class.ti-alert-triangle]="toastType==='warning'" [class.ti-info-circle]="toastType==='info'"></i>
+      {{ toastMessage }}
+    </div>
+  }
+
+  <!-- En-tête -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-primary text-white border-0">
+        <div class="card-body py-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-white mb-1 fw-bold"><i class="ti ti-tools me-2"></i>Gestion des machines</h2>
+              <p class="text-white opacity-75 mb-0">Validez, rejetez ou gérez les machines publiées</p>
+            </div>
+            <!-- Badge ML -->
+            <div class="d-flex gap-2 align-items-center">
+              <span class="badge bg-dark bg-opacity-25 text-white px-3 py-2 fs-6">
+                🤖 Modération IA active
+              </span>
+              <span class="badge bg-white bg-opacity-20 text-white px-3 py-2 fs-6">
+                {{ stats.total }} machines
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="row mb-4 g-3">
+    <div class="col-xl col-md-4 col-6">
+      <div class="card stat-card border-0 shadow-sm cursor-pointer"
+        [class.active-tab-card]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1 small fw-semibold text-uppercase">En attente</p>
+              <h2 class="mb-0 fw-bold text-warning">{{ stats.pending }}</h2>
+            </div>
+            <div class="stat-icon bg-warning-subtle rounded-3 p-3">
+              <i class="ti ti-clock fs-4 text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl col-md-4 col-6">
+      <div class="card stat-card border-0 shadow-sm cursor-pointer"
+        [class.active-tab-card]="activeTab === 'approved'" (click)="activeTab = 'approved'">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1 small fw-semibold text-uppercase">Approuvées</p>
+              <h2 class="mb-0 fw-bold text-success">{{ stats.approved }}</h2>
+            </div>
+            <div class="stat-icon bg-success-subtle rounded-3 p-3">
+              <i class="ti ti-circle-check fs-4 text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl col-md-4 col-6">
+      <div class="card stat-card border-0 shadow-sm cursor-pointer"
+        [class.active-tab-card]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1 small fw-semibold text-uppercase">Rejetées (admin)</p>
+              <h2 class="mb-0 fw-bold text-danger">{{ stats.rejected }}</h2>
+            </div>
+            <div class="stat-icon bg-danger-subtle rounded-3 p-3">
+              <i class="ti ti-ban fs-4 text-danger"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ✅ NOUVEAU : stat auto-rejetées ML -->
+    <div class="col-xl col-md-4 col-6">
+      <div class="card stat-card border-0 shadow-sm cursor-pointer"
+        [class.active-tab-card]="activeTab === 'auto_rejected'"
+        (click)="activeTab = 'auto_rejected'">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1 small fw-semibold text-uppercase">🤖 Rejetées (IA)</p>
+              <h2 class="mb-0 fw-bold text-dark">{{ stats.autoRejected }}</h2>
+            </div>
+            <div class="stat-icon bg-dark-subtle rounded-3 p-3">
+              <i class="ti ti-robot fs-4 text-dark"></i>
+            </div>
+          </div>
+          <div class="mt-1">
+            <span class="badge bg-dark-subtle text-dark small">Détection automatique</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl col-md-4 col-6">
+      <div class="card stat-card border-0 shadow-sm cursor-pointer"
+        [class.active-tab-card]="activeTab === 'all'" (click)="activeTab = 'all'">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1 small fw-semibold text-uppercase">Total</p>
+              <h2 class="mb-0 fw-bold text-primary">{{ stats.total }}</h2>
+            </div>
+            <div class="stat-icon bg-primary-subtle rounded-3 p-3">
+              <i class="ti ti-database fs-4 text-primary"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+      <!-- Tabs + Recherche -->
+      <div class="row mb-3 align-items-center g-2">
+        <div class="col-md-8">
+          <ul class="nav nav-tabs border-0">
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" [class.active]="activeTab === 'pending'"
+                (click)="activeTab = 'pending'" href="javascript:void(0)">
+                <i class="ti ti-clock me-1"></i> En attente
+                @if (stats.pending > 0) {
+                  <span class="badge bg-warning ms-1 rounded-pill">{{ stats.pending }}</span>
+                }
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" [class.active]="activeTab === 'approved'"
+                (click)="activeTab = 'approved'" href="javascript:void(0)">
+                <i class="ti ti-check me-1"></i> Approuvées
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" [class.active]="activeTab === 'rejected'"
+                (click)="activeTab = 'rejected'" href="javascript:void(0)">
+                <i class="ti ti-ban me-1"></i> Rejetées
+              </a>
+            </li>
+            <!-- ✅ NOUVEL ONGLET : rejets ML -->
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" [class.active]="activeTab === 'auto_rejected'"
+                (click)="activeTab = 'auto_rejected'" href="javascript:void(0)">
+                🤖 IA Rejetées
+                @if (stats.autoRejected > 0) {
+                  <span class="badge bg-dark ms-1 rounded-pill">{{ stats.autoRejected }}</span>
+                }
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-semibold" [class.active]="activeTab === 'all'"
+                (click)="activeTab = 'all'" href="javascript:void(0)">
+                <i class="ti ti-list me-1"></i> Tout
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="ti ti-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0 bg-light"
+              placeholder="Rechercher..." [(ngModel)]="searchTerm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Explication onglet IA -->
+        @if (activeTab === 'auto_rejected') {
+          <div class="alert alert-dark d-flex align-items-start gap-2 py-2 mb-3"
+            >
+            <i class="ti ti-robot fs-5 mt-1"></i>
+            <div>
+              <strong>🤖 Rejet automatique par intelligence artificielle</strong>
+              <p class="mb-0 small">Ces machines ont été détectées comme contenant du contenu offensant ou haineux
+              par notre modèle ML. L'admin peut forcer l'approbation si le rejet est erroné.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Loader -->
+        @if (loading) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" style="width:2.5rem;height:2.5rem;"></div>
+            <p class="text-muted mt-2">Chargement...</p>
+          </div>
+        }
+
+        <!-- Table -->
+        @if (!loading) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">Machine</th>
+                  <th>Fournisseur</th>
+                  <th>Prix</th>
+                  <th>Zone</th>
+                  <th>Disponibilité</th>
+                  <th>Statut</th>
+                  @if (activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all') {
+                    <th>
+                      Motif rejet
+                    </th>
+                  }
+                  <th class="text-end pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (machine of getDisplayedMachines(); track machine) {
+                  <tr
+                    [class.table-warning-subtle]="machine.validationStatus === 'PENDING'"
+                    [class.table-danger-subtle]="machine.validationStatus === 'REJECTED'"
+                    [class.table-dark-subtle]="machine.validationStatus === 'AUTO_REJECTED'">
+                    <!-- Machine -->
+                    <td class="ps-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <img [src]="getMachineImage(machine)"
+                          style="width:42px;height:42px;object-fit:cover;border-radius:8px;" alt="">
+                          <div>
+                            <div class="fw-semibold">{{ machine.name }}</div>
+                            <small class="text-muted">{{ machine.type }} · {{ machine.category }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="fw-medium">{{ machine.supplierName || '—' }}</div>
+                        @if (machine.supplierCompanyName) {
+                          <small class="text-muted">{{ machine.supplierCompanyName }}</small>
+                        }
+                      </td>
+                      <td>
+                        <span class="fw-bold text-primary">{{ formatPrice(machine.price) }} TND</span>
+                        <div><small class="text-muted">/{{ machine.priceUnit }}</small></div>
+                      </td>
+                      <td><i class="ti ti-map-pin text-muted me-1"></i>{{ machine.location }}</td>
+                      <td>
+                        <span class="badge rounded-pill"
+                          [class.bg-success-subtle]="machine.availability === 'AVAILABLE'"
+                          [class.text-success]="machine.availability === 'AVAILABLE'"
+                          [class.bg-danger-subtle]="machine.availability === 'UNAVAILABLE'"
+                          [class.text-danger]="machine.availability === 'UNAVAILABLE'"
+                          [class.bg-warning-subtle]="machine.availability === 'RESERVED'"
+                          [class.text-warning]="machine.availability === 'RESERVED'">
+                          {{ getAvailabilityText(machine.availability) }}
+                        </span>
+                      </td>
+                      <!-- Statut validation -->
+                      <td>
+                        <span class="badge rounded-pill px-2 py-1"
+                          [class.bg-warning-subtle]="machine.validationStatus === 'PENDING'"
+                          [class.text-warning]="machine.validationStatus === 'PENDING'"
+                          [class.bg-success-subtle]="machine.validationStatus === 'APPROVED'"
+                          [class.text-success]="machine.validationStatus === 'APPROVED'"
+                          [class.bg-danger-subtle]="machine.validationStatus === 'REJECTED'"
+                          [class.text-danger]="machine.validationStatus === 'REJECTED'"
+                          [class.bg-dark-subtle]="machine.validationStatus === 'AUTO_REJECTED'"
+                          [class.text-dark]="machine.validationStatus === 'AUTO_REJECTED'">
+                          {{ getStatusText(machine.validationStatus) }}
+                        </span>
+                      </td>
+                      <!-- Motif rejet -->
+                      @if (activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all') {
+                        <td>
+                          @if (machine.validationStatus === 'REJECTED' || machine.validationStatus === 'AUTO_REJECTED') {
+                            <!-- Icône IA si rejet automatique -->
+                            @if (machine.validationStatus === 'AUTO_REJECTED') {
+                              <div class="mb-1">
+                                <span class="badge bg-dark small">🤖 Détecté par IA</span>
+                              </div>
+                            }
+                            <span class="text-danger small" style="font-size:0.78rem;">
+                              {{ machine.rejectionReason || '—' }}
+                            </span>
+                            @if (machine.rejectedAt) {
+                              <div>
+                                <small class="text-muted">{{ machine.rejectedAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                              </div>
+                            }
+                          }
+                          @if (machine.validationStatus !== 'REJECTED' && machine.validationStatus !== 'AUTO_REJECTED') {
+                            <span
+                            class="text-muted">—</span>
+                          }
+                        </td>
+                      }
+                      <!-- Actions -->
+                      <td class="text-end pe-3">
+                        <div class="d-flex gap-1 justify-content-end">
+                          <!-- PENDING → approuver / rejeter manuellement -->
+                          @if (machine.validationStatus === 'PENDING') {
+                            <button class="btn btn-sm btn-success" (click)="approveMachine(machine)" title="Approuver">
+                              <i class="ti ti-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" (click)="openRejectModal(machine)" title="Rejeter">
+                              <i class="ti ti-x"></i>
+                            </button>
+                          }
+                          <!-- AUTO_REJECTED → forcer l'approbation (override ML) -->
+                          @if (machine.validationStatus === 'AUTO_REJECTED') {
+                            <button
+                              class="btn btn-sm btn-outline-success"
+                              (click)="forceApprove(machine)"
+                              title="Forcer l'approbation (override IA)">
+                              <i class="ti ti-shield-check"></i>
+                            </button>
+                          }
+                          <!-- REJECTED → ré-approuver -->
+                          @if (machine.validationStatus === 'REJECTED') {
+                            <button
+                              class="btn btn-sm btn-outline-success"
+                              (click)="approveMachine(machine)" title="Ré-approuver">
+                              <i class="ti ti-refresh"></i>
+                            </button>
+                          }
+                          <!-- APPROVED → rejeter -->
+                          @if (machine.validationStatus === 'APPROVED') {
+                            <button
+                              class="btn btn-sm btn-outline-warning"
+                              (click)="openRejectModal(machine)" title="Rejeter">
+                              <i class="ti ti-ban"></i>
+                            </button>
+                          }
+                          <!-- Supprimer (toujours visible) -->
+                          <button class="btn btn-sm btn-outline-danger"
+                            (click)="deleteMachine(machine)" title="Supprimer">
+                            <i class="ti ti-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  @if (getDisplayedMachines().length === 0) {
+                    <tr>
+                      <td [attr.colspan]="10" class="text-center py-5">
+                        <i class="ti ti-inbox" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+                        <p class="text-muted mb-0">Aucune machine pour cet onglet</p>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal rejet manuel -->
+    @if (showRejectModal) {
+      <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-danger-subtle">
+              <h5 class="modal-title text-danger fw-bold">
+                <i class="ti ti-ban me-2"></i>Rejeter la machine
+              </h5>
+              <button type="button" class="btn-close" (click)="showRejectModal = false"></button>
+            </div>
+            <div class="modal-body pt-3">
+              @if (selectedMachine) {
+                <div class="alert alert-warning py-2 small">
+                  <i class="ti ti-info-circle me-1"></i>
+                  <strong>{{ selectedMachine.name }}</strong> sera grisée pour le fournisseur.
+                </div>
+              }
+              <label class="form-label fw-semibold">Motif du rejet <span class="text-danger">*</span></label>
+              <textarea class="form-control" rows="3" [(ngModel)]="rejectReason"
+              placeholder="Ex: Informations incomplètes, prix incorrect..."></textarea>
+              <small class="text-muted mt-1 d-block">
+                <i class="ti ti-eye me-1"></i>Ce motif est visible par le fournisseur.
+              </small>
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-light" (click)="showRejectModal = false">Annuler</button>
+              <button class="btn btn-danger" (click)="confirmReject()" [disabled]="!rejectReason.trim()">
+                <i class="ti ti-ban me-1"></i>Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }

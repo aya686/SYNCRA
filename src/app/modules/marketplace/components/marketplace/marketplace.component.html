@@ -1,0 +1,236 @@
+<!-- marketplace.component.html — Style Europages -->
+
+<!-- ══════════════════════════════════════════════════════════
+HERO — PHOTO BACKGROUND + BARRE DE RECHERCHE CENTRALE
+Reproduit exactement le style de l'image Europages
+══════════════════════════════════════════════════════════ -->
+<section class="ep-hero">
+  <canvas class="hero-canvas" #heroCanvas></canvas>
+
+  <!-- Photo de fond industrielle -->
+  <div class="hero-photo-bg"></div>
+  <div class="hero-dark-overlay"></div>
+
+  <div class="hero-content">
+    <h1 class="hero-title reveal">
+      La place de marché B2B leader en Tunisie.
+    </h1>
+
+    <!-- Barre de recherche principale -->
+    <div class="hero-search-box reveal" style="--delay:.08s">
+      <input
+        type="text"
+        class="hero-search-input"
+        [(ngModel)]="searchTerm"
+        (keyup)="onKeySearch($event)"
+        placeholder="Que recherchez-vous ? ex : machine agricole, réparation, électronique...">
+        <button class="hero-search-btn" (click)="onSearch()">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+
+
+
+      <!-- Badge certifications -->
+      <div class="hero-badges reveal" style="--delay:.20s">
+        <div class="hero-badge">
+          <i class="bi bi-patch-check-fill"></i>
+          <strong>SYNCRA</strong>
+          <span>Fournisseurs vérifiés &amp; certifiés</span>
+        </div>
+        <div class="hero-badge-sep">·</div>
+        <div class="hero-badge">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Plateforme de confiance</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+  BANDE STATISTIQUES — fond vert foncé style Europages
+  ══════════════════════════════════════════════════════════ -->
+  <section class="ep-stats">
+    <div class="stats-inner">
+      <div class="stats-visual">
+        <div class="stats-globe">
+          <i class="bi bi-globe2"></i>
+        </div>
+      </div>
+      <div class="stats-items">
+        <div class="stat-item">
+          <div class="stat-icon"><i class="bi bi-building"></i></div>
+          <div class="stat-val">{{ stats.suppliers }}</div>
+          <div class="stat-lbl">Fournisseurs B2B</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="bi bi-grid"></i></div>
+          <div class="stat-val">{{ stats.categories }}</div>
+          <div class="stat-lbl">Secteurs d'activité</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+          <div class="stat-val">{{ stats.machines }}</div>
+          <div class="stat-lbl">Machines</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="bi bi-briefcase"></i></div>
+          <div class="stat-val">{{ stats.services }}</div>
+          <div class="stat-lbl">Services</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-val">+{{ (stats.machines + stats.services) * 3 }}</div>
+          <div class="stat-lbl">Acheteurs / mois</div>
+        </div>
+      </div>
+      <
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+  SECTION CATÉGORIES — style Europages exact
+  Grande carte à gauche + grille 5×2 à droite
+  ══════════════════════════════════════════════════════════ -->
+  <section class="ep-categories">
+    <div class="ep-section-inner">
+      <h2 class="ep-section-title reveal">
+        Recherchez par catégories de produits et trouvez l'inspiration
+      </h2>
+
+      <!-- Loader -->
+      @if (loading) {
+        <div class="ep-loader">
+          <div class="ep-spinner"></div>
+        </div>
+      }
+
+      @if (!loading) {
+        <div class="cat-layout">
+          <!-- Grande carte featured (à gauche) -->
+          @if (featuredCat) {
+            <div class="cat-featured" (click)="openCategory(featuredCat)">
+              <img [src]="featuredCat.image" [alt]="featuredCat.label" (error)="handleImgErr($event)">
+              <div class="cat-featured-overlay"></div>
+              <div class="cat-featured-info">
+                <span class="cat-featured-count">{{ getTotal(featuredCat) }} produits</span>
+                <h3 class="cat-featured-name">{{ featuredCat.label }}</h3>
+                <button class="btn-source-now">Sourcez maintenant</button>
+              </div>
+            </div>
+          }
+          <!-- Grille des autres catégories (5 par ligne) -->
+          <div class="cat-grid-right">
+            @for (cat of otherCats; track cat; let i = $index) {
+              <div class="cat-tile reveal"
+                [style.--delay]="(i * 0.04) + 's'"
+                (click)="openCategory(cat)">
+                <div class="cat-tile-img">
+                  <img [src]="cat.image" [alt]="cat.label" (error)="handleImgErr($event)">
+                </div>
+                <div class="cat-tile-info">
+                  <p class="cat-tile-name">{{ cat.label }}</p>
+                  <p class="cat-tile-count">({{ getTotal(cat) }})</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        }<!-- /cat-layout -->
+
+        <!-- Lien tout voir -->
+        <div class="cat-see-all reveal">
+          <button class="btn-see-all-cats" routerLink="/machines/recommendation" routerLinkActive="active">
+            Récommendation personnalisée
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+    SECTION TENDANCES
+    ══════════════════════════════════════════════════════════ -->
+    @if (!loading && trendingAll.length > 0) {
+      <section class="ep-trending">
+        <div class="ep-section-inner">
+          <div class="ep-trend-head reveal">
+            <h2 class="ep-section-title">
+              Découvrez les produits &amp; services tendance
+            </h2>
+            <p class="ep-section-sub">Sélectionnés selon la meilleure notation</p>
+          </div>
+          <div class="trend-grid">
+            @for (item of trendingAll; track item; let i = $index) {
+              <div class="trend-card reveal"
+                [style.--delay]="(i * 0.04) + 's'"
+                (click)="openTrendingItem(item)">
+                <!-- Badge type -->
+                <div class="trend-type" [class.is-machine]="isMachine(item)" [class.is-service]="!isMachine(item)">
+                  <i class="bi" [class.bi-tools]="isMachine(item)" [class.bi-briefcase]="!isMachine(item)"></i>
+                  {{ isMachine(item) ? 'Machine' : 'Service' }}
+                </div>
+                <div class="trend-img">
+                  <img [src]="getImage(item) || 'assets/images/default-machine.jpg'"
+                    [alt]="getName(item)" (error)="handleImgErr($event)">
+                    <div class="trend-img-overlay">
+                      <span><i class="bi bi-eye"></i> Voir</span>
+                    </div>
+                  </div>
+                  <div class="trend-body">
+                    <div class="trend-cat">{{ getCategory(item) }}</div>
+                    <h4 class="trend-name">{{ getName(item) }}</h4>
+                    <div class="trend-location">
+                      <i class="bi bi-geo-alt"></i>{{ getLocation(item) }}
+                    </div>
+                    <div class="trend-stars">
+                      @for (s of getStars(getRating(item)); track s) {
+                        <i class="bi"
+                          [class.bi-star-fill]="s==='full'"
+                          [class.bi-star-half]="s==='half'"
+                        [class.bi-star]="s==='empty'"></i>
+                      }
+                    </div>
+                  </div>
+                  <div class="trend-footer">
+                    <span class="trend-price">
+                      {{ getPrice(item) | number }} TND
+                      <small>/{{ getPriceUnit(item) }}</small>
+                    </span>
+                    <button class="btn-trend-cta">
+                      <i class="bi bi-arrow-right"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- CTA fournisseur en bas -->
+      <section class="ep-cta-band">
+        <div class="ep-section-inner">
+          <div class="cta-band-inner reveal">
+            <div class="cta-band-text">
+              <h3>Vous êtes fournisseur ou prestataire ?</h3>
+              <p>Rejoignez notre plateforme et accédez à des milliers d'acheteurs qualifiés en Tunisie.</p>
+            </div>
+            <div class="cta-band-actions">
+              <button class="btn-cta-join" routerLink="/machines/create">
+                <i class="bi bi-plus-circle"></i>
+                Ajouter une machine
+              </button>
+              <button class="btn-cta-join outline" routerLink="/services/create">
+                <i class="bi bi-plus-circle"></i>
+                Proposer un service
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>

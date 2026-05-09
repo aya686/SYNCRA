@@ -1,0 +1,401 @@
+<!-- loyalty-dashboard.component.html -->
+
+<div class="loyalty-wrapper">
+
+  <!-- Toast -->
+  @if (showToast) {
+    <div class="loy-toast" [class]="'toast-'+toastType">
+      {{ toastMsg }}
+    </div>
+  }
+
+  <!-- ══════════════════════ EN-TÊTE ══════════════════════ -->
+  <div class="loy-header">
+    <div class="loy-header-text">
+      <h1 class="loy-title">Espace <span class="accent">Fidélité</span></h1>
+      <p class="loy-subtitle">Gagnez des points à chaque achat et débloquez des récompenses exclusives</p>
+    </div>
+    <div class="loy-header-icon">⭐</div>
+  </div>
+
+  <!-- Loader -->
+  @if (loading) {
+    <div class="loy-loader">
+      <div class="spin-ring"></div>
+      <p>Chargement de votre compte...</p>
+    </div>
+  }
+
+  <!-- Erreur -->
+  @if (errorMsg) {
+    <div class="loy-error">
+      <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMsg }}
+    </div>
+  }
+
+  @if (!loading && account) {
+    <!-- ══════════════════════ CARTE PALIER ══════════════════════ -->
+    <div class="tier-card" [style.background]="getTierGradient(account.tier)">
+      <div class="tier-top">
+        <div>
+          <div class="tier-label">Votre palier</div>
+          <div class="tier-name">
+            {{ getTierEmoji(account.tier) }} {{ account.tier }}
+          </div>
+          <div class="tier-user">{{ account.userName }}</div>
+        </div>
+        <div class="tier-points-big">
+          <span class="pts-num">{{ account.points | number }}</span>
+          <span class="pts-label">points</span>
+        </div>
+      </div>
+      <!-- Barre de progression vers palier suivant -->
+      @if (account.pointsToNextTier > 0) {
+        <div class="tier-progress">
+          <div class="tier-progress-row">
+            <span>{{ account.tier }}</span>
+            <span>{{ account.nextTier }}</span>
+          </div>
+          <div class="tier-bar-track">
+            <div class="tier-bar-fill" [style.width]="account.progressPercent + '%'"></div>
+          </div>
+          <div class="tier-progress-hint">
+            Encore <strong>{{ account.pointsToNextTier | number }}</strong> pts pour atteindre {{ account.nextTier }}
+          </div>
+        </div>
+      }
+      @if (account.pointsToNextTier === 0) {
+        <div class="tier-max">
+          💎 Vous êtes au palier maximum — Félicitations !
+        </div>
+      }
+      <!-- Mini stats -->
+      <div class="tier-mini-stats">
+        <div class="mini-stat">
+          <span class="ms-val">{{ account.totalPointsEarned | number }}</span>
+          <span class="ms-lbl">pts gagnés</span>
+        </div>
+        <div class="mini-stat">
+          <span class="ms-val">{{ account.totalPointsSpent | number }}</span>
+          <span class="ms-lbl">pts utilisés</span>
+        </div>
+        <div class="mini-stat">
+          <span class="ms-val">{{ account.discountPercent }}%</span>
+          <span class="ms-lbl">réduction dispo</span>
+        </div>
+      </div>
+    </div>
+    <!-- ══════════════════════ RÉCOMPENSES ══════════════════════ -->
+    <h2 class="section-title"><i class="bi bi-gift"></i> Mes récompenses</h2>
+    <div class="rewards-grid">
+      <!-- 1. Réduction -->
+      <div class="reward-card" [class.reward-locked]="account.points < 100">
+        <div class="reward-icon">💸</div>
+        <div class="reward-body">
+          <div class="reward-name">Réduction sur achat</div>
+          <div class="reward-desc">
+            100 pts = 1% de réduction (max 15%).<br>
+            Votre réduction disponible : <strong>{{ account.discountPercent }}%</strong>
+          </div>
+          <div class="reward-cost">
+            <label class="points-input-label">Points à utiliser :</label>
+            <div class="points-input-row">
+              <input type="number" class="pts-input" [(ngModel)]="discountPoints"
+                min="100" max="1500" step="100"
+                [max]="account.points">
+                <span class="pts-preview">→ {{ discountPreview }}% de réduction</span>
+              </div>
+            </div>
+            <button class="btn-redeem"
+              [disabled]="account.points < 100 || redeemLoading"
+              (click)="redeemDiscount()">
+              <i class="bi bi-check-circle"></i>
+              {{ account.points >= 100 ? 'Utiliser' : account.points + '/100 pts' }}
+            </button>
+          </div>
+          @if (account.discountPercent > 0) {
+            <div class="reward-available">
+              <span class="avail-badge">✅ Disponible</span>
+            </div>
+          }
+        </div>
+        <!-- 2. Livraison gratuite -->
+        <div class="reward-card" [class.reward-locked]="!account.freeDeliveryAvailable">
+          <div class="reward-icon">🚚</div>
+          <div class="reward-body">
+            <div class="reward-name">Livraison gratuite</div>
+            <div class="reward-desc">
+              Utilisez 300 pts pour une livraison offerte sur votre prochaine commande.
+            </div>
+            <div class="reward-threshold">
+              <div class="threshold-bar-track">
+                <div class="threshold-bar-fill"
+                  [style.width]="Math.min(100, (account.points / 300) * 100) + '%'"
+                [style.background]="account.freeDeliveryAvailable ? '#10b981' : '#6366f1'"></div>
+              </div>
+              <span class="threshold-label">
+                {{ account.freeDeliveryAvailable ? '✅ Débloquée !' : account.points + '/300 pts' }}
+              </span>
+            </div>
+            <button class="btn-redeem btn-delivery"
+              [disabled]="!account.freeDeliveryAvailable || redeemLoading"
+              (click)="redeemDelivery()">
+              <i class="bi bi-truck"></i>
+              {{ account.freeDeliveryAvailable ? 'Activer (300 pts)' : 'Verrouillé' }}
+            </button>
+          </div>
+          @if (account.freeDeliveryAvailable) {
+            <div class="reward-available">
+              <span class="avail-badge avail-green">✅ Disponible</span>
+            </div>
+          }
+        </div>
+        <!-- 3. Accès premium -->
+        <div class="reward-card" [class.reward-locked]="!account.premiumAccessAvailable">
+          <div class="reward-icon">🎁</div>
+          <div class="reward-body">
+            <div class="reward-name">Accès Premium fournisseurs</div>
+            <div class="reward-desc">
+              Accédez aux fournisseurs premium et à leurs offres exclusives pendant 30 jours.
+            </div>
+            <div class="reward-threshold">
+              <div class="threshold-bar-track">
+                <div class="threshold-bar-fill"
+                  [style.width]="Math.min(100, (account.points / 800) * 100) + '%'"
+                [style.background]="account.premiumAccessAvailable ? '#f59e0b' : '#6366f1'"></div>
+              </div>
+              <span class="threshold-label">
+                {{ account.premiumAccessAvailable ? '✅ Débloqué !' : account.points + '/800 pts' }}
+              </span>
+            </div>
+            <button class="btn-redeem btn-premium"
+              [disabled]="!account.premiumAccessAvailable || redeemLoading"
+              (click)="redeemPremium()">
+              <i class="bi bi-star-fill"></i>
+              {{ account.premiumAccessAvailable ? 'Activer (800 pts)' : 'Verrouillé' }}
+            </button>
+          </div>
+          @if (account.premiumAccessAvailable) {
+            <div class="reward-available">
+              <span class="avail-badge avail-gold">⭐ Disponible</span>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- ══════════════════════ RÈGLE DE POINTS ══════════════════════ -->
+      <div class="points-rule-card">
+        <h3><i class="bi bi-info-circle"></i> Comment gagner des points</h3>
+        <div class="rules-grid">
+          <div class="rule-item">
+            <span class="rule-icon">🛒</span>
+            <div><strong>1 TND dépensé = 1 point</strong><br><small>Sur chaque commande confirmée</small></div>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">🥈</span>
+            <div><strong>Palier Silver : ×1.2</strong><br><small>Dès 500 pts cumulés</small></div>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">🥇</span>
+            <div><strong>Palier Gold : ×1.5</strong><br><small>Dès 1 500 pts cumulés</small></div>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">💎</span>
+            <div><strong>Palier Platinum : ×2.0</strong><br><small>Dès 4 000 pts cumulés</small></div>
+          </div>
+          <div class="rule-item">
+            <span class="rule-icon">🎉</span>
+            <div><strong>+100 pts bonus</strong><br><small>Premier achat uniquement</small></div>
+          </div>
+        </div>
+      </div>
+      <!-- ══════════════════════ HISTORIQUE ══════════════════════ -->
+      <h2 class="section-title"><i class="bi bi-clock-history"></i> Historique des 10 dernières opérations</h2>
+      @if (account?.history && account.history.length > 0) {
+        <div class="history-list">
+          @for (tx of account.history; track tx) {
+            <div class="history-item">
+              <div class="tx-icon-wrap" [style.background]="tx.pointsDelta > 0 ? '#d1fae5' : '#fee2e2'">
+                <i class="bi" [class]="getTxIcon(tx.type)"
+                [style.color]="getTxColor(tx.pointsDelta)"></i>
+              </div>
+              <div class="tx-body">
+                <div class="tx-desc">{{ tx.description }}</div>
+                <div class="tx-date">{{ tx.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+              <div class="tx-delta" [style.color]="getTxColor(tx.pointsDelta)">
+                {{ tx.pointsDelta > 0 ? '+' : '' }}{{ tx.pointsDelta }} pts
+              </div>
+              <div class="tx-balance">{{ tx.balanceAfter }} pts</div>
+            </div>
+          }
+        </div>
+      }
+      @if (!account.history?.length) {
+        <div class="history-empty">
+          <i class="bi bi-inbox"></i><p>Aucune opération pour le moment.</p>
+        </div>
+      }
+    }
+
+    <!-- ══════════════════════ TOP CLASSEMENTS ══════════════════════ -->
+    <div class="top-section">
+
+      <div class="top-header">
+        <h2 class="section-title mb-0">
+          <i class="bi bi-trophy-fill text-warning"></i> Classements
+        </h2>
+
+        <!-- Contrôles -->
+        <div class="top-controls">
+          <select class="ctrl-select" [(ngModel)]="topLimit" (change)="onTopFilterChange()">
+            @for (l of limits; track l) {
+              <option [value]="l">Top {{ l }}</option>
+            }
+          </select>
+          <select class="ctrl-select" [(ngModel)]="topCategory" (change)="onTopFilterChange()">
+            <option value="">Toutes catégories</option>
+            @for (c of categories; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabs Machines / Services -->
+      <div class="top-tabs">
+        <button class="top-tab" [class.active]="activeTopTab === 'machines'"
+          (click)="activeTopTab = 'machines'">
+          <i class="bi bi-tools"></i> Machines
+          <span class="tab-count">{{ topMachines.length }}</span>
+        </button>
+        <button class="top-tab" [class.active]="activeTopTab === 'services'"
+          (click)="activeTopTab = 'services'">
+          <i class="bi bi-briefcase"></i> Services
+          <span class="tab-count">{{ topServices.length }}</span>
+        </button>
+      </div>
+
+      <!-- Loader classement -->
+      @if (topLoading) {
+        <div class="loy-loader">
+          <div class="spin-ring"></div>
+        </div>
+      }
+
+      <!-- Podium Top 3 -->
+      @if (!topLoading && activeTopItems.length >= 3) {
+        <div class="podium">
+          <!-- 2ème -->
+          @if (activeTopItems[1]) {
+            <div class="podium-item podium-2">
+              <div class="podium-medal">🥈</div>
+              <img [src]="activeTopItems[1].imageUrl || 'assets/images/default-machine.jpg'"
+                (error)="handleImgError($event)" alt="" class="podium-img">
+                <div class="podium-name">{{ activeTopItems[1].name }}</div>
+                <div class="podium-sold">{{ activeTopItems[1].totalSold }} ventes</div>
+                <div class="podium-bar podium-bar-2"></div>
+              </div>
+            }
+            <!-- 1er -->
+            @if (activeTopItems[0]) {
+              <div class="podium-item podium-1">
+                <div class="podium-crown">👑</div>
+                <div class="podium-medal">🥇</div>
+                <img [src]="activeTopItems[0].imageUrl || 'assets/images/default-machine.jpg'"
+                  (error)="handleImgError($event)" alt="" class="podium-img podium-img-big">
+                  <div class="podium-name">{{ activeTopItems[0].name }}</div>
+                  <div class="podium-sold">{{ activeTopItems[0].totalSold }} ventes</div>
+                  <div class="podium-bar podium-bar-1"></div>
+                </div>
+              }
+              <!-- 3ème -->
+              @if (activeTopItems[2]) {
+                <div class="podium-item podium-3">
+                  <div class="podium-medal">🥉</div>
+                  <img [src]="activeTopItems[2].imageUrl || 'assets/images/default-machine.jpg'"
+                    (error)="handleImgError($event)" alt="" class="podium-img">
+                    <div class="podium-name">{{ activeTopItems[2].name }}</div>
+                    <div class="podium-sold">{{ activeTopItems[2].totalSold }} ventes</div>
+                    <div class="podium-bar podium-bar-3"></div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Liste complète -->
+            @if (!topLoading && activeTopItems.length > 0) {
+              <div class="top-list">
+                @for (item of activeTopItems; track item) {
+                  <div class="top-row"
+                    [class.row-gold]="item.rank === 1"
+                    [class.row-silver]="item.rank === 2"
+                    [class.row-bronze]="item.rank === 3"
+                    (click)="viewItem(item)">
+                    <!-- Rang -->
+                    <div class="row-rank">
+                      @if (item.rank <= 3) {
+                        <span class="rank-medal">{{ getRankMedal(item.rank) }}</span>
+                      }
+                      @if (item.rank > 3) {
+                        <span class="rank-num" >#{{ item.rank }}</span>
+                      }
+                    </div>
+                    <!-- Image -->
+                    <img [src]="item.imageUrl || 'assets/images/default-machine.jpg'"
+                      (error)="handleImgError($event)" class="row-img" alt="">
+                      <!-- Infos -->
+                      <div class="row-info">
+                        <div class="row-name">{{ item.name }}</div>
+                        <div class="row-meta">
+                          <span><i class="bi bi-geo-alt"></i> {{ item.location }}</span>
+                          <span><i class="bi bi-building"></i> {{ item.supplierName }}</span>
+                          <span class="row-category">{{ item.category }}</span>
+                        </div>
+                        <div class="row-stars">
+                          @for (s of getStars(item.rating); track s) {
+                            <i class="bi" [class]="s + (s.includes('fill') ? ' text-warning' : ' text-muted')" style="font-size:0.7rem;"></i>
+                          }
+                          <span class="ms-1" style="font-size:0.72rem;color:#64748b;">({{ item.reviewCount }})</span>
+                        </div>
+                      </div>
+                      <!-- Ventes -->
+                      <div class="row-stats">
+                        <div class="stat-sold">
+                          <span class="stat-num">{{ item.totalSold }}</span>
+                          <span class="stat-lbl">ventes</span>
+                        </div>
+                        <div class="stat-rev">
+                          {{ formatRev(item.totalRevenue) }} TND
+                        </div>
+                      </div>
+                      <!-- Prix -->
+                      <div class="row-price">
+                        <span class="price-val">{{ formatPrice(item.price) }}</span>
+                        <span class="price-unit">TND/{{ item.priceUnit }}</span>
+                      </div>
+                      <!-- Disponibilité -->
+                      <div class="row-avail">
+                        <span class="avail-dot"
+                          [class.dot-ok]="item.availability === 'AVAILABLE'"
+                          [class.dot-no]="item.availability === 'UNAVAILABLE'"
+                          [class.dot-res]="item.availability === 'RESERVED'">
+                        </span>
+                        <span class="avail-txt">{{ item.availability === 'AVAILABLE' ? 'Dispo' : item.availability === 'RESERVED' ? 'Réservé' : 'Indispo' }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Vide -->
+              @if (!topLoading && activeTopItems.length === 0) {
+                <div class="top-empty">
+                  <i class="bi bi-trophy"></i>
+                  <p>Aucun classement disponible pour le moment.<br>
+                  Les classements se construisent avec les premières commandes.</p>
+                </div>
+              }
+
+            </div>
+
+          </div>

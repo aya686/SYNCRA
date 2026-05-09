@@ -1,0 +1,48 @@
+/* src/app/modules/reviews/components/review-list/review-list.component.css */
+
+.reviews-section {
+  padding: 0.5rem;
+}
+
+.average-rating-card {
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.average-rating-card:hover {
+  transform: translateY(-2px);
+}
+
+.review-card {
+  transition: box-shadow 0.2s;
+  border: none;
+}
+
+.review-card:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+}
+
+.review-avatar img {
+  border: 2px solid #0d6efd;
+}
+
+.rating-stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.review-content {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .review-card .d-flex {
+    flex-direction: column;
+  }
+  
+  .review-card .rating {
+    margin-top: 0.5rem;
+  }
+}

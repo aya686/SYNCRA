@@ -1,0 +1,425 @@
+<!-- src/app/modules/resources/components/create-service/create-service.component.html -->
+
+<div class="create-service-container">
+  <!-- En-tête stylisé -->
+  <div class="page-header-glass reveal">
+    <div class="glass-content">
+      <div class="breadcrumb">
+        <a routerLink="/">Accueil</a>
+        <i class="bi bi-chevron-right"></i>
+        <a routerLink="/services">Services</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">{{ isEditMode ? 'Modifier' : 'Ajouter' }} un service</span>
+      </div>
+      <div class="header-icon-wrap">
+        <i class="bi" [class.bi-plus-circle]="!isEditMode" [class.bi-pencil-square]="isEditMode"></i>
+      </div>
+      <h1 class="page-title">
+        {{ isEditMode ? 'Modifier le' : 'Ajouter un' }} <span class="gradient-text">service</span>
+      </h1>
+      <p class="page-subtitle">
+        {{ isEditMode ? 'Modifiez les informations de votre service' : 'Ajoutez un nouveau service à la plateforme' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  @if (loading) {
+    <div class="loader-wrapper">
+      <div class="loader-spinner"></div>
+      <p>Chargement...</p>
+    </div>
+  }
+
+  <!-- Formulaire -->
+  @if (!loading) {
+    <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form">
+      <div class="form-grid">
+        <!-- Colonne gauche - Informations principales -->
+        <div class="form-col-main">
+          <!-- Section Informations générales -->
+          <div class="form-card">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-info-circle"></i>
+              </div>
+              <div class="header-text">
+                <h3>Informations générales</h3>
+                <p>Les informations de base de votre service</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <!-- Nom -->
+              <div class="form-group">
+                <label class="form-label">
+                  Nom du service <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="bi bi-briefcase"></i>
+                  <input
+                    type="text"
+                    [class.error]="submitted && f['name'].invalid"
+                    formControlName="name"
+                    placeholder="Ex: Fabrication de bouteilles plastiques"
+                    >
+                  </div>
+                  @if (submitted && f['name'].invalid) {
+                    <div class="error-message">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      @if (f['name'].errors?.['required']) {
+                        <span>Le nom est requis</span>
+                      }
+                      @if (f['name'].errors?.['minlength']) {
+                        <span>Minimum 3 caractères</span>
+                      }
+                      @if (f['name'].errors?.['maxlength']) {
+                        <span>Maximum 100 caractères</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <!-- Description -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Description <span class="required">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-file-text"></i>
+                    <textarea
+                      rows="5"
+                      [class.error]="submitted && f['description'].invalid"
+                      formControlName="description"
+                      placeholder="Décrivez votre service, les délais, les conditions, etc."
+                    ></textarea>
+                  </div>
+                  <div class="char-count">{{ f['description'].value?.length || 0 }}/2000</div>
+                  @if (submitted && f['description'].invalid) {
+                    <div class="error-message">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      @if (f['description'].errors?.['required']) {
+                        <span>La description est requise</span>
+                      }
+                      @if (f['description'].errors?.['minlength']) {
+                        <span>Minimum 10 caractères</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <div class="form-row">
+                  <!-- Catégorie -->
+                  <div class="form-group">
+                    <label class="form-label">
+                      Catégorie <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-tags"></i>
+                      <select formControlName="category">
+                        @for (cat of categories; track cat) {
+                          <option [value]="cat">{{cat}}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Type de service -->
+                  <div class="form-group">
+                    <label class="form-label">
+                      Type de service <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-gear"></i>
+                      <select formControlName="serviceType">
+                        @for (type of serviceTypes; track type) {
+                          <option [value]="type.value">
+                            {{type.label}}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <!-- Sous-catégorie dynamique -->
+                @if (currentSubCategories.length > 0) {
+                  <div class="form-group">
+                    <label class="form-label">
+                      <i class="bi bi-diagram-3"></i> Sous-catégorie
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-list-ul"></i>
+                      <select formControlName="subCategory">
+                        <option value="">— Choisir une sous-catégorie —</option>
+                        @for (sub of currentSubCategories; track sub) {
+                          <option [value]="sub.key">
+                            {{ sub.label }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                    <div class="info-note">
+                      <i class="bi bi-info-circle"></i>
+                      <span>Aide les acheteurs à trouver votre service plus facilement</span>
+                    </div>
+                  </div>
+                }
+                <!-- Type d'entreprise -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Type d'entreprise <span class="required">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-building"></i>
+                    <select formControlName="businessType"
+                      [class.error]="submitted && f['businessType'].invalid">
+                      <option value="">— Sélectionner votre type d'entreprise —</option>
+                      @for (bt of businessTypes; track bt) {
+                        <option [value]="bt.value">
+                          {{ bt.label }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  @if (submitted && f['businessType'].invalid) {
+                    <div class="error-message">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      <span>Le type d'entreprise est requis</span>
+                    </div>
+                  }
+                </div>
+                <div class="form-row">
+                  <!-- Disponibilité -->
+                  <div class="form-group">
+                    <label class="form-label">
+                      Disponibilité <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-check-circle"></i>
+                      <select formControlName="availability">
+                        @for (avail of availabilityStatuses; track avail) {
+                          <option [value]="avail">
+                            {{ avail === 'AVAILABLE' ? '✅ Disponible' : avail === 'UNAVAILABLE' ? '❌ Indisponible' : '⏳ Réservé' }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Section Tarification -->
+            <div class="form-card">
+              <div class="card-header-custom">
+                <div class="header-icon">
+                  <i class="bi bi-tag"></i>
+                </div>
+                <div class="header-text">
+                  <h3>Tarification</h3>
+                  <p>Informations sur les prix</p>
+                </div>
+              </div>
+              <div class="card-body-custom">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Prix de base <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-cash"></i>
+                      <input
+                        type="number"
+                        step="0.01"
+                        [class.error]="submitted && f['basePrice'].invalid"
+                        formControlName="basePrice"
+                        placeholder="0"
+                        >
+                        <span class="input-suffix">TND</span>
+                      </div>
+                      @if (submitted && f['basePrice'].invalid) {
+                        <div class="error-message">
+                          <i class="bi bi-exclamation-triangle"></i>
+                          @if (f['basePrice'].errors?.['required']) {
+                            <span>Le prix est requis</span>
+                          }
+                          @if (f['basePrice'].errors?.['min']) {
+                            <span>Le prix doit être ≥ 0</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">
+                        Unité <span class="required">*</span>
+                      </label>
+                      <div class="input-wrapper">
+                        <i class="bi bi-clock"></i>
+                        <select formControlName="priceUnit">
+                          @for (unit of priceUnits; track unit) {
+                            <option [value]="unit">{{unit}}</option>
+                          }
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Section Localisation et contact -->
+              <div class="form-card">
+                <div class="card-header-custom">
+                  <div class="header-icon">
+                    <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="header-text">
+                    <h3>Localisation et contact</h3>
+                    <p>Où trouver le service ?</p>
+                  </div>
+                </div>
+                <div class="card-body-custom">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">
+                        Localisation <span class="required">*</span>
+                      </label>
+                      <div class="input-wrapper">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <input
+                          type="text"
+                          [class.error]="submitted && f['location'].invalid"
+                          formControlName="location"
+                          placeholder="Ex: Tunis, Sfax, Nabeul..."
+                          >
+                        </div>
+                        @if (submitted && f['location'].invalid) {
+                          <div class="error-message">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span>La localisation est requise</span>
+                          </div>
+                        }
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">
+                          Téléphone de contact <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                          <i class="bi bi-telephone"></i>
+                          <input
+                            type="tel"
+                            [class.error]="submitted && f['contactInfo'].invalid"
+                            formControlName="contactInfo"
+                            placeholder="Ex: +216 XX XXX XXX"
+                            >
+                          </div>
+                          @if (submitted && f['contactInfo'].invalid) {
+                            <div class="error-message">
+                              <i class="bi bi-exclamation-triangle"></i>
+                              @if (f['contactInfo'].errors?.['required']) {
+                                <span>Le téléphone est requis</span>
+                              }
+                              @if (f['contactInfo'].errors?.['pattern']) {
+                                <span>Format invalide (8-15 chiffres)</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Colonne droite - Images et prestataire -->
+                <div class="form-col-side">
+                  <!-- Section Images -->
+                  <div class="form-card">
+                    <div class="card-header-custom">
+                      <div class="header-icon">
+                        <i class="bi bi-images"></i>
+                      </div>
+                      <div class="header-text">
+                        <h3>Images</h3>
+                        <p>Ajoutez des photos du service</p>
+                      </div>
+                    </div>
+                    <div class="card-body-custom">
+                      <!-- Aperçu des images -->
+                      @if (imageUrls.length > 0) {
+                        <div class="image-grid">
+                          @for (img of imageUrls; track img; let i = $index) {
+                            <div class="image-item">
+                              <img [src]="img" [alt]="'Image ' + (i+1)" (error)="handleImageError($event)">
+                              <button type="button" class="remove-image" (click)="removeImage(i)">
+                                <i class="bi bi-x"></i>
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (imageUrls.length === 0) {
+                        <div class="empty-images">
+                          <i class="bi bi-image"></i>
+                          <p>Aucune image ajoutée</p>
+                        </div>
+                      }
+                      <!-- Ajout d'image -->
+                      <div class="add-image-input">
+                        <div class="input-wrapper">
+                          <i class="bi bi-link"></i>
+                          <input
+                            type="text"
+                            placeholder="URL de l'image (http://, https:// ou assets/)"
+                            [(ngModel)]="imageInputValue"
+                            [ngModelOptions]="{standalone: true}"
+                            (keyup.enter)="addImage()"
+                            >
+                          </div>
+                          <button type="button" class="btn-add-image" (click)="addImage()">
+                            <i class="bi bi-plus-lg"></i>
+                          </button>
+                        </div>
+                        <div class="info-note">
+                          <i class="bi bi-info-circle"></i>
+                          <span>Entrez une URL valide (http://, https:// ou assets/)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Section Prestataire -->
+                    <div class="form-card">
+                      <div class="card-header-custom">
+                        <div class="header-icon">
+                          <i class="bi bi-building"></i>
+                        </div>
+                        <div class="header-text">
+                          <h3>Informations prestataire</h3>
+                          <p>Vos informations</p>
+                        </div>
+                      </div>
+                      <div class="card-body-custom">
+                        <div class="info-row">
+                          <span class="info-label">Nom du prestataire</span>
+                          <span class="info-value">{{ getCurrentUserName() }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">ID prestataire</span>
+                          <span class="info-value">{{ getCurrentUserId() }}</span>
+                        </div>
+                        <div class="toggle-switch">
+                          <label class="switch-label">
+                            <input type="checkbox" formControlName="isInApp">
+                            <span class="switch-slider"></span>
+                            <span class="switch-text">Utilisateur inscrit sur la plateforme</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Boutons d'action -->
+                <div class="form-actions">
+                  <button type="button" class="btn-secondary" (click)="onCancel()">
+                    <i class="bi bi-x-lg"></i>
+                    <span>Annuler</span>
+                  </button>
+                  <button type="submit" class="btn-primary" [disabled]="loading">
+                    <i class="bi" [class.bi-plus-lg]="!isEditMode" [class.bi-check-lg]="isEditMode"></i>
+                    <span>{{ isEditMode ? 'Enregistrer les modifications' : 'Ajouter le service' }}</span>
+                    <div class="btn-bg"></div>
+                  </button>
+                </div>
+              </form>
+            }
+          </div>

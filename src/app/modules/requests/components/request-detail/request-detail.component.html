@@ -1,0 +1,462 @@
+<!-- src/app/modules/requests/components/request-detail/request-detail.component.html -->
+
+<canvas class="particle-canvas" #particleCanvas></canvas>
+@if (!loading && request) {
+  <div class="detail-container">
+    <!-- En-tête avec breadcrumb -->
+    <div class="detail-header reveal">
+      <div class="breadcrumb">
+        <a routerLink="/">Accueil</a>
+        <i class="bi bi-chevron-right"></i>
+        <a routerLink="/requests">Demandes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">{{ request.title }}</span>
+      </div>
+    </div>
+    <!-- En-tête de la demande -->
+    <div class="request-header reveal">
+      <div class="header-content">
+        <div class="header-badges">
+          <span class="status-badge" [class]="getStatusBadgeClass(request.status)">
+            <span class="status-dot"></span>
+            {{ getStatusLabel(request.status) }}
+          </span>
+          <span class="type-badge">
+            <i class="bi" [class.bi-tools]="request.requestType === 'MACHINE_PURCHASE' || request.requestType === 'MACHINE_RENT'"
+              [class.bi-briefcase]="request.requestType === 'SERVICE' || request.requestType === 'FABRICATION'"
+              [class.bi-wrench]="request.requestType === 'REPARATION'"
+            [class.bi-chat-dots]="request.requestType === 'CONSULTATION'"></i>
+            {{ getRequestTypeLabel(request.requestType) }}
+          </span>
+        </div>
+        <h1 class="request-title">{{ request.title }}</h1>
+        <div class="request-meta">
+          <span><i class="bi bi-calendar"></i> Créée le {{ formatDate(request.createdAt) }}</span>
+          <span><i class="bi bi-hash"></i> Référence #{{ request.id }}</span>
+        </div>
+      </div>
+      @if (canCancel() || canRespond()) {
+        <div class="header-actions">
+          @if (canCancel()) {
+            <button class="btn-cancel" (click)="showCancelModal = true">
+              <i class="bi bi-x-lg"></i>
+              <span>Annuler la demande</span>
+            </button>
+          }
+          @if (canRespond()) {
+            <button class="btn-respond" (click)="showResponseModal = true">
+              <i class="bi bi-reply-all"></i>
+              <span>Répondre à la demande</span>
+              <div class="btn-bg"></div>
+            </button>
+          }
+        </div>
+      }
+    </div>
+    <div class="detail-grid">
+      <!-- Colonne gauche - Contenu principal -->
+      <div class="detail-main">
+        <!-- Description -->
+        <div class="info-card reveal">
+          <div class="card-header-custom">
+            <div class="header-icon">
+              <i class="bi bi-file-text"></i>
+            </div>
+            <div class="header-text">
+              <h3>Description</h3>
+              <p>Détails de la demande</p>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            <p>{{ request.description }}</p>
+          </div>
+        </div>
+        <!-- Spécifications -->
+        @if (request.specifications) {
+          <div class="info-card reveal">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-gear"></i>
+              </div>
+              <div class="header-text">
+                <h3>Spécifications techniques</h3>
+                <p>Exigences détaillées</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <p>{{ request.specifications }}</p>
+            </div>
+          </div>
+        }
+        <!-- Détails de la commande -->
+        <div class="info-card reveal">
+          <div class="card-header-custom">
+            <div class="header-icon">
+              <i class="bi bi-clipboard-data"></i>
+            </div>
+            <div class="header-text">
+              <h3>Détails de la commande</h3>
+              <p>Informations sur la quantité et les délais</p>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Quantité</span>
+                <span class="detail-value">{{ request.quantity }} unités</span>
+              </div>
+              @if (request.material) {
+                <div class="detail-item">
+                  <span class="detail-label">Matériau</span>
+                  <span class="detail-value">{{ request.material }}</span>
+                </div>
+              }
+              <div class="detail-item">
+                <span class="detail-label">Délai souhaité</span>
+                <span class="detail-value">{{ request.deadline | date:'dd/MM/yyyy' }}</span>
+              </div>
+              @if (request.budget) {
+                <div class="detail-item">
+                  <span class="detail-label">Budget estimé</span>
+                  <span class="detail-value">{{ request.budget | number }} TND</span>
+                </div>
+              }
+              @if (request.machineServiceName) {
+                <div class="detail-item">
+                  <span class="detail-label">Ressource associée</span>
+                  <span class="detail-value">{{ request.machineServiceName }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- Fichiers joints -->
+        @if (request.attachments && request.attachments.length > 0) {
+          <div class="info-card reveal">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-paperclip"></i>
+              </div>
+              <div class="header-text">
+                <h3>Fichiers joints</h3>
+                <p>{{ request.attachments.length }} fichier(s)</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <div class="attachments-list">
+                @for (att of request.attachments; track att) {
+                  <div class="attachment-item">
+                    <div class="file-info">
+                      <i class="bi" [class.bi-file-pdf]="att.fileType === 'application/pdf'"
+                        [class.bi-file-image]="att.fileType.startsWith('image/')"
+                      [class.bi-file-earmark]="true"></i>
+                      <div>
+                        <span class="file-name">{{ att.fileName }}</span>
+                        <span class="file-size">{{ (att.fileSize / 1024).toFixed(2) }} KB</span>
+                      </div>
+                    </div>
+                    <button class="download-btn" (click)="downloadAttachment(att.fileUrl, att.fileName)">
+                      <i class="bi bi-download"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <!-- Colonne droite - Informations latérales -->
+      <div class="detail-side">
+        <!-- Demandeur -->
+        <div class="info-card reveal">
+          <div class="card-header-custom">
+            <div class="header-icon">
+              <i class="bi bi-person"></i>
+            </div>
+            <div class="header-text">
+              <h3>Demandeur</h3>
+              <p>Informations de contact</p>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            <div class="contact-info">
+              <div class="contact-name">{{ request.requesterName }}</div>
+              <div class="contact-detail">
+                <i class="bi bi-envelope"></i>
+                <span>{{ request.requesterEmail }}</span>
+              </div>
+              <div class="contact-detail">
+                <i class="bi bi-telephone"></i>
+                <span>{{ request.requesterPhone }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Fournisseur -->
+        <div class="info-card reveal">
+          <div class="card-header-custom">
+            <div class="header-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="header-text">
+              <h3>Fournisseur</h3>
+              <p>Prestataire sélectionné</p>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            @if (!request.isExternalProvider && request.targetProviderId) {
+              <div class="provider-info">
+                <div class="provider-name">Fournisseur inscrit</div>
+                <div class="provider-id">ID: {{ request.targetProviderId }}</div>
+              </div>
+            }
+            @if (request.isExternalProvider) {
+              <div class="provider-info">
+                <div class="provider-name">{{ request.externalProviderName || 'Non spécifié' }}</div>
+                @if (request.externalProviderCompany) {
+                  <div class="provider-detail">
+                    <i class="bi bi-building"></i>
+                    <span>{{ request.externalProviderCompany }}</span>
+                  </div>
+                }
+                @if (request.externalProviderPhone) {
+                  <div class="provider-detail">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ request.externalProviderPhone }}</span>
+                  </div>
+                }
+                @if (request.externalProviderEmail) {
+                  <div class="provider-detail">
+                    <i class="bi bi-envelope"></i>
+                    <span>{{ request.externalProviderEmail }}</span>
+                  </div>
+                }
+              </div>
+            }
+            @if (!request.targetProviderId && !request.externalProviderName) {
+              <div class="text-muted">
+                Aucun fournisseur sélectionné
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Réponse du fournisseur -->
+        @if (request.responseMessage) {
+          <div class="info-card reveal">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-chat-dots"></i>
+              </div>
+              <div class="header-text">
+                <h3>Réponse du fournisseur</h3>
+                <p>Proposition reçue</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <div class="response-message">
+                <p>{{ request.responseMessage }}</p>
+              </div>
+              @if (request.proposedPrice) {
+                <div class="response-details">
+                  <div class="response-price">
+                    <span>Prix proposé</span>
+                    <strong>{{ request.proposedPrice | number }} TND</strong>
+                  </div>
+                  @if (request.estimatedDelivery) {
+                    <div class="response-delivery">
+                      <span>Livraison estimée</span>
+                      <strong>{{ request.estimatedDelivery }}</strong>
+                    </div>
+                  }
+                </div>
+              }
+              @if (request.respondedAt) {
+                <div class="response-date">
+                  <i class="bi bi-clock"></i>
+                  <span>Répondu le {{ formatDate(request.respondedAt) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <!-- Chronologie -->
+        <div class="info-card reveal">
+          <div class="card-header-custom">
+            <div class="header-icon">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="header-text">
+              <h3>Chronologie</h3>
+              <p>Suivi de la demande</p>
+            </div>
+          </div>
+          <div class="card-body-custom">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-icon created">
+                  <i class="bi bi-plus-circle"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Demande créée</div>
+                  <div class="timeline-date">{{ formatDate(request.createdAt) }}</div>
+                </div>
+              </div>
+              @if (request.respondedAt) {
+                <div class="timeline-item">
+                  <div class="timeline-icon responded">
+                    <i class="bi bi-reply-all"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Réponse du fournisseur</div>
+                    <div class="timeline-date">{{ formatDate(request.respondedAt) }}</div>
+                  </div>
+                </div>
+              }
+              @if (request.status === RequestStatus.IN_PROGRESS) {
+                <div class="timeline-item">
+                  <div class="timeline-icon progress">
+                    <i class="bi bi-play-circle"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">En cours de réalisation</div>
+                    <div class="timeline-date">{{ formatDate(request.updatedAt) }}</div>
+                  </div>
+                </div>
+              }
+              @if (request.status === RequestStatus.COMPLETED) {
+                <div class="timeline-item">
+                  <div class="timeline-icon completed">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Demande terminée</div>
+                    <div class="timeline-date">{{ formatDate(request.updatedAt) }}</div>
+                  </div>
+                </div>
+              }
+              @if (request.status === RequestStatus.CANCELLED) {
+                <div class="timeline-item">
+                  <div class="timeline-icon cancelled">
+                    <i class="bi bi-x-circle"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-title">Demande annulée</div>
+                    <div class="timeline-date">{{ formatDate(request.updatedAt) }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- Actions fournisseur -->
+        @if (isProvider && request.status === RequestStatus.ACCEPTED) {
+          <div class="info-card reveal">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-gear"></i>
+              </div>
+              <div class="header-text">
+                <h3>Gérer la demande</h3>
+                <p>Mettre à jour le statut</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <div class="action-buttons">
+                <button class="btn-start" (click)="updateStatus(RequestStatus.IN_PROGRESS)">
+                  <i class="bi bi-play-circle"></i>
+                  <span>Démarrer la réalisation</span>
+                </button>
+                <button class="btn-complete" (click)="updateStatus(RequestStatus.COMPLETED)">
+                  <i class="bi bi-check-circle"></i>
+                  <span>Marquer comme terminée</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Loader -->
+@if (loading) {
+  <div class="loader-wrapper">
+    <div class="loader-spinner"></div>
+    <p>Chargement de la demande...</p>
+  </div>
+}
+
+<!-- Modal Réponse -->
+@if (showResponseModal) {
+  <div class="modal-custom" [class.show]="showResponseModal">
+    <div class="modal-overlay" (click)="showResponseModal = false"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Répondre à la demande</h3>
+        <button class="modal-close" (click)="showResponseModal = false">×</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="responseForm">
+          <div class="form-group">
+            <label class="form-label">Message <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <i class="bi bi-chat"></i>
+              <textarea rows="4" formControlName="message" placeholder="Votre réponse au client..."></textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Prix proposé (TND) <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="bi bi-cash"></i>
+                <input type="number" step="0.01" formControlName="proposedPrice" placeholder="0">
+                <span class="input-suffix">TND</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Livraison estimée <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="bi bi-calendar"></i>
+                <input type="date" formControlName="estimatedDelivery">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="showResponseModal = false">Annuler</button>
+        <button class="btn-primary" (click)="onSubmitResponse()" [disabled]="responseForm.invalid">
+          <span>Envoyer la réponse</span>
+          <div class="btn-bg"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Annulation -->
+@if (showCancelModal) {
+  <div class="modal-custom" [class.show]="showCancelModal">
+    <div class="modal-overlay" (click)="showCancelModal = false"></div>
+    <div class="modal-container modal-danger">
+      <div class="modal-header">
+        <h3>Annuler la demande</h3>
+        <button class="modal-close" (click)="showCancelModal = false">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="warning-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <p>Êtes-vous sûr de vouloir annuler cette demande ?</p>
+        <p class="text-warning">Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="showCancelModal = false">Retour</button>
+        <button class="btn-danger" (click)="onCancelRequest()">
+          <span>Confirmer l'annulation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

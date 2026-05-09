@@ -1,0 +1,160 @@
+<!-- src/app/modules/orders/components/my-orders/my-orders.component.html -->
+
+<div class="orders-container">
+
+  <!-- En-tête -->
+  <div class="page-header reveal">
+    <div class="breadcrumb-nav">
+      <span routerLink="/" style="cursor:pointer;">Accueil</span>
+      <i class="bi bi-chevron-right"></i>
+      <span class="active">Mes commandes</span>
+    </div>
+    <h1 class="page-title">
+      Mes <span class="accent">commandes</span>
+    </h1>
+    <p class="page-subtitle">Suivez l'avancement de vos commandes en temps réel</p>
+  </div>
+
+  <!-- Erreur -->
+  @if (errorMessage) {
+    <div class="alert-error">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+      <button (click)="errorMessage = ''">×</button>
+    </div>
+  }
+
+  <!-- Loader -->
+  @if (loading) {
+    <div class="loader-box">
+      <div class="spin-ring"></div>
+      <p>Chargement de vos commandes...</p>
+    </div>
+  }
+
+  <!-- Aucune commande -->
+  @if (!loading && orders.length === 0 && !errorMessage) {
+    <div class="empty-state">
+      <i class="bi bi-bag-x"></i>
+      <h3>Aucune commande</h3>
+      <p>Vous n'avez pas encore passé de commande.</p>
+      <button class="btn-shop" routerLink="/machines">
+        <i class="bi bi-shop"></i> Découvrir les machines
+      </button>
+    </div>
+  }
+
+  <!-- Liste des commandes -->
+  @if (!loading && orders.length > 0) {
+    <div class="orders-list">
+      <!-- Compteur -->
+      <p class="orders-count">{{ orders.length }} commande(s)</p>
+      @for (order of orders; track order) {
+        <div class="order-card">
+          <!-- En-tête de la commande -->
+          <div class="order-header">
+            <div class="order-meta">
+              <div class="order-number">
+                <i class="bi bi-bag-fill"></i>
+                <strong>{{ order.orderNumber }}</strong>
+              </div>
+              <div class="order-date">{{ formatDate(order.createdAt) }}</div>
+            </div>
+            <div class="order-status-wrap">
+              <span class="order-status"
+                [class.status-pending]="order.status === 'PENDING'"
+                [class.status-confirmed]="order.status === 'CONFIRMED'"
+                [class.status-delivery]="order.status === 'IN_DELIVERY'"
+                [class.status-delivered]="order.status === 'DELIVERED'"
+                [class.status-cancelled]="order.status === 'CANCELLED'"
+                [class.status-refunded]="order.status === 'REFUNDED'">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </div>
+          </div>
+          <!-- Timeline de progression (seulement si pas annulé/remboursé) -->
+          @if (order.status !== 'CANCELLED' && order.status !== 'REFUNDED') {
+            <div class="order-timeline">
+              <div class="timeline-step" [class.done]="isStatusPassed(order.status, 'PENDING')">
+                <div class="step-dot">@if (isStatusPassed(order.status, 'PENDING')) {
+                  <i class="bi bi-check2"></i>
+                }</div>
+                <div class="step-label">Commandé</div>
+              </div>
+              <div class="timeline-line" [class.done]="isStatusPassed(order.status, 'CONFIRMED')"></div>
+              <div class="timeline-step" [class.done]="isStatusPassed(order.status, 'CONFIRMED')">
+                <div class="step-dot">@if (isStatusPassed(order.status, 'CONFIRMED')) {
+                  <i class="bi bi-check2"></i>
+                }</div>
+                <div class="step-label">Confirmé</div>
+              </div>
+              <div class="timeline-line" [class.done]="isStatusPassed(order.status, 'IN_DELIVERY')"></div>
+              <div class="timeline-step" [class.done]="isStatusPassed(order.status, 'IN_DELIVERY')">
+                <div class="step-dot">@if (isStatusPassed(order.status, 'IN_DELIVERY')) {
+                  <i class="bi bi-truck"></i>
+                }</div>
+                <div class="step-label">En livraison</div>
+              </div>
+              <div class="timeline-line" [class.done]="order.status === 'DELIVERED'"></div>
+              <div class="timeline-step" [class.done]="order.status === 'DELIVERED'">
+                <div class="step-dot">@if (order.status === 'DELIVERED') {
+                  <i class="bi bi-gift-fill"></i>
+                }</div>
+                <div class="step-label">Livré</div>
+              </div>
+            </div>
+          }
+          <!-- Articles -->
+          <div class="order-items">
+            @for (item of order.items; track item) {
+              <div class="order-item">
+                <div class="item-img">
+                  <img [src]="item.machineImageUrl || 'assets/images/default-product.jpg'"
+                    [alt]="item.machineName"
+                    (error)="handleImageError($event)">
+                  </div>
+                  <div class="item-info">
+                    <div class="item-name">{{ item.machineName }}</div>
+                    <div class="item-detail">
+                      <span class="item-supplier"><i class="bi bi-building"></i> {{ item.supplierName }}</span>
+                      <span class="item-qty">×{{ item.quantity }}</span>
+                    </div>
+                  </div>
+                  <div class="item-price">{{ formatPrice(item.totalPrice) }} TND</div>
+                </div>
+              }
+            </div>
+            <!-- Pied de la commande -->
+            <div class="order-footer">
+              <div class="delivery-info">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>{{ order.deliveryAddress }}, {{ order.deliveryCity }}</span>
+              </div>
+              <div class="order-totals">
+                <div class="total-row">
+                  <span>Sous-total</span>
+                  <span>{{ formatPrice(order.subtotal) }} TND</span>
+                </div>
+                <div class="total-row">
+                  <span>Livraison</span>
+                  <span>{{ formatPrice(order.deliveryCost) }} TND</span>
+                </div>
+                <div class="total-row grand-total">
+                  <span>Total</span>
+                  <span class="total-value">{{ formatPrice(order.totalAmount) }} TND</span>
+                </div>
+              </div>
+            </div>
+            <!-- Note admin -->
+            @if (order.adminNote) {
+              <div class="admin-note">
+                <i class="bi bi-chat-square-text-fill"></i>
+                <span><strong>Note :</strong> {{ order.adminNote }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+  </div>

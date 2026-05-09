@@ -1,0 +1,292 @@
+<!-- src/app/modules/admin/components/orders/admin-orders.component.html -->
+
+<div class="admin-orders">
+
+  <!-- Toast -->
+  @if (showToastFlag) {
+    <div class="toast-notification" [class]="'toast-' + toastType">
+      <i class="ti"
+        [class.ti-check]="toastType==='success'"
+        [class.ti-x]="toastType==='error'"
+      [class.ti-info-circle]="toastType==='info'"></i>
+      {{ toastMessage }}
+    </div>
+  }
+
+  <!-- En-tête -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card text-white border-0 overflow-hidden"
+        style="background: linear-gradient(135deg, #0d4a2e 0%, #15803d 60%, #16a34a 100%);">
+        <div class="card-body py-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-white mb-1 fw-bold">
+                <i class="ti ti-shopping-bag me-2"></i>Gestion des commandes
+              </h2>
+              <p class="text-white opacity-75 mb-0">
+                Confirmez, suivez et gérez toutes les commandes passées
+              </p>
+            </div>
+            <div class="text-end">
+              <div class="text-white opacity-75 small">Chiffre d'affaires livré</div>
+              <div class="text-white fw-bold fs-4">{{ formatPrice(stats.revenue) }} TND</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="row mb-4 g-3">
+    @for (kpi of [
+      {label:'En attente',   count: stats.pending,     color:'warning', icon:'ti-clock',        tab:'pending'},
+      {label:'Confirmées',   count: stats.confirmed,   color:'info',    icon:'ti-circle-check', tab:'confirmed'},
+      {label:'En livraison', count: stats.in_delivery, color:'primary', icon:'ti-truck',        tab:'in_delivery'},
+      {label:'Livrées',      count: stats.delivered,   color:'success', icon:'ti-gift',         tab:'delivered'},
+      {label:'Annulées',     count: stats.cancelled,   color:'danger',  icon:'ti-ban',          tab:'cancelled'},
+      {label:'Total',        count: stats.total,       color:'secondary',icon:'ti-database',    tab:'all'}
+      ]; track kpi) {
+      <div class="col-xl-2 col-md-4 col-6">
+        <div class="card stat-card border-0 shadow-sm cursor-pointer"
+          [class.active-tab-card]="activeTab === kpi.tab"
+          (click)="activeTab = $any(kpi.tab)">
+          <div class="card-body py-3 px-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-0 fw-semibold text-uppercase" style="font-size:0.68rem;">{{ kpi.label }}</p>
+                <h3 class="mb-0 fw-bold" [class]="'text-' + kpi.color">{{ kpi.count }}</h3>
+              </div>
+              <div class="rounded-3 p-2" [class]="'bg-' + kpi.color + '-subtle'">
+                <i class="ti fs-5" [class]="'ti ' + kpi.icon + ' text-' + kpi.color"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Tableau -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+      <!-- Tabs + Recherche -->
+      <div class="row mb-3 align-items-center g-2">
+        <div class="col-md-8">
+          <ul class="nav nav-tabs border-0 flex-wrap">
+            @for (tab of [
+              {key:'all',         label:'Toutes',      badge: stats.total},
+              {key:'pending',     label:'En attente',  badge: stats.pending},
+              {key:'confirmed',   label:'Confirmées',  badge: stats.confirmed},
+              {key:'in_delivery', label:'En livraison',badge: stats.in_delivery},
+              {key:'delivered',   label:'Livrées',     badge: stats.delivered},
+              {key:'cancelled',   label:'Annulées',    badge: stats.cancelled}
+              ]; track tab) {
+              <li class="nav-item">
+                <a class="nav-link fw-semibold small"
+                  [class.active]="activeTab === tab.key"
+                  (click)="activeTab = $any(tab.key)"
+                  href="javascript:void(0)">
+                  {{ tab.label }}
+                  @if (tab.badge > 0) {
+                    <span class="badge ms-1 rounded-pill bg-secondary">{{ tab.badge }}</span>
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="ti ti-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0 bg-light"
+              placeholder="N° commande, client, ville..."
+              [(ngModel)]="searchTerm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Loader -->
+        @if (loading) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-success" style="width:2.5rem;height:2.5rem;"></div>
+            <p class="text-muted mt-2">Chargement des commandes...</p>
+          </div>
+        }
+
+        <!-- Table -->
+        @if (!loading) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">N° Commande</th>
+                  <th>Client</th>
+                  <th>Articles</th>
+                  <th>Livraison</th>
+                  <th>Total</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                  <th class="text-end pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of getDisplayedOrders(); track order) {
+                  <tr
+                    [class.table-warning-subtle]="order.status === 'PENDING'"
+                    [class.table-success-subtle]="order.status === 'DELIVERED'">
+                    <!-- N° commande -->
+                    <td class="ps-3">
+                      <div class="fw-bold text-primary">{{ order.orderNumber }}</div>
+                      <small class="text-muted">#{{ order.id }}</small>
+                    </td>
+                    <!-- Client -->
+                    <td>
+                      <div class="fw-medium">{{ order.userName || 'User #' + order.userId }}</div>
+                      <small class="text-muted">{{ order.userPhone || order.deliveryPhone }}</small>
+                    </td>
+                    <!-- Articles -->
+                    <td>
+                      <p class="text-sm text-gray-600 mb-2">
+                        {{ order.items ? order.items.length : 0 }} article(s)
+                      </p>
+                      @if (order.items && order.items.length > 0) {
+                        <div>
+                          <p class="text-sm text-gray-600">
+                            Premier article: {{ order.items[0].machineName }}
+                          </p>
+                        </div>
+                      }
+                    </td>
+                    <!-- Livraison -->
+                    <td>
+                      <div>{{ order.deliveryCity }}</div>
+                      <small class="text-muted">{{ order.deliveryAddress }}</small>
+                    </td>
+                    <!-- Total -->
+                    <td>
+                      <span class="fw-bold text-success fs-6">{{ formatPrice(order.totalAmount) }} TND</span>
+                      @if (order.deliveryCost > 0) {
+                        <div>
+                          <small class="text-muted">dont {{ formatPrice(order.deliveryCost) }} livraison</small>
+                        </div>
+                      }
+                    </td>
+                    <!-- Statut -->
+                    <td>
+                      <span class="badge rounded-pill px-2 py-1"
+                        [class.bg-warning-subtle]="order.status==='PENDING'"   [class.text-warning]="order.status==='PENDING'"
+                        [class.bg-info-subtle]="order.status==='CONFIRMED'"    [class.text-info]="order.status==='CONFIRMED'"
+                        [class.bg-primary-subtle]="order.status==='IN_DELIVERY'" [class.text-primary]="order.status==='IN_DELIVERY'"
+                        [class.bg-success-subtle]="order.status==='DELIVERED'" [class.text-success]="order.status==='DELIVERED'"
+                        [class.bg-danger-subtle]="order.status==='CANCELLED'"  [class.text-danger]="order.status==='CANCELLED'"
+                        [class.bg-secondary-subtle]="order.status==='REFUNDED'" [class.text-secondary]="order.status==='REFUNDED'">
+                        {{ getStatusLabel(order.status) }}
+                      </span>
+                      @if (order.adminNote) {
+                        <div class="mt-1">
+                          <small class="text-muted fst-italic">{{ order.adminNote }}</small>
+                        </div>
+                      }
+                    </td>
+                    <!-- Date -->
+                    <td class="text-muted small">{{ formatDate(order.createdAt) }}</td>
+                    <!-- Actions -->
+                    <td class="text-end pe-3">
+                      <div class="d-flex gap-1 justify-content-end">
+                        <!-- Confirmer rapidement si PENDING -->
+                        @if (order.status === 'PENDING') {
+                          <button
+                            class="btn btn-sm btn-success"
+                            (click)="quickConfirm(order)" title="Confirmer">
+                            <i class="ti ti-check"></i>
+                          </button>
+                        }
+                        <!-- Changer le statut -->
+                        @if (order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && order.status !== 'REFUNDED') {
+                          <button
+                            class="btn btn-sm btn-outline-primary"
+                            (click)="openStatusModal(order)" title="Changer statut">
+                            <i class="ti ti-edit"></i>
+                          </button>
+                        }
+                        <!-- Supprimer -->
+                        <button class="btn btn-sm btn-outline-danger"
+                          (click)="deleteOrder(order)" title="Supprimer">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (getDisplayedOrders().length === 0) {
+                  <tr>
+                    <td colspan="8" class="text-center py-5">
+                      <i class="ti ti-inbox" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+                      <p class="text-muted mb-0">Aucune commande pour cet onglet</p>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal changement statut -->
+  @if (showStatusModal) {
+    <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 bg-light">
+            <h5 class="modal-title fw-bold">
+              <i class="ti ti-edit me-2"></i>Changer le statut
+            </h5>
+            <button type="button" class="btn-close" (click)="showStatusModal = false"></button>
+          </div>
+          <div class="modal-body pt-3">
+            @if (selectedOrder) {
+              <div class="alert alert-light py-2 small">
+                <strong>{{ selectedOrder.orderNumber }}</strong>
+                — {{ selectedOrder.userName || 'User #' + selectedOrder.userId }}
+                — <span class="fw-bold text-success">{{ formatPrice(selectedOrder.totalAmount) }} TND</span>
+              </div>
+            }
+            <label class="form-label fw-semibold">Nouveau statut <span class="text-danger">*</span></label>
+            <div class="d-flex flex-column gap-2 mb-3">
+              @for (opt of statusOptions; track opt) {
+                <div
+                  class="status-option"
+                  [class.selected]="newStatus === opt.value"
+                  (click)="newStatus = opt.value">
+                  <span>{{ opt.label }}</span>
+                  @if (newStatus === opt.value) {
+                    <i class="ti ti-check ms-auto"></i>
+                  }
+                </div>
+              }
+            </div>
+            <label class="form-label fw-semibold">Note admin (optionnel)</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="adminNote"
+            placeholder="Ex: Livraison prévue demain entre 9h-12h..."></textarea>
+            <small class="text-muted mt-1 d-block">
+              <i class="ti ti-bell me-1"></i>Une notification sera envoyée au client.
+            </small>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-light" (click)="showStatusModal = false">Annuler</button>
+            <button class="btn btn-primary" (click)="confirmStatusChange()" [disabled]="!newStatus">
+              <i class="ti ti-check me-1"></i>Confirmer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }

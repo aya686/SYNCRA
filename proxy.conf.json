@@ -1,6 +1,10 @@
 {
   "/api": {
+<<<<<<< HEAD
     "target": "http://localhost:8081",
+=======
+    "target": "http://localhost:8080",
+>>>>>>> e-commerce
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

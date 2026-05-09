@@ -1,0 +1,248 @@
+<!-- src/app/modules/admin/components/dashboard/dashboard.component.html -->
+
+<div class="admin-dashboard">
+
+  <!-- Welcome Banner -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="welcome-card">
+        <div class="welcome-content">
+          <div>
+            <h2 class="mb-1">Tableau de bord administrateur</h2>
+            <p class="mb-0 opacity-75">Gérez et validez les ressources de la plateforme</p>
+          </div>
+          <div class="welcome-actions">
+            <a routerLink="/admin/machines" class="btn btn-light btn-sm fw-semibold">
+              <i class="ti ti-tools me-1"></i> Gérer les machines
+            </a>
+            <a routerLink="/admin/services" class="btn btn-outline-light btn-sm fw-semibold ms-2">
+              <i class="ti ti-briefcase me-1"></i> Gérer les services
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+
+    <!-- Machines -->
+    <div class="col-xl-3 col-md-6">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="ti ti-tools"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats.totalMachines }}</div>
+          <div class="kpi-label">Machines total</div>
+        </div>
+        <a routerLink="/admin/machines" class="kpi-link">Voir tout <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- En attente -->
+    <div class="col-xl-3 col-md-6">
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-icon"><i class="ti ti-clock"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats.pendingMachines }}</div>
+          <div class="kpi-label">En attente validation</div>
+        </div>
+        <a routerLink="/admin/machines" class="kpi-link">Valider <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Approuvées -->
+    <div class="col-xl-3 col-md-6">
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="ti ti-circle-check"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats.approvedMachines }}</div>
+          <div class="kpi-label">Machines approuvées</div>
+        </div>
+        <a routerLink="/admin/machines" class="kpi-link">Voir <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Rejetées -->
+    <div class="col-xl-3 col-md-6">
+      <div class="kpi-card kpi-red">
+        <div class="kpi-icon"><i class="ti ti-ban"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats.rejectedMachines }}</div>
+          <div class="kpi-label">Machines rejetées</div>
+        </div>
+        <a routerLink="/admin/machines" class="kpi-link">Voir <i class="ti ti-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Légende comportement des statuts -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body py-3">
+          <h6 class="fw-bold mb-3 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">
+            <i class="ti ti-info-circle me-1"></i> Comportement des statuts
+          </h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="status-info-card status-pending">
+                <div class="d-flex align-items-start gap-2">
+                  <i class="ti ti-clock fs-5 mt-1"></i>
+                  <div>
+                    <strong>EN ATTENTE</strong>
+                    <p class="mb-0 small opacity-75">Visible uniquement par le fournisseur qui a publié la machine. Masquée pour tous les autres utilisateurs.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="status-info-card status-approved">
+                <div class="d-flex align-items-start gap-2">
+                  <i class="ti ti-circle-check fs-5 mt-1"></i>
+                  <div>
+                    <strong>APPROUVÉE</strong>
+                    <p class="mb-0 small opacity-75">Visible par tous les utilisateurs de la plateforme. Peut être ajoutée au panier.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="status-info-card status-rejected">
+                <div class="d-flex align-items-start gap-2">
+                  <i class="ti ti-ban fs-5 mt-1"></i>
+                  <div>
+                    <strong>REJETÉE</strong>
+                    <p class="mb-0 small opacity-75">Grisée et désactivée pour le fournisseur propriétaire (avec motif). Invisible pour les autres. Peut être corrigée et re-soumise.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dernières machines + Raccourcis -->
+  <div class="row g-4">
+
+    <!-- Dernières machines -->
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Dernières machines ajoutées</h5>
+            <a routerLink="/admin/machines" class="btn btn-sm btn-outline-primary">Tout voir</a>
+          </div>
+
+          @if (loading) {
+            <div class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary"></div>
+            </div>
+          }
+
+          @if (!loading) {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Machine</th>
+                    <th>Fournisseur</th>
+                    <th>Prix</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (m of recentMachines; track m) {
+                    <tr>
+                      <td>
+                        <div class="fw-semibold">{{ m.name }}</div>
+                        <small class="text-muted">{{ m.category }}</small>
+                      </td>
+                      <td class="text-muted small">{{ m.supplierName || '—' }}</td>
+                      <td class="fw-bold text-primary">{{ m.price | number }} TND</td>
+                      <td>
+                        <span class="badge rounded-pill"
+                          [class.bg-warning-subtle]="m.validationStatus === 'PENDING'"
+                          [class.text-warning]="m.validationStatus === 'PENDING'"
+                          [class.bg-success-subtle]="m.validationStatus === 'APPROVED'"
+                          [class.text-success]="m.validationStatus === 'APPROVED'"
+                          [class.bg-danger-subtle]="m.validationStatus === 'REJECTED'"
+                          [class.text-danger]="m.validationStatus === 'REJECTED'">
+                          {{ getStatusText(m.validationStatus) }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                  @if (recentMachines.length === 0) {
+                    <tr>
+                      <td colspan="4" class="text-center text-muted py-4">Aucune machine</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Raccourcis rapides -->
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="fw-bold mb-4">Actions rapides</h5>
+          <div class="quick-actions">
+
+            <a routerLink="/admin/machines" class="quick-action-item">
+              <div class="qa-icon bg-warning-subtle">
+                <i class="ti ti-clock text-warning fs-5"></i>
+              </div>
+              <div class="qa-text">
+                <strong>Valider les machines</strong>
+                <small class="text-muted d-block">{{ stats.pendingMachines }} en attente</small>
+              </div>
+              <i class="ti ti-chevron-right text-muted ms-auto"></i>
+            </a>
+
+            <a routerLink="/admin/services" class="quick-action-item">
+              <div class="qa-icon bg-primary-subtle">
+                <i class="ti ti-briefcase text-primary fs-5"></i>
+              </div>
+              <div class="qa-text">
+                <strong>Gérer les services</strong>
+                <small class="text-muted d-block">{{ stats.pendingServices }} en attente</small>
+              </div>
+              <i class="ti ti-chevron-right text-muted ms-auto"></i>
+            </a>
+
+            <a routerLink="/admin/requests" class="quick-action-item">
+              <div class="qa-icon bg-info-subtle">
+                <i class="ti ti-mail text-info fs-5"></i>
+              </div>
+              <div class="qa-text">
+                <strong>Demandes clients</strong>
+                <small class="text-muted d-block">{{ stats.totalRequests }} demandes</small>
+              </div>
+              <i class="ti ti-chevron-right text-muted ms-auto"></i>
+            </a>
+
+            <a routerLink="/admin/orders" class="quick-action-item">
+              <div class="qa-icon bg-success-subtle">
+                <i class="ti ti-shopping-cart text-success fs-5"></i>
+              </div>
+              <div class="qa-text">
+                <strong>Commandes</strong>
+                <small class="text-muted d-block">Historique des achats</small>
+              </div>
+              <i class="ti ti-chevron-right text-muted ms-auto"></i>
+            </a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

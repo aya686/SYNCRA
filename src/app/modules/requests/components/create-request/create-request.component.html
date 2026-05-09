@@ -1,0 +1,466 @@
+<!-- src/app/modules/requests/components/create-request/create-request.component.html -->
+
+<div class="create-request-container">
+  <!-- En-tête stylisé -->
+  <div class="page-header-glass reveal">
+    <div class="glass-content">
+      <div class="breadcrumb">
+        <a routerLink="/">Accueil</a>
+        <i class="bi bi-chevron-right"></i>
+        <a routerLink="/requests">Demandes</a>
+        <i class="bi bi-chevron-right"></i>
+        <span class="active">Nouvelle demande</span>
+      </div>
+      <div class="header-icon-wrap">
+        <i class="bi bi-send-plus"></i>
+      </div>
+      <h1 class="page-title">
+        Nouvelle <span class="gradient-text">demande</span>
+      </h1>
+      <p class="page-subtitle">
+        Créez une demande de service ou de machine auprès des fournisseurs
+      </p>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  @if (loading) {
+    <div class="loader-wrapper">
+      <div class="loader-spinner"></div>
+      <p>Envoi de la demande...</p>
+    </div>
+  }
+
+  <!-- Formulaire -->
+  @if (!loading) {
+    <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="request-form">
+      <div class="form-grid">
+        <!-- Colonne gauche - Détails de la demande -->
+        <div class="form-col-main">
+          <!-- Section Informations générales -->
+          <div class="form-card">
+            <div class="card-header-custom">
+              <div class="header-icon">
+                <i class="bi bi-file-text"></i>
+              </div>
+              <div class="header-text">
+                <h3>Détails de la demande</h3>
+                <p>Informations principales de votre demande</p>
+              </div>
+            </div>
+            <div class="card-body-custom">
+              <!-- Titre -->
+              <div class="form-group">
+                <label class="form-label">
+                  Titre de la demande <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="bi bi-tag"></i>
+                  <input
+                    type="text"
+                    [class.error]="submitted && f['title'].invalid"
+                    formControlName="title"
+                    placeholder="Ex: Fabrication de bouteilles plastiques 500ml"
+                    >
+                  </div>
+                  @if (submitted && f['title'].invalid) {
+                    <div class="error-message">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      @if (f['title'].errors?.['required']) {
+                        <span>Le titre est requis</span>
+                      }
+                      @if (f['title'].errors?.['minlength']) {
+                        <span>Minimum 5 caractères</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <!-- Type de demande -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Type de demande <span class="required">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-box"></i>
+                    <select formControlName="requestType">
+                      @for (type of requestTypes; track type) {
+                        <option [value]="type">
+                          {{getRequestTypeLabel(type)}}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                </div>
+                <!-- Type de ressource -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Type de ressource <span class="required">*</span>
+                  </label>
+                  <div class="resource-toggle">
+                    <button type="button" class="toggle-btn"
+                      [class.active]="requestForm.get('resourceType')?.value === 'service'"
+                      (click)="requestForm.patchValue({ resourceType: 'service' })">
+                      <i class="bi bi-briefcase"></i>
+                      <span>Service</span>
+                    </button>
+                    <button type="button" class="toggle-btn"
+                      [class.active]="requestForm.get('resourceType')?.value === 'machine'"
+                      (click)="requestForm.patchValue({ resourceType: 'machine' })">
+                      <i class="bi bi-tools"></i>
+                      <span>Machine</span>
+                    </button>
+                  </div>
+                </div>
+                <!-- Sélection service -->
+                @if (requestForm.get('resourceType')?.value === 'service' && services.length > 0) {
+                  <div class="form-group">
+                    <label class="form-label">
+                      Service souhaité
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-briefcase"></i>
+                      <select formControlName="machineServiceId" (change)="onResourceSelect($event)">
+                        <option [value]="null">-- Sélectionnez un service --</option>
+                        @for (service of services; track service) {
+                          <option [value]="service.id">
+                            {{service.name}} - {{service.basePrice}} TND/{{service.priceUnit}}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                }
+                <!-- Sélection machine -->
+                @if (requestForm.get('resourceType')?.value === 'machine' && machines.length > 0) {
+                  <div class="form-group">
+                    <label class="form-label">
+                      Machine souhaitée
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-tools"></i>
+                      <select formControlName="machineServiceId" (change)="onResourceSelect($event)">
+                        <option [value]="null">-- Sélectionnez une machine --</option>
+                        @for (machine of machines; track machine) {
+                          <option [value]="machine.id">
+                            {{machine.name}} - {{machine.price}} TND/{{machine.priceUnit}}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                }
+                <!-- Description -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Description détaillée <span class="required">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-file-text"></i>
+                    <textarea
+                      rows="5"
+                      [class.error]="submitted && f['description'].invalid"
+                      formControlName="description"
+                      placeholder="Décrivez votre besoin en détail..."
+                    ></textarea>
+                  </div>
+                  <div class="char-count">{{ f['description'].value?.length || 0 }}/2000</div>
+                  @if (submitted && f['description'].invalid) {
+                    <div class="error-message">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      @if (f['description'].errors?.['required']) {
+                        <span>La description est requise</span>
+                      }
+                      @if (f['description'].errors?.['minlength']) {
+                        <span>Minimum 20 caractères</span>
+                      }
+                    </div>
+                  }
+                </div>
+                <!-- Spécifications -->
+                <div class="form-group">
+                  <label class="form-label">
+                    Spécifications techniques
+                  </label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-gear"></i>
+                    <textarea
+                      rows="3"
+                      formControlName="specifications"
+                      placeholder="Dimensions, matériaux, tolérances, etc."
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <!-- Quantité -->
+                  <div class="form-group">
+                    <label class="form-label">
+                      Quantité <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-hash"></i>
+                      <input
+                        type="number"
+                        [class.error]="submitted && f['quantity'].invalid"
+                        formControlName="quantity"
+                        placeholder="1"
+                        >
+                      </div>
+                      @if (submitted && f['quantity'].invalid) {
+                        <div class="error-message">
+                          <i class="bi bi-exclamation-triangle"></i>
+                          @if (f['quantity'].errors?.['required']) {
+                            <span>Quantité requise</span>
+                          }
+                          @if (f['quantity'].errors?.['min']) {
+                            <span>Minimum 1</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <!-- Matériau -->
+                    <div class="form-group">
+                      <label class="form-label">
+                        Matériau
+                      </label>
+                      <div class="input-wrapper">
+                        <i class="bi bi-cube"></i>
+                        <input
+                          type="text"
+                          formControlName="material"
+                          placeholder="Ex: Plastique PET, Aluminium..."
+                          >
+                        </div>
+                      </div>
+                      <!-- Délai -->
+                      <div class="form-group">
+                        <label class="form-label">
+                          Délai souhaité <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                          <i class="bi bi-calendar"></i>
+                          <input
+                            type="date"
+                            [class.error]="submitted && f['deadline'].invalid"
+                            formControlName="deadline"
+                            >
+                          </div>
+                          @if (submitted && f['deadline'].invalid) {
+                            <div class="error-message">
+                              <i class="bi bi-exclamation-triangle"></i>
+                              <span>Le délai est requis</span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      <!-- Budget -->
+                      <div class="form-group">
+                        <label class="form-label">
+                          Budget estimé (TND)
+                        </label>
+                        <div class="input-wrapper">
+                          <i class="bi bi-cash"></i>
+                          <input
+                            type="number"
+                            step="0.01"
+                            formControlName="budget"
+                            placeholder="0"
+                            >
+                            <span class="input-suffix">TND</span>
+                          </div>
+                        </div>
+                        <!-- Fichiers joints -->
+                        <div class="form-group">
+                          <label class="form-label">
+                            Fichiers joints
+                          </label>
+                          <div class="file-drop-zone" (click)="fileInput.click()">
+                            <input type="file" #fileInput multiple hidden (change)="onFileSelected($event)">
+                            <i class="bi bi-cloud-upload"></i>
+                            <p>Cliquez ou glissez-déposez des fichiers</p>
+                            <small>PDF, images, DWG, STEP (max 10MB)</small>
+                          </div>
+                          <!-- Liste des fichiers -->
+                          @if (attachments.length > 0) {
+                            <div class="attachments-list">
+                              @for (att of attachments; track att; let i = $index) {
+                                <div class="attachment-item">
+                                  <div class="file-info">
+                                    <i class="bi" [class.bi-file-pdf]="att.file.type === 'application/pdf'"
+                                      [class.bi-file-image]="att.file.type.startsWith('image/')"
+                                    [class.bi-file-earmark]="true"></i>
+                                    <div>
+                                      <span class="file-name">{{att.name}}</span>
+                                      <span class="file-size">{{(att.file.size / 1024).toFixed(2)}} KB</span>
+                                    </div>
+                                  </div>
+                                  <button type="button" class="remove-file" (click)="removeAttachment(i)">
+                                    <i class="bi bi-x"></i>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Colonne droite - Fournisseur et informations -->
+                  <div class="form-col-side">
+                    <!-- Section Fournisseur -->
+                    <div class="form-card">
+                      <div class="card-header-custom">
+                        <div class="header-icon">
+                          <i class="bi bi-building"></i>
+                        </div>
+                        <div class="header-text">
+                          <h3>Choisir un fournisseur</h3>
+                          <p>Sélectionnez le prestataire</p>
+                        </div>
+                      </div>
+                      <div class="card-body-custom">
+                        <!-- Type de fournisseur -->
+                        <div class="provider-toggle">
+                          <button type="button" class="toggle-btn"
+                            [class.active]="requestForm.get('providerType')?.value === 'internal'"
+                            (click)="requestForm.patchValue({ providerType: 'internal' })">
+                            <i class="bi bi-person-check"></i>
+                            <span>Fournisseur inscrit</span>
+                          </button>
+                          <button type="button" class="toggle-btn"
+                            [class.active]="requestForm.get('providerType')?.value === 'external'"
+                            (click)="requestForm.patchValue({ providerType: 'external' })">
+                            <i class="bi bi-person"></i>
+                            <span>Fournisseur externe</span>
+                          </button>
+                        </div>
+                        <!-- Recherche fournisseur inscrit -->
+                        @if (requestForm.get('providerType')?.value === 'internal') {
+                          <div class="provider-search">
+                            <div class="search-wrapper">
+                              <i class="bi bi-search"></i>
+                              <input
+                                type="text"
+                                placeholder="Rechercher un fournisseur..."
+                                [(ngModel)]="searchTerm"
+                                [ngModelOptions]="{standalone: true}"
+                                (input)="searchProviders()"
+                                >
+                              </div>
+                              @if (searching) {
+                                <div class="search-loading">
+                                  <div class="spinner"></div>
+                                  <span>Recherche...</span>
+                                </div>
+                              }
+                              @if (searchResults.length > 0 && !searching) {
+                                <div class="search-results">
+                                  @for (provider of searchResults; track provider) {
+                                    <div class="result-item" (click)="selectProvider(provider)">
+                                      <div class="result-info">
+                                        <strong>{{provider.name}}</strong>
+                                        <span class="company">{{provider.companyName}}</span>
+                                        <div class="result-meta">
+                                          <span><i class="bi bi-geo-alt"></i> {{provider.location}}</span>
+                                          <span><i class="bi bi-star-fill"></i> {{provider.rating}}</span>
+                                        </div>
+                                      </div>
+                                      @if (selectedProvider?.id === provider.id) {
+                                        <i class="bi bi-check-circle"></i>
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              }
+                              @if (selectedProvider && requestForm.get('providerType')?.value === 'internal') {
+                                <div class="selected-provider">
+                                  <div class="selected-icon">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                  </div>
+                                  <div class="selected-info">
+                                    <strong>{{selectedProvider.name}}</strong>
+                                    <span>{{selectedProvider.companyName}}</span>
+                                    <small><i class="bi bi-telephone"></i> {{selectedProvider.phone}}</small>
+                                  </div>
+                                  <input type="hidden" formControlName="selectedProviderId">
+                                </div>
+                              }
+                            </div>
+                          }
+                          <!-- Fournisseur externe -->
+                          @if (requestForm.get('providerType')?.value === 'external') {
+                            <div class="external-form">
+                              <div class="form-group">
+                                <label class="form-label">Nom du fournisseur</label>
+                                <div class="input-wrapper">
+                                  <i class="bi bi-person"></i>
+                                  <input type="text" formControlName="externalProviderName" placeholder="Nom complet">
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <div class="input-wrapper">
+                                  <i class="bi bi-telephone"></i>
+                                  <input type="tel" formControlName="externalProviderPhone" placeholder="+216 XX XXX XXX">
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <div class="input-wrapper">
+                                  <i class="bi bi-envelope"></i>
+                                  <input type="email" formControlName="externalProviderEmail" placeholder="contact@example.com">
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="form-label">Entreprise</label>
+                                <div class="input-wrapper">
+                                  <i class="bi bi-building"></i>
+                                  <input type="text" formControlName="externalProviderCompany" placeholder="Nom de l'entreprise">
+                                </div>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      <!-- Section Vos informations -->
+                      <div class="form-card">
+                        <div class="card-header-custom">
+                          <div class="header-icon">
+                            <i class="bi bi-person"></i>
+                          </div>
+                          <div class="header-text">
+                            <h3>Vos informations</h3>
+                            <p>Contact pour le suivi</p>
+                          </div>
+                        </div>
+                        <div class="card-body-custom">
+                          <div class="info-row">
+                            <span class="info-label">Nom</span>
+                            <span class="info-value">{{ getCurrentUserName() }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ getCurrentUserEmail() }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">Téléphone</span>
+                            <span class="info-value">{{ getCurrentUserPhone() }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Boutons d'action -->
+                  <div class="form-actions">
+                    <button type="button" class="btn-secondary" (click)="onCancel()">
+                      <i class="bi bi-x-lg"></i>
+                      <span>Annuler</span>
+                    </button>
+                    <button type="submit" class="btn-primary" [disabled]="loading">
+                      <i class="bi bi-send"></i>
+                      <span>Envoyer la demande</span>
+                      <div class="btn-bg"></div>
+                    </button>
+                  </div>
+                </form>
+              }
+            </div>

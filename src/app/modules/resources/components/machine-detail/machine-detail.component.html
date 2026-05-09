@@ -1,0 +1,426 @@
+<!-- machine-detail.component.html — avec produits similaires + du même fournisseur -->
+<canvas class="particle-canvas" #particleCanvas></canvas>
+
+@if (!loading && machine) {
+  <div class="detail-container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-wrapper">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a routerLink="/">Accueil</a></li>
+          <li class="breadcrumb-item"><a routerLink="/machines">Machines</a></li>
+          <li class="breadcrumb-item active">{{ machine.name }}</li>
+        </ol>
+      </nav>
+    </div>
+    <!-- ══════════ SECTION PRINCIPALE ══════════ -->
+    <div class="row">
+      <!-- Galerie -->
+      <div class="col-md-6 mb-4">
+        <div class="image-gallery">
+          <div class="main-image-wrapper">
+            <img
+            [src]="machine.imageUrls && machine.imageUrls.length > 0
+                    ? machine.imageUrls[selectedImageIndex]
+                    : 'assets/images/default-machine.jpg'"
+              class="img-fluid rounded shadow-sm w-100"
+              [alt]="machine.name"
+              style="height: 400px; object-fit: cover;"
+              (error)="handleImageError($event)">
+              <div class="availability-badge" [class]="getAvailabilityClass(machine.availability)">
+                <span class="badge-dot"></span>{{ getAvailabilityText(machine.availability) }}
+              </div>
+              <!-- ✅ Badge stock faible -->
+              @if (isLowStock(machine)) {
+                <div class="low-stock-ribbon">
+                  🔥 Plus que {{ machine.stockQuantity }} en stock !
+                </div>
+              }
+            </div>
+            @if (machine.imageUrls && machine.imageUrls.length > 1) {
+              <div class="thumbnail-list">
+                @for (img of machine.imageUrls; track img; let i = $index) {
+                  <div class="thumbnail"
+                    [class.active]="selectedImageIndex === i"
+                    (click)="selectImage(i)">
+                    <img [src]="img" [alt]="'Image '+(i+1)">
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Infos -->
+        <div class="col-md-6">
+          <h1 class="detail-title">{{ machine.name }}</h1>
+          <div class="detail-location">
+            <i class="bi bi-geo-alt-fill"></i><span>{{ machine.location }}</span>
+          </div>
+          <!-- Stock faible inline -->
+          @if (isLowStock(machine)) {
+            <div class="stock-alert-inline">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <strong>⚡ Stock limité !</strong>
+              Il ne reste que <strong>{{ machine.stockQuantity }}</strong> exemplaire(s).
+              Dépêchez-vous d'acheter avant rupture de stock !
+            </div>
+          }
+          <div class="rating-section">
+            <div class="stars">
+              @for (star of getStars(machine.rating); track star) {
+                <i [class]="star"></i>
+              }
+            </div>
+            <span class="rating-count">({{ machine.reviewCount || 0 }} avis)</span>
+          </div>
+          <div class="price-section">
+            <span class="price-value">{{ machine.price | number }} TND</span>
+            <span class="price-unit">/ {{ machine.priceUnit || 'unité' }}</span>
+          </div>
+          <div class="badges-group">
+            <span class="badge"
+              [class.sale]="machine.transactionType === 'SALE'"
+              [class.rent]="machine.transactionType === 'RENT'"
+              [class.both]="machine.transactionType === 'BOTH'">
+              {{ getTransactionTypeText(machine.transactionType) }}
+            </span>
+            <span class="badge secondary">{{ machine.type }}</span>
+            <span class="badge light">{{ machine.category }}</span>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-cart" (click)="addToCart()" [disabled]="machine.availability !== 'AVAILABLE'">
+              <i class="bi bi-cart-plus"></i><span>Ajouter au panier</span>
+            </button>
+            <button class="btn-contact" (click)="showContactModal = true">
+              <i class="bi bi-envelope"></i><span>Contacter le fournisseur</span>
+            </button>
+          </div>
+          @if (isCurrentUserSupplier()) {
+            <div class="admin-actions">
+              <button class="btn-edit" (click)="editMachine()"><i class="bi bi-pencil"></i> Modifier</button>
+              <button class="btn-delete" (click)="showConfirmDelete = true"><i class="bi bi-trash"></i> Supprimer</button>
+            </div>
+          }
+          @if (machine.stockQuantity && machine.stockQuantity > 3) {
+            <div class="stock-info">
+              <i class="bi bi-box-seam"></i>
+              <span>Stock disponible: {{ machine.stockQuantity }} unités</span>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Description -->
+      <div class="detail-section">
+        <div class="section-header">
+          <div class="section-icon"><i class="bi bi-file-text"></i></div>
+          <h5>Description</h5>
+        </div>
+        <div class="section-content"><p>{{ machine.description }}</p></div>
+      </div>
+      <!-- Caractéristiques -->
+      <div class="tech-specs-section">
+        <div class="tech-header">
+          <div class="section-tag center-tag">CARACTÉRISTIQUES</div>
+          <h2>Détails techniques</h2>
+          <p>Spécifications complètes de la machine</p>
+        </div>
+        <div class="specs-grid-cards">
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-gear-wide-connected"></i></div>
+            <div class="spec-content"><h3>Type</h3><p>{{ machine.type }}</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-tags"></i></div>
+            <div class="spec-content"><h3>Catégorie</h3><p>{{ machine.category }}</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-currency-exchange"></i></div>
+            <div class="spec-content"><h3>Transaction</h3><p>{{ getTransactionTypeText(machine.transactionType) }}</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-building"></i></div>
+            <div class="spec-content"><h3>Fournisseur</h3><p>{{ machine.supplierName }}</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-calendar-date"></i></div>
+            <div class="spec-content"><h3>Date d'ajout</h3><p>{{ formatDate(machine.createdAt) }}</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-icon-wrap"><i class="bi bi-box-seam"></i></div>
+            <div class="spec-content"><h3>Stock</h3><p>{{ machine.stockQuantity || 0 }} unités</p></div>
+            <div class="spec-arrow">→</div>
+          </div>
+        </div>
+      </div>
+      <!-- Avis -->
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <div class="section-tag center-tag">AVIS CLIENTS</div>
+          <h2>Ce que disent nos clients</h2>
+          <p>Découvrez les retours d'expérience des utilisateurs</p>
+        </div>
+        <div class="review-form-card">
+          <div class="review-form-header">
+            <div class="form-icon-wrap"><i class="bi bi-star"></i></div>
+            <div class="form-content"><h3>Donner mon avis</h3><p>Partagez votre expérience</p></div>
+          </div>
+          <div class="review-form-body">
+            <div class="rating-input">
+              <label>Votre note</label>
+              <div class="stars-input">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <i class="bi"
+                    [class.bi-star-fill]="newRating >= star"
+                    [class.bi-star]="newRating < star"
+                  (click)="newRating = star"></i>
+                }
+              </div>
+            </div>
+            <div class="comment-input">
+              <label>Votre commentaire</label>
+              <textarea [(ngModel)]="newComment" rows="3" placeholder="Écrivez votre avis ici..."></textarea>
+            </div>
+            <button class="btn-submit-review" (click)="submitReview()" [disabled]="isSubmittingReview || newRating === 0">
+              <span>{{ isSubmittingReview ? 'Envoi...' : 'Publier mon avis' }}</span>
+              <i class="bi bi-send"></i>
+              <div class="btn-bg"></div>
+            </button>
+          </div>
+        </div>
+        @if (reviews.length > 0) {
+          <div class="reviews-grid">
+            @for (review of reviews; track review; let i = $index) {
+              <div class="review-card"
+                [style.animation-delay]="(i * 0.08) + 's'">
+                <div class="review-icon-wrap">
+                  <div class="review-avatar"><span>{{ getUserInitial(review.userName) }}</span></div>
+                </div>
+                <div class="review-content">
+                  <div class="review-header">
+                    <h3>{{ review.userName }}</h3>
+                    <div class="review-stars">
+                      @for (star of getStars(review.rating); track star) {
+                        <i [class]="star"></i>
+                      }
+                    </div>
+                    <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+                  </div>
+                  <p>{{ review.comment }}</p>
+                </div>
+                <div class="review-arrow">→</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-reviews-card">
+            <div class="empty-icon-wrap"><i class="bi bi-chat-dots"></i></div>
+            <div class="empty-content"><h3>Aucun avis</h3><p>Soyez le premier à donner votre avis</p></div>
+            <div class="empty-arrow">→</div>
+          </div>
+        }
+      </div>
+      <!-- ══════════════════════════════════════════════════════════
+      ✅ SECTION : MACHINES SIMILAIRES
+      ══════════════════════════════════════════════════════════ -->
+      @if (similarMachines.length > 0 || loadingSimilar) {
+        <div class="related-section">
+          <div class="related-header">
+            <div class="section-tag center-tag">VOUS POURRIEZ AIMER</div>
+            <h2>Machines similaires</h2>
+            <p>Même catégorie ou même type — trouvez la machine qui vous convient</p>
+          </div>
+          @if (loadingSimilar) {
+            <div class="related-loader">
+              <div class="spin-ring-sm"></div>
+            </div>
+          }
+          @if (!loadingSimilar) {
+            <div class="related-grid">
+              @for (m of similarMachines; track m; let i = $index) {
+                <div class="related-card"
+                  [style.animation-delay]="(i * 0.07) + 's'"
+                  (click)="viewMachine(m)">
+                  <!-- Badge stock faible -->
+                  @if (isLowStock(m)) {
+                    <div class="related-stock-badge">
+                      🔥 {{ m.stockQuantity }} restant(s)
+                    </div>
+                  }
+                  <div class="related-img-wrap">
+                    <img [src]="getMachineImage(m)" [alt]="m.name" (error)="handleImageError($event)">
+                    <div class="related-overlay">
+                      <button class="btn-view-related">
+                        <i class="bi bi-eye"></i> Voir détails
+                      </button>
+                    </div>
+                  </div>
+                  <div class="related-info">
+                    <div class="related-category">{{ m.category }}</div>
+                    <h4 class="related-name">{{ m.name }}</h4>
+                    <div class="related-location">
+                      <i class="bi bi-geo-alt"></i> {{ m.location }}
+                    </div>
+                    <div class="related-stars">
+                      @for (s of getStars(m.rating); track s) {
+                        <i [class]="'bi ' + s" style="color:#fbbf24;font-size:0.72rem;"></i>
+                      }
+                      <span class="ms-1" style="font-size:0.72rem;color:#64748b;">({{ m.reviewCount || 0 }})</span>
+                    </div>
+                    <div class="related-footer">
+                      <div class="related-price">
+                        <span class="price-num">{{ formatPrice(m.price) }} TND</span>
+                        <span class="price-u">/{{ m.priceUnit }}</span>
+                      </div>
+                      <button class="btn-add-related"
+                        [disabled]="m.availability !== 'AVAILABLE'"
+                        (click)="addSimilarToCart(m); $event.stopPropagation()"
+                        title="Ajouter au panier">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+      <!-- ══════════════════════════════════════════════════════════
+      ✅ SECTION : PLUS DU MÊME FOURNISSEUR
+      ══════════════════════════════════════════════════════════ -->
+      @if (supplierMachines.length > 0 || loadingSupplier) {
+        <div class="supplier-section">
+          <div class="related-header">
+            <div class="section-tag center-tag">CE FOURNISSEUR</div>
+            <h2>
+              <i class="bi bi-building me-2"></i>
+              Plus de produits à découvrir de <span class="supplier-accent">{{ machine.supplierName }}</span>
+            </h2>
+            <p>Explorez d'autres offres de ce fournisseur</p>
+          </div>
+          @if (loadingSupplier) {
+            <div class="related-loader">
+              <div class="spin-ring-sm"></div>
+            </div>
+          }
+          @if (!loadingSupplier) {
+            <div class="supplier-grid">
+              @for (m of supplierMachines; track m; let i = $index) {
+                <div class="supplier-card"
+                  [style.animation-delay]="(i * 0.08) + 's'"
+                  (click)="viewMachine(m)">
+                  <!-- Badge stock faible -->
+                  @if (isLowStock(m)) {
+                    <div class="related-stock-badge">
+                      🔥 {{ m.stockQuantity }} restant(s)
+                    </div>
+                  }
+                  <div class="supplier-img-wrap">
+                    <img [src]="getMachineImage(m)" [alt]="m.name" (error)="handleImageError($event)">
+                    <div class="supplier-type-tag">{{ m.transactionType === 'SALE' ? '💰 Vente' : m.transactionType === 'RENT' ? '🔑 Location' : '🔄 Vente/Loc' }}</div>
+                  </div>
+                  <div class="supplier-info">
+                    <div class="supplier-cat">{{ m.category }}</div>
+                    <h4 class="supplier-name">{{ m.name }}</h4>
+                    <div class="supplier-meta">
+                      <span><i class="bi bi-geo-alt"></i> {{ m.location }}</span>
+                      @if (m.stockQuantity) {
+                        <span>
+                          <i class="bi bi-box-seam"></i> {{ m.stockQuantity }}
+                        </span>
+                      }
+                    </div>
+                    <div class="supplier-bottom">
+                      <span class="supplier-price">{{ formatPrice(m.price) }} TND/{{ m.priceUnit }}</span>
+                      <div class="supplier-avail"
+                        [class.avail-yes]="m.availability === 'AVAILABLE'"
+                        [class.avail-no]="m.availability !== 'AVAILABLE'">
+                        <span class="avail-dot"></span>
+                        {{ getAvailabilityText(m.availability) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          <!-- Bouton voir tout le catalogue du fournisseur -->
+          @if (!loadingSupplier) {
+            <div class="see-all-supplier">
+              <button class="btn-see-all" [routerLink]="['/machines']"
+                [queryParams]="{supplier: machine.supplierId}">
+                <i class="bi bi-grid-3x3-gap"></i>
+                Voir tout le catalogue de {{ machine.supplierName }}
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    }<!-- end detail-container -->
+
+    <!-- Loader principal -->
+    @if (loading) {
+      <div class="loader-wrapper">
+        <div class="loader-spinner"></div>
+        <p>Chargement de la machine...</p>
+      </div>
+    }
+
+    <!-- Modal Contact -->
+    @if (showContactModal) {
+      <div class="modal-custom" [class.show]="showContactModal">
+        <div class="modal-overlay" (click)="showContactModal = false"></div>
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3>Contacter {{ machine?.supplierName }}</h3>
+            <button class="modal-close" (click)="showContactModal = false">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="contact-info">
+              <i class="bi bi-telephone"></i>
+              <div><strong>Téléphone</strong><p>{{ machine?.contactInfo || 'Non spécifié' }}</p></div>
+            </div>
+            <div class="contact-info">
+              <i class="bi bi-envelope"></i>
+              <div><strong>Email</strong><p>{{ getSupplierEmail(machine?.supplierName) }}</p></div>
+            </div>
+            <div class="contact-info">
+              <i class="bi bi-geo-alt"></i>
+              <div><strong>Localisation</strong><p>{{ machine?.location }}</p></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="showContactModal = false">Fermer</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Modal Suppression -->
+    @if (showConfirmDelete) {
+      <div class="modal-custom" [class.show]="showConfirmDelete">
+        <div class="modal-overlay" (click)="showConfirmDelete = false"></div>
+        <div class="modal-container modal-danger">
+          <div class="modal-header">
+            <h3>Confirmer la suppression</h3>
+            <button class="modal-close" (click)="showConfirmDelete = false">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="warning-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <p>Supprimer <strong>"{{ machine?.name }}"</strong> ?</p>
+            <p class="text-warning">Cette action est irréversible.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="showConfirmDelete = false">Annuler</button>
+            <button class="btn-danger" (click)="deleteMachine()">Supprimer</button>
+          </div>
+        </div>
+      </div>
+    }

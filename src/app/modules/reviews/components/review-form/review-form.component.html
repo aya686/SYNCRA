@@ -1,0 +1,90 @@
+<!-- src/app/modules/reviews/components/review-form/review-form.component.html -->
+
+<div class="review-form-card card shadow-sm">
+  <div class="card-header bg-white">
+    <h5 class="mb-0">
+      <i class="bi bi-star-fill text-warning me-2"></i>
+      Donner mon avis sur "{{entityName}}"
+    </h5>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
+      <!-- Sélection de la note -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">
+          Votre note <span class="text-danger">*</span>
+        </label>
+        <div class="rating-input">
+          <div class="d-flex gap-3 flex-wrap justify-content-center">
+            @for (rating of ratingOptions; track rating) {
+              <div
+                class="rating-option text-center"
+                [class.selected]="selectedRating === rating.value"
+                (click)="setRating(rating.value)"
+                >
+                <div class="rating-stars">
+                  <i [class]="rating.icon" style="font-size: 2rem; color: #ffc107;"></i>
+                </div>
+                <div class="small mt-1 fw-semibold">{{rating.label}}</div>
+                <div class="rating-value small text-muted">{{rating.value}}/5</div>
+              </div>
+            }
+          </div>
+        </div>
+        @if (reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched) {
+          <div class="invalid-feedback d-block text-center mt-2">
+            Veuillez sélectionner une note
+          </div>
+        }
+      </div>
+
+      <!-- Commentaire -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold">
+          Votre commentaire <span class="text-danger">*</span>
+        </label>
+        <textarea
+          rows="4"
+          class="form-control"
+          [class.is-invalid]="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched"
+          formControlName="comment"
+          placeholder="Partagez votre expérience..."
+        ></textarea>
+        @if (reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched) {
+          <div class="invalid-feedback">
+            @if (reviewForm.get('comment')?.errors?.['required']) {
+              <span>Le commentaire est requis</span>
+            }
+            @if (reviewForm.get('comment')?.errors?.['minlength']) {
+              <span>Minimum 10 caractères</span>
+            }
+            @if (reviewForm.get('comment')?.errors?.['maxlength']) {
+              <span>Maximum 500 caractères</span>
+            }
+          </div>
+        }
+        <div class="d-flex justify-content-between align-items-center mt-1">
+          <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            Votre avis nous aide à améliorer nos services
+          </small>
+          <small class="text-muted">
+            {{ reviewForm.get('comment')?.value?.length || 0 }}/500
+          </small>
+        </div>
+      </div>
+
+      <!-- Boutons -->
+      <div class="d-flex gap-2 justify-content-end mt-4">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="submitting">
+          <i class="bi bi-x-circle me-2"></i>
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          <i class="bi bi-send me-2"></i>
+          {{ submitting ? 'Publication en cours...' : 'Publier mon avis' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
