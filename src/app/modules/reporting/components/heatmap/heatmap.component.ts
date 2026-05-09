@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Chart from 'chart.js/auto';
 
@@ -22,8 +22,9 @@ export class HeatmapComponent implements OnInit, AfterViewInit {
   peakValue = 0;
   
   private chart: any;
+  @ViewChild('heatmapCanvas') heatmapCanvas!: ElementRef<HTMLCanvasElement>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadHeatmapData();
@@ -36,23 +37,19 @@ export class HeatmapComponent implements OnInit, AfterViewInit {
   loadHeatmapData(): void {
     this.loading = true;
     this.http.get('http://localhost:8089/event_db/api/stats/heatmap').subscribe({
-      next: (data: any) => {
-        console.log('Données heatmap reçues:', data);
-        this.processHeatmapData(data);
-        this.loading = false;
-        setTimeout(() => {
-          this.createHeatmap();
-        }, 100);
-      },
-      error: (err) => {
-        console.error('Erreur:', err);
-        // Données mockées pour tester
-        this.generateMockData();
-        this.loading = false;
-        setTimeout(() => {
-          this.createHeatmap();
-        }, 100);
-      }
+  next: (data: any) => {
+  this.processHeatmapData(data);
+  this.loading = false;
+  this.cdr.detectChanges();
+  setTimeout(() => this.createHeatmap(), 100);
+},
+error: (err) => {
+  console.error('Erreur:', err);
+  this.generateMockData();
+  this.loading = false;
+  this.cdr.detectChanges();
+  setTimeout(() => this.createHeatmap(), 100);
+}
     });
   }
 
@@ -139,11 +136,11 @@ export class HeatmapComponent implements OnInit, AfterViewInit {
   }
 
   createHeatmap(): void {
-    const canvas = document.getElementById('heatmapCanvas') as HTMLCanvasElement;
-    if (!canvas) {
-      console.error('Canvas non trouvé');
-      return;
-    }
+  const canvas = this.heatmapCanvas?.nativeElement;
+if (!canvas) {
+  console.error('Canvas non trouvé');
+  return;
+}
     
     // Détruire le graphique existant
     if (this.chart) {
