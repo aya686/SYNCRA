@@ -1,0 +1,255 @@
+// ── HEADER ICON ──────────────────────────────────────────────────────
+.dash-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #5e35b1, #7c4dff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 22px;
+    color: #fff;
+  }
+}
+
+// ── STAT CARDS ────────────────────────────────────────────────────────
+.stat-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(94, 53, 177, 0.1);
+  }
+}
+
+.stat-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────
+.chart-wrap {
+  padding: 0 4px;
+}
+
+.chart-col {
+  min-width: 0;
+}
+
+.chart-bar-track {
+  border-bottom: 2px solid #e9ecef;
+}
+
+// ── USER RISQUE LIST ──────────────────────────────────────────────────
+.user-risque-item {
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+}
+
+.user-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.user-avatar-sm {
+  width: 34px;
+  height: 34px;
+  font-size: 12px;
+}
+
+.flex-1 { flex: 1; }
+.min-w-0 { min-width: 0; }
+
+// ── IA CARD ───────────────────────────────────────────────────────────
+.ia-card {
+  border: 1.5px solid rgba(94, 53, 177, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(94, 53, 177, 0.08);
+}
+
+.ia-card-header {
+  background: linear-gradient(135deg, #1a1463, #4527a0);
+  padding: 18px 20px;
+  border-bottom: none !important;
+}
+
+.ia-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ia-refresh-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.spin {
+  display: inline-block;
+  animation: spinAnim 0.9s linear infinite;
+}
+
+@keyframes spinAnim {
+  to { transform: rotate(360deg); }
+}
+
+// IA Score block
+.ia-score-block {
+  background: #f8f9fe;
+  border-radius: 12px;
+  border: 1.5px solid #e9ecef;
+}
+
+.ia-metric-block {
+  background: #f8f9fe;
+  border-radius: 10px;
+  border: 1.5px solid #e9ecef;
+}
+
+.ia-reco-block {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+}
+
+.ia-action-block {
+  background: #f0f4ff;
+  border-left: 3px solid #5e35b1;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
+}
+
+// ── KPI ITEMS ─────────────────────────────────────────────────────────
+.kpi-item {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+// ── GENERAL CARD ──────────────────────────────────────────────────────
+.card {
+  border-radius: 14px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+.card-footer {
+  background: #f8f9fe;
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 20px;
+  border-radius: 0 0 14px 14px !important;
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────
+.table thead th {
+  color: #6c757d;
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: #fafbff; }
+}
+
+// ── PROGRESS ─────────────────────────────────────────────────────────
+.progress {
+  background: #eef0f5;
+}
+
+// ── BERRY BADGE HELPERS ───────────────────────────────────────────────
+.bg-light-primary { background-color: rgba(94, 53, 177, 0.1) !important; }
+.bg-light-danger  { background-color: rgba(239, 68, 68, 0.1) !important; }
+.bg-light-success { background-color: rgba(16, 185, 129, 0.1) !important; }
+.bg-light-warning { background-color: rgba(245, 158, 11, 0.1) !important; }
+
+.btn-light-primary {
+  background: rgba(94, 53, 177, 0.1);
+  color: #5e35b1;
+  border: none;
+
+  &:hover { background: rgba(94, 53, 177, 0.18); color: #5e35b1; }
+}
+
+.btn-light-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: none;
+
+  &:hover { background: rgba(239, 68, 68, 0.18); color: #ef4444; }
+}
+
+.btn-light-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: none;
+
+  &:hover { background: rgba(16, 185, 129, 0.18); color: #10b981; }
+}
+
+.btn-light-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: none;
+
+  &:hover { background: rgba(245, 158, 11, 0.18); color: #f59e0b; }
+}

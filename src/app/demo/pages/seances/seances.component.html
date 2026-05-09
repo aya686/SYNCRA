@@ -1,0 +1,582 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- TOASTS -->
+<div class="toast-container">
+  <div *ngFor="let t of toasts" class="toast-item"
+       [class.toast-success]="t.type==='success'" [class.toast-warning]="t.type==='warning'"
+       [class.toast-danger]="t.type==='danger'" [class.toast-info]="t.type==='info'"
+       [class.toast-hiding]="!t.visible">
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="dismissToast(t.id)">×</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap"><span class="brand-hex">⬡</span></div>
+      <span class="brand-name">SYNCRA</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/dashboard">Tableau de bord</a>
+      <a class="nav-link" routerLink="/dossier-sante">Mon dossier</a>
+      <a class="nav-link active" routerLink="/seances">Séances</a>
+    </div>
+    <div class="nav-actions-group">
+      <button class="btn-calendar-nav" (click)="ouvrirCalendrier()">📅 Calendrier</button>
+      <button class="btn-planifier-nav" (click)="ouvrirPlanifier()">+ Planifier</button>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADER -->
+<div class="page-loader" *ngIf="loading">
+  <div class="loader-inner">
+    <span class="loader-hex">⬡</span>
+    <div class="loader-text">Chargement de vos séances...</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+
+<!-- HERO -->
+<section class="sc-hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-grid-overlay"></div>
+  <div class="sc-hero-inner">
+
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-pulse"></span>
+        SUIVI PSYCHOLOGIQUE · PERSONNEL
+      </div>
+      <h1 class="sc-hero-title">
+        Mes Séances
+        <span class="title-accent">de <em>Suivi</em></span>
+      </h1>
+      <p class="sc-hero-sub">Suivez vos consultations, gérez vos rendez-vous et accédez à vos rapports.</p>
+
+      <div class="hero-stats-row">
+        <div class="stat-pill">
+          <span class="sp-icon">✓</span>
+          <div><span class="sp-val">{{ totalEffectuees }}</span><span class="sp-label">Séances effectuées</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">📅</span>
+          <div><span class="sp-val">{{ totalPlanifiees }}</span><span class="sp-label">À venir</span></div>
+        </div>
+        <div class="stat-pill" [class.sp-danger]="tauxPresence < 60">
+          <span class="sp-icon">📊</span>
+          <div><span class="sp-val">{{ tauxPresence }}%</span><span class="sp-label">Taux de présence</span></div>
+        </div>
+      </div>
+
+      <div class="prochaine-card" *ngIf="prochaine">
+        <div class="prochaine-label">🔔 Prochaine séance</div>
+        <div class="prochaine-info">
+          <span class="prochaine-date">{{ formatDate(prochaine.date) }} à {{ prochaine.heure }}</span>
+          <span class="prochaine-spec">Dr {{ prochaine.specialiste.prenom }} {{ prochaine.specialiste.nom }}</span>
+          <span class="prochaine-type">{{ getTypeIcon(prochaine.typeSeance) }} {{ prochaine.typeSeance === 'EN_LIGNE' ? 'En ligne' : 'Présentiel' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- IA PRÉVISION -->
+    <div class="hero-prevision-card">
+      <div class="prev-card-header">
+        <div class="prev-ai-icon">🧠</div>
+        <div>
+          <div class="prev-card-title">Prévision IA de Rechute</div>
+          <div class="prev-card-sub">Groq · Llama 3.3-70b</div>
+        </div>
+        <button class="prev-refresh" (click)="loadPrevisionIA()" [disabled]="previsionLoading">
+          <span [class.spin]="previsionLoading">↻</span>
+        </button>
+      </div>
+
+      <div class="prev-loading" *ngIf="previsionLoading">
+        <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+        <span>Calcul de la prévision...</span>
+      </div>
+
+      <ng-container *ngIf="!previsionLoading && prevision">
+        <div class="risque-gauge-wrap">
+          <div class="risque-gauge">
+            <svg viewBox="0 0 120 70" class="gauge-arc-svg">
+              <path d="M10,70 A60,60 0 0,1 110,70" fill="none" stroke="#e8f0f9" stroke-width="10" stroke-linecap="round"/>
+              <path d="M10,70 A60,60 0 0,1 110,70" fill="none"
+                    [attr.stroke]="getRisqueColor(prevision.risqueRechute)"
+                    stroke-width="10" stroke-linecap="round"
+                    [attr.stroke-dasharray]="(prevision.risqueRechute / 100) * 188.5 + ' 188.5'"/>
+            </svg>
+            <div class="gauge-center">
+              <span class="gauge-pct" [style.color]="getRisqueColor(prevision.risqueRechute)">{{ prevision.risqueRechute }}%</span>
+              <span class="gauge-sub">risque</span>
+            </div>
+          </div>
+          <div class="risque-meta">
+            <span class="risque-badge" [style.background]="getRisqueColor(prevision.risqueRechute) + '18'" [style.color]="getRisqueColor(prevision.risqueRechute)">{{ getRisqueLabel(prevision.risqueRechute) }}</span>
+            <span class="tendance-chip">{{ getTendanceIcon(prevision.tendance) }} {{ prevision.tendance }}</span>
+          </div>
+        </div>
+
+        <div class="prev-metrics">
+          <div class="prev-metric">
+            <span class="pm-label">Fréquence recommandée</span>
+            <span class="pm-val">{{ prevision.frequenceRecommandee }}</span>
+          </div>
+          <div class="prev-metric">
+            <span class="pm-label">Prochaine séance idéale</span>
+            <span class="pm-val accent">{{ formatPrevisionDate(prevision.prochaineSeanceIdeal) }}</span>
+          </div>
+          <div class="prev-metric">
+            <span class="pm-label">Score d'engagement</span>
+            <div class="engagement-bar-wrap">
+              <div class="engagement-bar">
+                <div class="engagement-fill" [style.width.%]="prevision.scoreEngagement" [style.background]="getRisqueColor(100 - prevision.scoreEngagement)"></div>
+              </div>
+              <span class="engagement-pct">{{ prevision.scoreEngagement }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="prev-message">
+          <span class="prev-msg-icon">💬</span>
+          <p>{{ prevision.messageIA }}</p>
+        </div>
+
+        <div class="prev-facteurs">
+          <span class="pf-label">Facteurs clés :</span>
+          <span class="pf-chip" *ngFor="let f of prevision.facteursPrincipaux">{{ f }}</span>
+        </div>
+
+        <button class="prev-detail-btn" (click)="showPrevisionDetail = !showPrevisionDetail">
+          {{ showPrevisionDetail ? '▲ Réduire' : '▼ Analyse complète' }}
+        </button>
+        <div class="prev-detail-box" *ngIf="showPrevisionDetail">
+          <p>Cette prévision est calculée en temps réel par Groq Llama 3.3 en analysant votre historique. Un risque de {{ prevision.risqueRechute }}% signifie {{ prevision.risqueRechute >= 70 ? 'qu\'une action urgente est recommandée.' : prevision.risqueRechute >= 40 ? 'qu\'une vigilance est conseillée.' : 'que votre suivi est bien maîtrisé.' }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- FILTRES -->
+<div class="sc-filters-bar">
+  <div class="sc-filters-inner">
+    <select class="syncra-select-sm" [(ngModel)]="filtreStatut" (ngModelChange)="applyFilters()">
+      <option value="tous">Tous statuts</option>
+      <option value="PLANIFIEE">📅 Planifiée</option>
+      <option value="EFFECTUEE">✓ Effectuée</option>
+      <option value="ANNULEE">✕ Annulée</option>
+      <option value="EN_ATTENTE">⏳ En attente</option>
+    </select>
+    <select class="syncra-select-sm" [(ngModel)]="filtreType" (ngModelChange)="applyFilters()">
+      <option value="tous">Tous types</option>
+      <option value="EN_LIGNE">💻 En ligne</option>
+      <option value="PRESENTIEL">🏥 Présentiel</option>
+    </select>
+    <select class="syncra-select-sm" [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+      <option value="date_desc">Plus récentes</option>
+      <option value="date_asc">Plus anciennes</option>
+    </select>
+    <span class="results-count">{{ seancesFiltrees.length }} séance{{ seancesFiltrees.length > 1 ? 's' : '' }}</span>
+    <button class="btn-planifier-bar" (click)="ouvrirCalendrier()">📅 Calendrier</button>
+    <button class="btn-planifier-bar" (click)="ouvrirPlanifier()">+ Planifier</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="sc-main">
+  <div class="empty-state" *ngIf="seancesFiltrees.length === 0">
+    <span class="empty-icon">🗓️</span>
+    <h3>Aucune séance trouvée</h3>
+    <p>Planifiez votre première séance de suivi psychologique.</p>
+    <button class="btn-save" (click)="ouvrirPlanifier()"><div class="btn-bg"></div>+ Planifier maintenant</button>
+  </div>
+
+  <div class="seances-timeline" *ngIf="seancesFiltrees.length > 0">
+    <div *ngFor="let seance of seancesFiltrees"
+         class="seance-card"
+         [class.seance-prochaine]="isProchaine(seance)"
+         [class.seance-annulee]="seance.statut === 'ANNULEE'"
+         (click)="ouvrirDetail(seance)">
+
+      <div class="prochaine-badge" *ngIf="isProchaine(seance)">🔔 Prochaine</div>
+
+      <div class="seance-card-inner">
+        <div class="seance-date-col">
+          <div class="date-circle" [class]="getStatutClass(seance.statut)">
+            <span class="date-day">{{ seance.date | date:'dd' }}</span>
+            <span class="date-month">{{ seance.date | date:'MMM' }}</span>
+          </div>
+          <span class="seance-heure">{{ seance.heure }}</span>
+        </div>
+
+        <div class="seance-body">
+          <div class="seance-top-row">
+            <span class="seance-type-icon">{{ getTypeIcon(seance.typeSeance) }}</span>
+            <span class="seance-specialite">{{ seance.specialiste.specialite }}</span>
+            <span class="seance-duree">{{ seance.dureeMinutes }} min</span>
+            <span class="seance-statut-badge" [class]="getStatutClass(seance.statut)">{{ getStatutLabel(seance.statut) }}</span>
+          </div>
+          <div class="seance-spec-row">
+            <div class="spec-avatar">{{ getSpecialisteInitiales(seance.specialiste) }}</div>
+            <span class="spec-name">Dr {{ seance.specialiste.prenom }} {{ seance.specialiste.nom }}</span>
+          </div>
+          <p class="seance-motif">{{ seance.motif }}</p>
+          <div class="seance-note" *ngIf="seance.noteUtilisateur">
+            <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.star-active]="s <= (seance.noteUtilisateur || 0)">★</span>
+          </div>
+        </div>
+
+        <div class="seance-actions" (click)="$event.stopPropagation()">
+          <button class="action-btn btn-rapport" *ngIf="seance.statut === 'EFFECTUEE'" (click)="voirRapport(seance, $event)" title="Voir le rapport">📄</button>
+          <button class="action-btn btn-detail" (click)="ouvrirDetail(seance)" title="Détail">→</button>
+        </div>
+      </div>
+      <div class="seance-status-line" [class]="getStatutClass(seance.statut)"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════ MODAL PLANIFIER ════════════ -->
+<div class="modal-overlay" *ngIf="showPlanifier" (click)="fermerPlanifier()"></div>
+<div class="planifier-modal" *ngIf="showPlanifier">
+  <div class="modal-header">
+    <h2 class="modal-title">Planifier une séance</h2>
+    <button class="modal-close" (click)="fermerPlanifier()">×</button>
+  </div>
+  <div class="stepper">
+    <div class="step" [class.step-active]="planifierStep >= 1" [class.step-done]="planifierStep > 1">
+      <div class="step-circle">{{ planifierStep > 1 ? '✓' : '1' }}</div><span class="step-label">Spécialiste</span>
+    </div>
+    <div class="step-line" [class.step-line-active]="planifierStep > 1"></div>
+    <div class="step" [class.step-active]="planifierStep >= 2" [class.step-done]="planifierStep > 2">
+      <div class="step-circle">{{ planifierStep > 2 ? '✓' : '2' }}</div><span class="step-label">Créneau</span>
+    </div>
+    <div class="step-line" [class.step-line-active]="planifierStep > 2"></div>
+    <div class="step" [class.step-active]="planifierStep >= 3" [class.step-done]="planifierStep > 3">
+      <div class="step-circle">{{ planifierStep > 3 ? '✓' : '3' }}</div><span class="step-label">Détails</span>
+    </div>
+    <div class="step-line" [class.step-line-active]="planifierStep > 3"></div>
+    <div class="step" [class.step-active]="planifierStep >= 4">
+      <div class="step-circle">4</div><span class="step-label">Confirmé</span>
+    </div>
+  </div>
+  <div class="modal-body">
+    <!-- ÉTAPE 1 -->
+    <div *ngIf="planifierStep === 1">
+      <p class="step-intro">Choisissez votre spécialiste :</p>
+      <div class="specialists-grid">
+        <div *ngFor="let spec of specialistes" class="specialist-card"
+             [class.spec-unavailable]="!spec.disponible"
+             [class.spec-selected]="nouvelleSeance.specialisteId === spec.id"
+             (click)="spec.disponible && choisirSpecialiste(spec.id)">
+          <div class="spec-avatar-lg">{{ getSpecialisteInitiales(spec) }}</div>
+          <div class="spec-info">
+            <div class="spec-name-lg">Dr {{ spec.prenom }} {{ spec.nom }}</div>
+            <div class="spec-specialite">{{ spec.specialite }}</div>
+            <div class="spec-tarif" *ngIf="spec.tarif">{{ spec.tarif }}€ / séance</div>
+          </div>
+          <div class="spec-dispo-badge" [class.dispo-ok]="spec.disponible" [class.dispo-no]="!spec.disponible">
+            {{ spec.disponible ? '● Disponible' : '○ Indisponible' }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ÉTAPE 2 -->
+    <div *ngIf="planifierStep === 2">
+      <div class="step-back-row">
+        <button class="btn-back" (click)="goStep(1)">← Retour</button>
+        <p class="step-intro">Choisissez un créneau :</p>
+      </div>
+      <div class="type-toggle">
+        <button class="type-btn" [class.type-active]="nouvelleSeance.typeSeance === 'EN_LIGNE'" (click)="nouvelleSeance.typeSeance = 'EN_LIGNE'">💻 En ligne</button>
+        <button class="type-btn" [class.type-active]="nouvelleSeance.typeSeance === 'PRESENTIEL'" (click)="nouvelleSeance.typeSeance = 'PRESENTIEL'">🏥 Présentiel</button>
+      </div>
+      <div class="creneaux-grid">
+        <div *ngFor="let dispo of disponibilitesSpecialiste" class="creneau-card"
+             [class.creneau-selected]="nouvelleSeance.disponibiliteId === dispo.id"
+             (click)="choisirDisponibilite(dispo)">
+          <div class="creneau-date">{{ formatDateShort(dispo.date) }}</div>
+          <div class="creneau-heure">{{ dispo.heureDebut }}</div>
+          <div class="creneau-duree">50 min</div>
+        </div>
+      </div>
+    </div>
+    <!-- ÉTAPE 3 -->
+    <div *ngIf="planifierStep === 3">
+      <div class="step-back-row">
+        <button class="btn-back" (click)="goStep(2)">← Retour</button>
+        <p class="step-intro">Précisez le motif :</p>
+      </div>
+      <div class="recap-box">
+        <div class="recap-row"><span class="recap-label">Spécialiste</span><span class="recap-val">Dr {{ getSelectedSpecialiste()?.prenom }} {{ getSelectedSpecialiste()?.nom }}</span></div>
+        <div class="recap-row"><span class="recap-label">Date</span><span class="recap-val">{{ nouvelleSeance.date | date:'dd/MM/yyyy' }} à {{ nouvelleSeance.heure }}</span></div>
+        <div class="recap-row"><span class="recap-label">Type</span><span class="recap-val">{{ getTypeIcon(nouvelleSeance.typeSeance) }} {{ nouvelleSeance.typeSeance === 'EN_LIGNE' ? 'En ligne' : 'Présentiel' }}</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motif de la consultation *</label>
+        <textarea class="syncra-textarea" rows="4" placeholder="Décrivez le motif..." [(ngModel)]="nouvelleSeance.motif"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" (click)="confirmerSeance()" [disabled]="planifierLoading || !nouvelleSeance.motif.trim()">
+          <div class="btn-bg"></div>
+          <span *ngIf="!planifierLoading">✓ Confirmer la séance</span>
+          <span *ngIf="planifierLoading">⏳ En cours...</span>
+        </button>
+      </div>
+    </div>
+    <!-- ÉTAPE 4 -->
+    <div *ngIf="planifierStep === 4" class="confirmation-step">
+      <div class="confirm-icon">🎉</div>
+      <h3 class="confirm-title">Séance planifiée !</h3>
+      <p class="confirm-sub">Votre demande a été envoyée. Confirmation dans les 24h.</p>
+      <div class="confirm-actions">
+        <button class="btn-save" (click)="fermerPlanifier()"><div class="btn-bg"></div>Voir mes séances</button>
+        <button class="btn-secondary" (click)="fermerPlanifier(); ouvrirPlanifier()">Planifier une autre</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL RAPPORT ════════════ -->
+<div class="modal-overlay" *ngIf="showRapport" (click)="showRapport = false"></div>
+<div class="rapport-modal" *ngIf="showRapport && rapportActif">
+  <div class="modal-header">
+    <h2 class="modal-title">📄 Rapport de séance</h2>
+    <button class="modal-close" (click)="showRapport = false">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="rapport-section">
+      <h3 class="rapport-section-title">Compte-rendu</h3>
+      <p class="rapport-text">{{ rapportActif.contenu }}</p>
+    </div>
+    <div class="rapport-section" *ngIf="rapportActif.recommendations">
+      <h3 class="rapport-section-title">💡 Recommandations</h3>
+      <div class="rapport-reco-box">{{ rapportActif.recommendations }}</div>
+    </div>
+    <div class="rapport-date">Rédigé le {{ formatDate(rapportActif.dateCreation) }}</div>
+  </div>
+</div>
+
+<!-- ════════════ DETAIL PANEL ════════════ -->
+<div class="detail-overlay" *ngIf="showDetailSeance" (click)="fermerDetail()"></div>
+<div class="detail-panel" *ngIf="showDetailSeance && seanceDetail">
+  <div class="detail-header">
+    <div class="detail-title-row">
+      <span class="detail-icon">{{ getTypeIcon(seanceDetail.typeSeance) }}</span>
+      <div>
+        <h2 class="detail-title">Séance {{ seanceDetail.typeSeance === 'EN_LIGNE' ? 'en ligne' : 'présentiel' }}</h2>
+        <p class="detail-sub">{{ formatDate(seanceDetail.date) }} à {{ seanceDetail.heure }}</p>
+      </div>
+      <button class="detail-close" (click)="fermerDetail()">×</button>
+    </div>
+    <span class="detail-statut-badge" [class]="getStatutClass(seanceDetail.statut)">{{ getStatutLabel(seanceDetail.statut) }}</span>
+  </div>
+  <div class="detail-body">
+    <div class="detail-section">
+      <h3 class="detail-section-title">👨‍⚕️ Spécialiste</h3>
+      <div class="detail-spec-card">
+        <div class="spec-avatar-lg">{{ getSpecialisteInitiales(seanceDetail.specialiste) }}</div>
+        <div>
+          <div class="spec-name-lg">Dr {{ seanceDetail.specialiste.prenom }} {{ seanceDetail.specialiste.nom }}</div>
+          <div class="spec-specialite">{{ seanceDetail.specialiste.specialite }}</div>
+          <div class="spec-tarif" *ngIf="seanceDetail.specialiste.tarif">{{ seanceDetail.specialiste.tarif }}€ / séance</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3 class="detail-section-title">📝 Motif</h3>
+      <p class="detail-text">{{ seanceDetail.motif }}</p>
+    </div>
+    <div class="detail-actions">
+      <button class="btn-save" *ngIf="seanceDetail.statut === 'EFFECTUEE'" (click)="voirRapport(seanceDetail, $event); fermerDetail()">
+        <div class="btn-bg"></div>📄 Voir le rapport
+      </button>
+      <button class="btn-secondary" *ngIf="seanceDetail.statut === 'PLANIFIEE'" (click)="fermerDetail(); ouvrirPlanifier()">📅 Modifier</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ CALENDRIER SYNCRA ════════════ -->
+<div class="cal-overlay" *ngIf="showCalendrier" (click)="fermerCalendrier()"></div>
+<div class="cal-modal" *ngIf="showCalendrier">
+  <div class="cal-modal-header">
+    <div class="cal-header-left">
+      <div class="cal-icon-wrap">⬡</div>
+      <div>
+        <h2 class="cal-modal-title">Calendrier SYNCRA</h2>
+        <p class="cal-modal-sub">Cliquez sur une date pour planifier ou voir vos séances</p>
+      </div>
+    </div>
+    <button class="cal-close-btn" (click)="fermerCalendrier()">×</button>
+  </div>
+
+  <div class="cal-body">
+    <!-- GAUCHE : grille calendrier -->
+    <div class="cal-left">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" (click)="prevMois()">‹</button>
+        <div class="cal-nav-center">
+          <span class="cal-month-name">{{ getNomMois(calMoisActuel) }}</span>
+          <span class="cal-year">{{ calAnneeActuelle }}</span>
+        </div>
+        <button class="cal-nav-btn" (click)="nextMois()">›</button>
+      </div>
+
+      <div class="cal-weekdays">
+        <span *ngFor="let j of joursNoms">{{ j }}</span>
+      </div>
+
+      <div class="cal-grid">
+        <div *ngFor="let jour of calJours"
+             class="cal-day"
+             [class.cal-day-empty]="!jour.date"
+             [class.cal-day-today]="jour.isToday"
+             [class.cal-day-selected]="jour.isSelected"
+             [class.cal-day-has-seance]="jour.seances.length > 0"
+             [class.cal-day-past]="jour.isPast"
+             [class.cal-day-IA-suggested]="jour.isIASuggested"
+             (click)="jour.date && selectionnerJour(jour)">
+          <span class="cal-day-num" *ngIf="jour.date">{{ jour.date.getDate() }}</span>
+          <div class="cal-day-dots" *ngIf="jour.seances.length > 0">
+            <span *ngFor="let s of jour.seances.slice(0,3)" class="cal-dot" [class]="getStatutClass(s.statut)"></span>
+          </div>
+          <div class="cal-ia-badge" *ngIf="jour.isIASuggested">✦</div>
+        </div>
+      </div>
+
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-dot st-effectuee"></span>Effectuée</div>
+        <div class="cal-legend-item"><span class="cal-dot st-planifiee"></span>Planifiée</div>
+        <div class="cal-legend-item"><span class="cal-dot st-annulee"></span>Annulée</div>
+        <div class="cal-legend-item"><span class="cal-ia-badge-sm">✦</span>Recommandé IA</div>
+      </div>
+    </div>
+
+    <!-- DROITE : détail jour -->
+    <div class="cal-right">
+      <!-- Aucune date sélectionnée -->
+      <div class="cal-right-empty" *ngIf="!calJourSelectionne">
+        <div class="cal-empty-illustration">
+          <div class="cal-empty-hex">⬡</div>
+          <div class="cal-empty-orbit"></div>
+        </div>
+        <p class="cal-empty-text">Sélectionnez une date<br>pour voir ou planifier une séance</p>
+        <div class="cal-empty-hint" *ngIf="prevision">
+          <span class="hint-ia-icon">✦</span>
+          <span>L'IA suggère le <strong>{{ formatPrevisionDate(prevision.prochaineSeanceIdeal) }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Date sélectionnée -->
+      <ng-container *ngIf="calJourSelectionne">
+        <div class="cal-jour-header">
+          <div class="cal-jour-date">
+            <span class="cal-jour-num">{{ calJourSelectionne.date!.getDate() }}</span>
+            <div>
+              <span class="cal-jour-mois">{{ getNomMois(calJourSelectionne.date!.getMonth()) }}</span>
+              <span class="cal-jour-annee">{{ calJourSelectionne.date!.getFullYear() }}</span>
+            </div>
+          </div>
+          <div class="cal-jour-tags">
+            <span class="cal-jour-tag ia" *ngIf="calJourSelectionne.isIASuggested">✦ Suggéré IA</span>
+            <span class="cal-jour-tag today" *ngIf="calJourSelectionne.isToday">Aujourd'hui</span>
+          </div>
+        </div>
+
+        <div class="cal-seances-list" *ngIf="calJourSelectionne.seances.length > 0">
+          <h4 class="cal-section-title">📋 Séances ce jour</h4>
+          <div *ngFor="let s of calJourSelectionne.seances"
+               class="cal-seance-item" [class]="getStatutClass(s.statut)"
+               (click)="ouvrirDetail(s); fermerCalendrier()">
+            <div class="csi-time">{{ s.heure }}</div>
+            <div class="csi-body">
+              <div class="csi-spec">Dr {{ s.specialiste.prenom }} {{ s.specialiste.nom }}</div>
+              <div class="csi-motif">{{ s.motif }}</div>
+            </div>
+            <span class="csi-badge" [class]="getStatutClass(s.statut)">{{ getStatutLabel(s.statut) }}</span>
+          </div>
+        </div>
+
+        <div class="cal-no-seance" *ngIf="calJourSelectionne.seances.length === 0 && !calJourSelectionne.isPast">
+          <span class="cal-no-icon">📭</span>
+          <p>Aucune séance ce jour.</p>
+        </div>
+
+        <div class="cal-ia-message" *ngIf="calJourSelectionne.isIASuggested">
+          <div class="cal-ia-msg-header">
+            <span class="cal-ia-msg-icon">🧠</span>
+            <span class="cal-ia-msg-title">Recommandation IA</span>
+          </div>
+          <p>Ce jour est recommandé basé sur votre historique et votre risque de rechute de <strong>{{ prevision?.risqueRechute }}%</strong>.</p>
+        </div>
+
+        <div class="cal-actions" *ngIf="!calJourSelectionne.isPast">
+          <button class="cal-btn-planifier" (click)="planifierDepuisCalendrier(calJourSelectionne)">
+            <span class="btn-bg"></span>
+            <span class="cal-btn-icon">+</span>
+            Planifier une séance ce jour
+          </button>
+        </div>
+
+        <div class="cal-past-msg" *ngIf="calJourSelectionne.isPast && calJourSelectionne.seances.length === 0">
+          <span>📆 Date passée — aucune séance enregistrée.</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ NOTIFICATION RDV ════════════ -->
+<div class="rdv-notif-card" *ngIf="showRdvNotif && rdvNotifData" [class.rdv-notif-hiding]="rdvNotifHiding">
+  <div class="rdv-notif-inner">
+    <div class="rdv-notif-icon-wrap">
+      <div class="rdv-notif-icon">✓</div>
+      <div class="rdv-notif-ring"></div>
+    </div>
+    <div class="rdv-notif-content">
+      <div class="rdv-notif-title">Séance confirmée !</div>
+      <div class="rdv-notif-detail">
+        <span class="rnd-line">📅 {{ rdvNotifData.date | date:'EEEE dd MMMM' }} à {{ rdvNotifData.heure }}</span>
+        <span class="rnd-line">👨‍⚕️ Dr {{ rdvNotifData.specialistePrenom }} {{ rdvNotifData.specialisteNom }}</span>
+        <span class="rnd-line">{{ rdvNotifData.typeSeance === 'EN_LIGNE' ? '💻 En ligne' : '🏥 Présentiel' }}</span>
+      </div>
+      <div class="rdv-notif-ia" *ngIf="rdvNotifData.messageIA">
+        <span class="rdv-ia-icon">✦</span>
+        <p>{{ rdvNotifData.messageIA }}</p>
+      </div>
+      <div class="rdv-notif-actions">
+        <button class="rdv-notif-btn primary" (click)="dismissRdvNotif()">Voir mes séances</button>
+        <button class="rdv-notif-btn ghost" (click)="dismissRdvNotif()">Fermer</button>
+      </div>
+    </div>
+    <div class="rdv-notif-progress">
+      <div class="rdv-notif-progress-fill" [style.animation-duration]="rdvNotifDuration + 'ms'"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="sc-marquee">
+  <div class="marquee-track">
+    <span>SUIVI PSYCHOLOGIQUE</span><span class="sep">◆</span>
+    <span>PRÉVISION IA RECHUTE</span><span class="sep">◆</span>
+    <span>CALENDRIER SYNCRA</span><span class="sep">◆</span>
+    <span>GROQ LLAMA 3</span><span class="sep">◆</span>
+    <span>BIEN-ÊTRE AU TRAVAIL</span><span class="sep">◆</span>
+    <span>SUIVI PSYCHOLOGIQUE</span><span class="sep">◆</span>
+    <span>PRÉVISION IA RECHUTE</span><span class="sep">◆</span>
+    <span>CALENDRIER SYNCRA</span><span class="sep">◆</span>
+    <span>GROQ LLAMA 3</span><span class="sep">◆</span>
+    <span>BIEN-ÊTRE AU TRAVAIL</span><span class="sep">◆</span>
+  </div>
+</div>
+
+</ng-container>

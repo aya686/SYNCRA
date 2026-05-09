@@ -1,0 +1,246 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- TOASTS -->
+<div class="toast-container">
+  <div *ngFor="let t of toasts" class="toast-item" [class.toast-success]="t.type==='success'" [class.toast-warning]="t.type==='warning'" [class.toast-hiding]="!t.visible">
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="dismissToast(t.id)">×</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/"><div class="brand-icon-wrap"><span class="brand-hex">⬡</span></div><span class="brand-name">SYNCRA</span></a>
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/dashboard-bienetre">Tableau de bord</a>
+      <a class="nav-link" routerLink="/mes-alertes">Mes Alertes</a>
+      <a class="nav-link active" routerLink="/seuils">Seuils & Préférences</a>
+    </div>
+    <div class="nav-actions-group">
+      <button class="btn-save-nav" (click)="sauvegarder()" [disabled]="saveLoading">
+        <span *ngIf="!saveLoading">💾 Sauvegarder</span>
+        <span *ngIf="saveLoading" class="spinner-small"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADER -->
+<div class="page-loader" *ngIf="loading"><div class="loader-inner"><span class="loader-hex">⬡</span><div class="loader-text">Chargement...</div><div class="loader-bar"><div class="loader-fill"></div></div></div></div>
+
+<ng-container *ngIf="!loading">
+
+<!-- HERO -->
+<section class="sc-hero">
+  <div class="hero-blob blob-1"></div><div class="hero-blob blob-2"></div><div class="hero-grid-overlay"></div>
+  <div class="sc-hero-inner">
+
+    <div class="hero-left">
+      <div class="hero-eyebrow"><span class="eyebrow-pulse"></span>SEUILS & PRÉFÉRENCES · PERSONNALISÉ</div>
+      <h1 class="sc-hero-title">Mes Seuils<span class="title-accent">&amp; <em>Préférences</em></span></h1>
+      <p class="sc-hero-sub">Configurez vos seuils d'alerte personnalisés et vos préférences de notification. L'IA calibre automatiquement les paramètres optimaux pour votre profil.</p>
+      <div class="hero-actions">
+        <button class="btn-save" (click)="sauvegarder()" [disabled]="saveLoading">
+          <div class="btn-bg"></div>
+          <span *ngIf="!saveLoading">💾 Sauvegarder tout</span>
+          <span *ngIf="saveLoading" class="spinner-small"></span>
+        </button>
+        <button class="btn-secondary" (click)="loadCalibrationIA()" [disabled]="calibrationLoading">↻ Recalibrer IA</button>
+      </div>
+    </div>
+
+    <!-- IA CALIBRATION CARD -->
+    <div class="hero-ia-card">
+      <div class="ia-card-header">
+        <div class="ia-icon">🎯</div>
+        <div>
+          <div class="ia-card-title">Calibrage IA des Seuils</div>
+          <div class="ia-card-sub">Groq · Analyse de votre profil stress</div>
+        </div>
+        <button class="ia-refresh-btn" (click)="loadCalibrationIA()" [disabled]="calibrationLoading">
+          <span [class.spin]="calibrationLoading">↻</span>
+        </button>
+      </div>
+
+      <div class="ia-loading" *ngIf="calibrationLoading">
+        <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+        <span>Analyse de votre profil...</span>
+      </div>
+
+      <ng-container *ngIf="!calibrationLoading && calibrationIA">
+        <div class="calibration-profil">
+          <span class="cal-profil-label">Profil détecté :</span>
+          <span class="cal-profil-val">{{ calibrationIA.profilStress }}</span>
+        </div>
+
+        <div class="calibration-message">
+          <span class="cal-msg-icon">💬</span>
+          <p>{{ calibrationIA.messageCalibrtion }}</p>
+        </div>
+
+        <div class="calibration-recs">
+          <div class="cal-rec" *ngFor="let rec of calibrationIA.seuilsRecommandes">
+            <div class="cal-rec-header">
+<span class="cal-rec-type">{{ rec.typeAlerte }}</span>
+              <div class="cal-rec-valeurs">
+                <span class="cal-actuel">{{ getSeuilByType(rec.typeAlerte)?.seuilDeclenchement || '—' }}</span>
+                <span class="cal-arrow">→</span>
+                <span class="cal-recommande" [style.color]="getSeuilColor(rec.seuilRecommande)">{{ rec.seuilRecommande }}</span>
+              </div>
+            </div>
+            <p class="cal-justification">{{ rec.justification }}</p>
+          </div>
+        </div>
+
+        <button class="btn-appliquer-ia" (click)="appliquerRecommandationsIA()">
+          ✦ Appliquer toutes les recommandations IA
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="sc-marquee">
+  <div class="marquee-track">
+    <span>CALIBRAGE IA</span><span class="sep">◆</span><span>SEUILS PERSONNALISÉS</span><span class="sep">◆</span>
+    <span>ALERTES BURNOUT</span><span class="sep">◆</span><span>PRÉFÉRENCES NOTIF</span><span class="sep">◆</span>
+    <span>CALIBRAGE IA</span><span class="sep">◆</span><span>SEUILS PERSONNALISÉS</span><span class="sep">◆</span>
+    <span>ALERTES BURNOUT</span><span class="sep">◆</span><span>PRÉFÉRENCES NOTIF</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="sc-main">
+
+  <!-- SEUILS SECTION -->
+  <div class="section-title-row">
+    <div class="section-tag-wrap">
+      <div class="section-tag">Configuration</div>
+      <h2 class="section-h2">Seuils d'<em>Alerte</em></h2>
+    </div>
+  </div>
+
+  <div class="seuils-grid">
+    <div class="seuil-card" *ngFor="let typeInfo of typesAlertes"
+         [class.seuil-inactive]="!getSeuilByType(typeInfo.key)?.actif">
+
+      <div class="seuil-card-header">
+        <div class="seuil-icon-wrap">{{ typeInfo.icon }}</div>
+        <div class="seuil-title-col">
+          <h3 class="seuil-label">{{ typeInfo.label }}</h3>
+          <p class="seuil-desc">{{ typeInfo.desc }}</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" [(ngModel)]="getSeuilByType(typeInfo.key)!.actif">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="seuil-slider-section" *ngIf="getSeuilByType(typeInfo.key)">
+        <div class="seuil-valeur-row">
+          <span class="seuil-valeur-label">Seuil actuel</span>
+          <div class="seuil-valeur-display">
+            <span class="seuil-num" [style.color]="getSeuilColor(getSeuilByType(typeInfo.key)!.seuilDeclenchement)">
+              {{ getSeuilByType(typeInfo.key)!.seuilDeclenchement }}
+            </span>
+            <span class="seuil-unit">/10</span>
+          </div>
+        </div>
+
+        <input type="range" class="seuil-range"
+               [min]="typeInfo.key === 'HEURES_EXCESSIVES' ? 35 : 1"
+               [max]="typeInfo.key === 'HEURES_EXCESSIVES' ? 70 : 10"
+               [(ngModel)]="getSeuilByType(typeInfo.key)!.seuilDeclenchement"
+               [style.--seuil-color]="getSeuilColor(getSeuilByType(typeInfo.key)!.seuilDeclenchement)">
+
+        <div class="seuil-scale">
+          <span>Faible risque</span>
+          <span>Risque élevé</span>
+        </div>
+
+        <!-- IA Recommandation -->
+        <div class="ia-rec-chip" *ngIf="getIARecommandation(typeInfo.key) !== null">
+          <span class="ia-chip-icon">✦</span>
+          <span>IA recommande : <strong>{{ getIARecommandation(typeInfo.key) }}</strong></span>
+          <button class="ia-chip-apply" (click)="getSeuilByType(typeInfo.key)!.seuilDeclenchement = getIARecommandation(typeInfo.key)!">Appliquer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRÉFÉRENCES NOTIFICATIONS -->
+  <div class="section-title-row" style="margin-top:48px">
+    <div class="section-tag-wrap">
+      <div class="section-tag">Notifications</div>
+      <h2 class="section-h2">Préférences de <em>Notification</em></h2>
+    </div>
+  </div>
+
+  <div class="preferences-grid">
+
+    <!-- CANAUX -->
+    <div class="pref-card">
+      <div class="pref-card-title">📬 Canaux de notification</div>
+      <div class="canal-options">
+        <div class="canal-option">
+          <div class="canal-info">
+            <span class="canal-icon">📧</span>
+            <div><div class="canal-label">Email</div><div class="canal-sub">Alertes importantes et résumés</div></div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" [(ngModel)]="preferences.email"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="canal-option">
+          <div class="canal-info">
+            <span class="canal-icon">🔔</span>
+            <div><div class="canal-label">In-App</div><div class="canal-sub">Notifications dans l'application</div></div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" [(ngModel)]="preferences.inApp"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="canal-option">
+          <div class="canal-info">
+            <span class="canal-icon">📱</span>
+            <div><div class="canal-label">SMS</div><div class="canal-sub">Alertes critiques uniquement</div></div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" [(ngModel)]="preferences.sms"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANAL PRÉFÉRÉ + FRÉQUENCE -->
+    <div class="pref-card">
+      <div class="pref-card-title">⚙️ Paramètres avancés</div>
+      <div class="form-group">
+        <label class="form-label">Canal préféré pour les alertes urgentes</label>
+        <div class="type-toggle">
+          <button class="type-btn" [class.type-active]="preferences.canalPrefere==='email'" (click)="preferences.canalPrefere='email'">📧 Email</button>
+          <button class="type-btn" [class.type-active]="preferences.canalPrefere==='in-app'" (click)="preferences.canalPrefere='in-app'">🔔 In-App</button>
+          <button class="type-btn" [class.type-active]="preferences.canalPrefere==='sms'" (click)="preferences.canalPrefere='sms'">📱 SMS</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fréquence du résumé hebdomadaire</label>
+        <div class="type-toggle">
+          <button class="type-btn" [class.type-active]="preferences.frequenceResume==='immediate'" (click)="preferences.frequenceResume='immediate'">Immédiat</button>
+          <button class="type-btn" [class.type-active]="preferences.frequenceResume==='quotidien'" (click)="preferences.frequenceResume='quotidien'">Quotidien</button>
+          <button class="type-btn" [class.type-active]="preferences.frequenceResume==='hebdomadaire'" (click)="preferences.frequenceResume='hebdomadaire'">Hebdo</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SAVE CTA -->
+  <div class="save-cta">
+    <button class="btn-save large" (click)="sauvegarder()" [disabled]="saveLoading">
+      <div class="btn-bg"></div>
+      <span *ngIf="!saveLoading">💾 Sauvegarder toutes les préférences</span>
+      <span *ngIf="saveLoading" class="spinner-small"></span>
+    </button>
+  </div>
+
+</main>
+
+</ng-container>

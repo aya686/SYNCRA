@@ -1,0 +1,323 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-text">SYNCRA</span>
+      <span class="brand-module">· Santé</span>
+    </a>
+    <div class="nav-links">
+      <a routerLink="/dashboard-bienetre" class="nav-link">Tableau de bord</a>
+      <a routerLink="/dossier-sante" class="nav-link active">Mon Dossier</a>
+      <a routerLink="/mes-seances" class="nav-link">Mes Séances</a>
+      <a routerLink="/mes-alertes" class="nav-link">Alertes</a>
+    </div>
+    <div class="nav-actions">
+      <div class="privacy-badge">
+        <span class="lock-icon">🔒</span>
+        <span>Dossier Confidentiel</span>
+      </div>
+      <div class="user-avatar">{{ userInitials }}</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero-dossier">
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="tag-dot"></span>
+      Dossier médical personnel
+    </div>
+    <h1 class="hero-title">
+      Mon Dossier<br>
+      <span class="gradient-text">Santé</span>
+    </h1>
+    <p class="hero-sub">Confidentiel · Sécurisé · Accessible uniquement par vous et votre spécialiste assigné</p>
+  </div>
+  <div class="hero-visual">
+    <div class="dossier-card-3d">
+      <div class="card-face">
+        <div class="card-header-vis">
+          <span class="card-icon">🏥</span>
+          <div>
+            <div class="card-name">{{ dossier?.groupeSanguin || 'A+' }}</div>
+            <div class="card-label">Groupe Sanguin</div>
+          </div>
+        </div>
+        <div class="card-stats-vis">
+          <div class="stat-vis">
+            <span class="stat-num">{{ dossier?.consultations?.length || 0 }}</span>
+            <span class="stat-lbl">Consultations</span>
+          </div>
+          <div class="stat-vis">
+            <span class="stat-num">{{ dossier?.antecedents?.length || 0 }}</span>
+            <span class="stat-lbl">Antécédents</span>
+          </div>
+          <div class="stat-vis">
+            <span class="stat-num">{{ dossier?.documentsMedicaux?.length || 0 }}</span>
+            <span class="stat-lbl">Documents</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<main class="dossier-main" *ngIf="!loading; else loadingTpl">
+
+  <!-- AI ANALYSE BANNER -->
+  <section class="ai-banner" *ngIf="aiAnalyse">
+    <div class="ai-banner-inner">
+      <div class="ai-icon-wrap">
+        <span class="ai-pulse"></span>
+        <span class="ai-icon">✦</span>
+      </div>
+      <div class="ai-text">
+        <span class="ai-label">Analyse IA · Syncra Health</span>
+        <p class="ai-content">{{ aiAnalyse }}</p>
+      </div>
+      <button class="ai-refresh-btn" (click)="loadAiAnalyse()" [disabled]="aiLoading">
+        <span *ngIf="!aiLoading">↻ Actualiser</span>
+        <span *ngIf="aiLoading" class="spinner-small"></span>
+      </button>
+    </div>
+  </section>
+  <section class="ai-banner ai-loading-banner" *ngIf="!aiAnalyse && aiLoading">
+    <div class="ai-banner-inner">
+      <div class="ai-icon-wrap">
+        <span class="ai-pulse"></span>
+        <span class="ai-icon">✦</span>
+      </div>
+      <div class="ai-text">
+        <span class="ai-label">Analyse IA en cours...</span>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRID LAYOUT -->
+  <div class="dossier-grid">
+
+    <!-- COL LEFT -->
+    <div class="col-left">
+
+      <!-- INFOS GÉNÉRALES -->
+      <div class="glass-card info-card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <span class="card-icon-sm">👤</span>
+            <h2 class="card-title">Informations Générales</h2>
+          </div>
+          <button class="edit-btn" (click)="toggleEditInfo()">
+            {{ editingInfo ? 'Annuler' : '✎ Modifier' }}
+          </button>
+        </div>
+
+        <div class="info-grid" *ngIf="!editingInfo">
+          <div class="info-item">
+            <span class="info-label">Groupe sanguin</span>
+            <span class="info-value blood-group">{{ dossier?.groupeSanguin || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Genre</span>
+            <span class="info-value">{{ dossier?.genre || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dossier créé le</span>
+            <span class="info-value">{{ dossier?.dateCreation | date:'dd MMM yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Statut</span>
+            <span class="info-value status-badge">Actif</span>
+          </div>
+        </div>
+
+        <div class="edit-form" *ngIf="editingInfo">
+          <div class="form-group">
+            <label>Groupe sanguin</label>
+            <select [(ngModel)]="editForm.groupeSanguin" class="syncra-select">
+              <option *ngFor="let g of groupesSanguins" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Genre</label>
+            <select [(ngModel)]="editForm.genre" class="syncra-select">
+              <option value="Masculin">Masculin</option>
+              <option value="Féminin">Féminin</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" (click)="saveInfo()">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANTÉCÉDENTS -->
+      <div class="glass-card antecedents-card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <span class="card-icon-sm">📋</span>
+            <h2 class="card-title">Antécédents Médicaux</h2>
+          </div>
+          <button class="add-btn" (click)="showAddAntecedent = !showAddAntecedent">+ Ajouter</button>
+        </div>
+
+        <div class="add-form" *ngIf="showAddAntecedent">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Type</label>
+              <select [(ngModel)]="newAntecedent.type" class="syncra-select">
+                <option value="ANXIETE">Anxiété</option>
+                <option value="DEPRESSION">Dépression</option>
+                <option value="STRESS">Stress</option>
+                <option value="TROUBLE_SOMMEIL">Trouble du sommeil</option>
+                <option value="BURN_OUT">Burn-out</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <input type="text" [(ngModel)]="newAntecedent.description" class="syncra-input" placeholder="Décrivez l'antécédent...">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" (click)="addAntecedent()">Ajouter</button>
+            <button class="btn-cancel" (click)="showAddAntecedent = false">Annuler</button>
+          </div>
+        </div>
+
+        <div class="antecedents-list" *ngIf="dossier?.antecedents?.length; else noAntecedents">
+          <div class="antecedent-item" *ngFor="let ant of dossier!.antecedents">
+            <div class="ant-type-badge" [ngClass]="getAntecedentClass(ant.type)">
+              {{ formatAntecedentType(ant.type) }}
+            </div>
+            <p class="ant-description">{{ ant.description }}</p>
+            <button class="delete-btn" (click)="deleteAntecedent(ant.id)">✕</button>
+          </div>
+        </div>
+        <ng-template #noAntecedents>
+          <div class="empty-state">
+            <span class="empty-icon">📭</span>
+            <p>Aucun antécédent enregistré</p>
+          </div>
+        </ng-template>
+      </div>
+
+    </div>
+
+    <!-- COL RIGHT -->
+    <div class="col-right">
+
+      <!-- CONSULTATIONS -->
+      <div class="glass-card consultations-card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <span class="card-icon-sm">🩺</span>
+            <h2 class="card-title">Consultations Passées</h2>
+          </div>
+          <span class="count-badge">{{ dossier?.consultations?.length || 0 }}</span>
+        </div>
+
+        <div class="consultations-timeline" *ngIf="dossier?.consultations?.length; else noConsultations">
+          <div class="timeline-item" *ngFor="let c of dossier!.consultations | slice:0:showAllConsultations ? 999 : 4; let i = index"
+               [class.latest]="i === 0">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="consultation-header">
+                <span class="consultation-date">{{ c.date | date:'dd MMM yyyy' }}</span>
+                <span class="consultation-time">{{ c.heure }}</span>
+              </div>
+              <p class="consultation-motif">{{ c.motif }}</p>
+              <div class="consultation-medecin" *ngIf="c.medecin">
+                <span class="medecin-avatar">{{ getMedecinInitials(c.medecin) }}</span>
+                <span class="medecin-name">Dr. {{ c.medecin.prenom }} {{ c.medecin.nom }}</span>
+                <span class="medecin-specialite">· {{ c.medecin.specialite }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="show-more-btn"
+                *ngIf="(dossier?.consultations?.length || 0) > 4"
+                (click)="showAllConsultations = !showAllConsultations">
+          {{ showAllConsultations ? '▲ Voir moins' : '▼ Voir toutes les consultations (' + dossier!.consultations.length + ')' }}
+        </button>
+
+        <ng-template #noConsultations>
+          <div class="empty-state">
+            <span class="empty-icon">🗓️</span>
+            <p>Aucune consultation enregistrée</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- DOCUMENTS MÉDICAUX -->
+      <div class="glass-card documents-card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <span class="card-icon-sm">📁</span>
+            <h2 class="card-title">Documents Médicaux</h2>
+          </div>
+          <button class="add-btn" (click)="triggerUpload()">↑ Uploader</button>
+        </div>
+
+        <!-- UPLOAD ZONE -->
+        <div class="upload-zone"
+             [class.dragging]="isDragging"
+             (dragover)="onDragOver($event)"
+             (dragleave)="isDragging = false"
+             (drop)="onDrop($event)"
+             (click)="triggerUpload()">
+          <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none" accept=".pdf,.jpg,.png,.docx">
+          <div class="upload-content" *ngIf="!uploadProgress">
+            <span class="upload-icon">⬆</span>
+            <p class="upload-text">Glissez un fichier ou <span class="upload-link">cliquez ici</span></p>
+            <p class="upload-hint">PDF, JPG, PNG, DOCX · Max 10MB</p>
+          </div>
+          <div class="upload-progress-wrap" *ngIf="uploadProgress">
+            <p class="upload-uploading">Upload en cours...</p>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+            <span class="progress-pct">{{ uploadProgress }}%</span>
+          </div>
+        </div>
+
+        <div class="documents-grid" *ngIf="dossier?.documentsMedicaux?.length; else noDocs">
+          <div class="document-item" *ngFor="let doc of dossier!.documentsMedicaux">
+            <div class="doc-icon-wrap" [ngClass]="getDocTypeClass(doc.type)">
+              <span>{{ getDocIcon(doc.type) }}</span>
+            </div>
+            <div class="doc-info">
+              <p class="doc-nom">{{ doc.nom }}</p>
+              <span class="doc-type-badge">{{ doc.type }}</span>
+            </div>
+            <div class="doc-actions">
+              <a [href]="doc.url" target="_blank" class="doc-btn-view">👁</a>
+              <button class="doc-btn-delete" (click)="deleteDocument(doc.id)">✕</button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noDocs>
+          <div class="empty-state small">
+            <span class="empty-icon">📂</span>
+            <p>Aucun document uploadé</p>
+          </div>
+        </ng-template>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<ng-template #loadingTpl>
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <p>Chargement de votre dossier...</p>
+  </div>
+</ng-template>

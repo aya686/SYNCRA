@@ -1,0 +1,357 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container">
+  <div *ngFor="let toast of toasts"
+       class="toast-item"
+       [class.toast-success]="toast.type === 'success'"
+       [class.toast-warning]="toast.type === 'warning'"
+       [class.toast-danger]="toast.type === 'danger'"
+       [class.toast-info]="toast.type === 'info'"
+       [class.toast-hiding]="!toast.visible">
+    <span class="toast-icon">{{ toast.icon }}</span>
+    <span class="toast-msg">{{ toast.message }}</span>
+    <button class="toast-close" (click)="dismissToast(toast.id)">×</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap"><span class="brand-hex">⬡</span></div>
+      <span class="brand-name">SYNCRA</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/dashboard">Tableau de bord</a>
+      <a class="nav-link" routerLink="/dossier-sante">Mon dossier</a>
+      <a class="nav-link" routerLink="/seances">Séances</a>
+      <a class="nav-link active" routerLink="/alertes">Alertes</a>
+      <a class="nav-link" routerLink="/programme">Programme</a>
+    </div>
+    <div class="nav-actions">
+      <div class="notif-badge-wrap">
+        <span class="notif-dot" *ngIf="stats.nonTraitees > 0"></span>
+        <span class="notif-count" *ngIf="stats.nonTraitees > 0">{{ stats.nonTraitees }}</span>
+        🔔
+      </div>
+      <div class="user-avatar">ME</div>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADING -->
+<div class="page-loader" *ngIf="loading">
+  <div class="loader-inner">
+    <span class="loader-hex">⬡</span>
+    <div class="loader-text">Chargement des alertes...</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+
+  <!-- HERO -->
+  <section class="ab-hero">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-grid-overlay"></div>
+    <div class="ab-hero-inner">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-pulse"></span>
+          SURVEILLANCE BURNOUT · TEMPS RÉEL
+        </div>
+        <h1 class="ab-hero-title">
+          Mes Alertes
+          <span class="title-accent">Burnout <em>& Bien-être</em></span>
+        </h1>
+        <p class="ab-hero-sub">
+          Toutes vos alertes générées automatiquement par l'analyse de vos sessions de travail.
+          Suivez, traitez et comprenez vos signaux de fatigue.
+        </p>
+        <!-- STATS BADGES -->
+        <div class="hero-stats-row">
+          <div class="stat-badge" [class.stat-badge-danger]="stats.critiques > 0">
+            <span class="sb-val">{{ stats.total }}</span>
+            <span class="sb-label">Alertes totales</span>
+          </div>
+          <div class="stat-badge stat-badge-danger" *ngIf="stats.critiques > 0">
+            <span class="sb-val">{{ stats.critiques }}</span>
+            <span class="sb-label">Critiques</span>
+          </div>
+          <div class="stat-badge stat-badge-warning">
+            <span class="sb-val">{{ stats.nonTraitees }}</span>
+            <span class="sb-label">Non traitées</span>
+          </div>
+          <div class="stat-badge stat-badge-success">
+            <span class="sb-val">{{ stats.tauxResolution }}%</span>
+            <span class="sb-label">Résolution</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- IA INSIGHT CARD -->
+      <div class="hero-ai-card">
+        <div class="ai-card-header">
+          <div class="ai-icon-wrap"><div class="ai-icon">🤖</div></div>
+          <div>
+            <div class="ai-card-title">Analyse IA — Groq Llama 3</div>
+            <div class="ai-card-sub">Synthèse intelligente de vos alertes</div>
+          </div>
+          <button class="ai-refresh-btn" (click)="loadAiInsight()" [disabled]="aiInsightLoading" title="Actualiser">
+            <span [class.spin]="aiInsightLoading">↻</span>
+          </button>
+        </div>
+        <div class="ai-card-body">
+          <div class="ai-loading" *ngIf="aiInsightLoading">
+            <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+            <span>Analyse en cours...</span>
+          </div>
+          <p class="ai-text" *ngIf="!aiInsightLoading && aiInsight">{{ aiInsight }}</p>
+          <p class="ai-placeholder" *ngIf="!aiInsightLoading && !aiInsight">En attente d'analyse...</p>
+        </div>
+        <div class="ai-card-footer">
+          <span class="ai-badge accent">⬡ Groq Llama 3</span>
+          <span class="ai-badge">🔒 100% Gratuit</span>
+          <span class="ai-badge" [class.accent]="stats.tendance === 'hausse'">
+            {{ stats.tendance === 'hausse' ? '📈 Tendance hausse' : stats.tendance === 'baisse' ? '📉 Tendance baisse' : '➡️ Stable' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTRES & RECHERCHE -->
+  <div class="ab-filters-bar">
+    <div class="ab-filters-inner">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Rechercher une alerte..."
+               [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+      </div>
+      <div class="filters-row">
+        <select class="syncra-select-sm" [(ngModel)]="filtreNiveau" (ngModelChange)="applyFilters()">
+          <option value="tous">Tous niveaux</option>
+          <option value="critique">🔴 Critique (≥8)</option>
+          <option value="eleve">🟠 Élevé (5-7)</option>
+          <option value="modere">🟢 Modéré (&lt;5)</option>
+        </select>
+        <select class="syncra-select-sm" [(ngModel)]="filtreType" (ngModelChange)="applyFilters()">
+          <option value="tous">Tous types</option>
+          <option value="CHARGE_ELEVEE">🔥 Charge élevée</option>
+          <option value="DEADLINE_STRESS">⏰ Deadline stress</option>
+          <option value="LATENCE_LONGUE">⏳ Session longue</option>
+          <option value="SURCHARGE_CONSECUTIVE">📈 Surcharge consécutive</option>
+          <option value="MANQUE_PAUSE">☕ Manque de pause</option>
+        </select>
+        <select class="syncra-select-sm" [(ngModel)]="filtreStatut" (ngModelChange)="applyFilters()">
+          <option value="tous">Tous statuts</option>
+          <option value="non_traite">⏳ Non traitées</option>
+          <option value="traite">✓ Traitées</option>
+        </select>
+        <select class="syncra-select-sm" [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+          <option value="date_desc">Date ↓</option>
+          <option value="date_asc">Date ↑</option>
+          <option value="risque_desc">Risque ↓</option>
+          <option value="risque_asc">Risque ↑</option>
+        </select>
+      </div>
+      <div class="results-count">
+        {{ alertesFiltrees.length }} alerte{{ alertesFiltrees.length > 1 ? 's' : '' }} affichée{{ alertesFiltrees.length > 1 ? 's' : '' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="ab-main">
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="alertesFiltrees.length === 0">
+      <span class="empty-icon">✅</span>
+      <h3>Aucune alerte trouvée</h3>
+      <p>Modifiez vos filtres ou profitez du calme !</p>
+    </div>
+
+    <!-- LISTE ALERTES -->
+    <div class="alertes-list" *ngIf="alertesFiltrees.length > 0">
+      <div *ngFor="let alerte of alertesFiltrees"
+           class="alerte-card"
+           [class.alerte-traitee]="alerte.traitee"
+           [class.alerte-critique]="alerte.niveauRisque >= 8 && !alerte.traitee"
+           (click)="ouvrirDetail(alerte)">
+
+        <!-- Indicateur pulsant pour critiques non traitées -->
+        <div class="alerte-pulse-ring" *ngIf="alerte.niveauRisque >= 8 && !alerte.traitee"></div>
+
+        <div class="alerte-card-inner">
+          <!-- NIVEAU GAUGE -->
+          <div class="alerte-gauge-col">
+            <div class="gauge-circle" [class]="getNiveauClass(alerte.niveauRisque)">
+              <svg viewBox="0 0 36 36" class="gauge-svg">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+               <circle cx="18" cy="18" r="15.9" fill="none"
+        stroke="white" stroke-width="3"
+        [attr.stroke-dasharray]="(alerte.niveauRisque * 10) + ', 100'"
+        stroke-linecap="round"
+        transform="rotate(-90 18 18)"/>>
+              </svg>
+              <span class="gauge-val">{{ alerte.niveauRisque }}</span>
+            </div>
+            <span class="gauge-label" [class]="getNiveauClass(alerte.niveauRisque)">{{ getNiveauLabel(alerte.niveauRisque) }}</span>
+          </div>
+
+          <!-- CONTENU -->
+          <div class="alerte-body">
+            <div class="alerte-header-row">
+              <span class="alerte-type-icon">{{ getTypeIcon(alerte.typeAlerte) }}</span>
+              <span class="alerte-type-label">{{ formatTypeAlerte(alerte.typeAlerte) }}</span>
+              <span class="alerte-time">{{ getRelativeTime(alerte.dateAlerte) }}</span>
+              <span class="alerte-status" [class.status-done]="alerte.traitee">
+                {{ alerte.traitee ? '✓ Traitée' : '⏳ En attente' }}
+              </span>
+            </div>
+
+            <p class="alerte-source" *ngIf="alerte.sourceDescription">
+              📍 {{ alerte.sourceDescription }}
+            </p>
+
+            <p class="alerte-reco" *ngIf="alerte.recommandation">
+              💡 {{ alerte.recommandation }}
+            </p>
+
+            <div class="alerte-session" *ngIf="alerte.sessionTravail">
+              <span class="session-chip">⏱ {{ alerte.sessionTravail.chargeScore }}/10 charge</span>
+              <span class="session-chip">📅 {{ formatDate(alerte.dateAlerte) }}</span>
+              <span class="session-chip" *ngIf="alerte.sessionTravail.deadlines > 0">
+                🎯 {{ alerte.sessionTravail.deadlines }} deadline{{ alerte.sessionTravail.deadlines > 1 ? 's' : '' }}
+              </span>
+              <span class="session-chip" *ngIf="alerte.sessionTravail.pausesTotales === 0">⚠️ 0 pause</span>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="alerte-actions" (click)="$event.stopPropagation()">
+            <button class="action-btn btn-traiter"
+                    *ngIf="!alerte.traitee"
+                    (click)="marquerTraitee(alerte, $event)"
+                    title="Marquer comme traitée">✓</button>
+            <button class="action-btn btn-detail"
+                    (click)="ouvrirDetail(alerte)"
+                    title="Voir le détail">→</button>
+          </div>
+        </div>
+
+        <!-- BARRE RISQUE -->
+        <div class="alerte-risk-bar">
+          <div class="risk-bar-fill" [style.width.%]="alerte.niveauRisque * 10"
+               [style.background]="getNiveauBarColor(alerte.niveauRisque)"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PANNEAU DETAIL (slide-in) -->
+  <div class="detail-overlay" *ngIf="selectedAlerte" (click)="fermerDetail()"></div>
+  <div class="detail-panel" *ngIf="selectedAlerte">
+    <div class="detail-header">
+      <div class="detail-title-row">
+        <span class="detail-icon">{{ getTypeIcon(selectedAlerte.typeAlerte) }}</span>
+        <div>
+          <h2 class="detail-title">{{ formatTypeAlerte(selectedAlerte.typeAlerte) }}</h2>
+          <p class="detail-sub">{{ formatDate(selectedAlerte.dateAlerte) }} à {{ formatHeure(selectedAlerte.dateAlerte) }}</p>
+        </div>
+        <button class="detail-close" (click)="fermerDetail()">×</button>
+      </div>
+      <!-- NIVEAU VISUEL -->
+      <div class="detail-niveau-wrap" [class]="getNiveauClass(selectedAlerte.niveauRisque)">
+        <div class="detail-niveau-label">Niveau de risque</div>
+        <div class="detail-niveau-val">{{ selectedAlerte.niveauRisque }}<span>/10</span></div>
+        <div class="detail-niveau-bar">
+          <div class="detail-niveau-fill" [style.width.%]="selectedAlerte.niveauRisque * 10"></div>
+        </div>
+        <div class="detail-niveau-badge">{{ getNiveauLabel(selectedAlerte.niveauRisque) }}</div>
+      </div>
+    </div>
+
+    <div class="detail-body">
+
+      <!-- SOURCE -->
+      <div class="detail-section" *ngIf="selectedAlerte.sourceDescription">
+        <h3 class="detail-section-title">📍 Source de l'alerte</h3>
+        <p class="detail-section-text">{{ selectedAlerte.sourceDescription }}</p>
+      </div>
+
+      <!-- SESSION -->
+      <div class="detail-section" *ngIf="selectedAlerte.sessionTravail">
+        <h3 class="detail-section-title">⏱ Session de travail associée</h3>
+        <div class="session-detail-grid">
+          <div class="session-stat">
+            <span class="ss-label">Score charge</span>
+            <span class="ss-val">{{ selectedAlerte.sessionTravail!.chargeScore }}/10</span>
+          </div>
+          <div class="session-stat">
+            <span class="ss-label">Deadlines</span>
+            <span class="ss-val">{{ selectedAlerte.sessionTravail!.deadlines }}</span>
+          </div>
+          <div class="session-stat">
+            <span class="ss-label">Pauses</span>
+            <span class="ss-val" [class.text-danger]="selectedAlerte.sessionTravail!.pausesTotales === 0">
+              {{ selectedAlerte.sessionTravail!.pausesTotales }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECOMMANDATION -->
+      <div class="detail-section" *ngIf="selectedAlerte.recommandation">
+        <h3 class="detail-section-title">💡 Recommandation</h3>
+        <div class="reco-box">{{ selectedAlerte.recommandation }}</div>
+      </div>
+
+      <!-- IA ANALYSE DÉTAILLÉE -->
+      <div class="detail-section">
+        <h3 class="detail-section-title">🤖 Analyse IA personnalisée</h3>
+        <div class="ai-detail-box">
+          <div class="ai-loading" *ngIf="aiDetailLoading">
+            <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+            <span>Analyse Groq en cours...</span>
+          </div>
+          <p class="ai-detail-text" *ngIf="!aiDetailLoading && aiDetailAnalyse">{{ aiDetailAnalyse }}</p>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="detail-actions">
+        <button class="btn-save" *ngIf="!selectedAlerte.traitee"
+                (click)="marquerTraitee(selectedAlerte, $event); fermerDetail()">
+          <div class="btn-bg"></div>✓ Marquer comme traitée
+        </button>
+        <a class="btn-secondary" routerLink="/seances" (click)="fermerDetail()">
+          📅 Planifier une séance
+        </a>
+        <a class="btn-secondary" routerLink="/programme" (click)="fermerDetail()">
+          🏃 Voir mon programme
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="ab-marquee">
+    <div class="marquee-track">
+      <span>SYNCRA BURNOUT MONITOR</span><span class="sep">◆</span>
+      <span>ANALYSE IA EN TEMPS RÉEL</span><span class="sep">◆</span>
+      <span>GROQ LLAMA 3</span><span class="sep">◆</span>
+      <span>PROTECTION BIEN-ÊTRE</span><span class="sep">◆</span>
+      <span>ALERTES INTELLIGENTES</span><span class="sep">◆</span>
+      <span>SYNCRA BURNOUT MONITOR</span><span class="sep">◆</span>
+      <span>ANALYSE IA EN TEMPS RÉEL</span><span class="sep">◆</span>
+      <span>GROQ LLAMA 3</span><span class="sep">◆</span>
+      <span>PROTECTION BIEN-ÊTRE</span><span class="sep">◆</span>
+      <span>ALERTES INTELLIGENTES</span><span class="sep">◆</span>
+    </div>
+  </div>
+
+</ng-container>

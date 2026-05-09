@@ -1,0 +1,234 @@
+<!-- TOAST -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999" *ngIf="showToast">
+  <div class="toast show border-0" [class.bg-success]="toastType==='success'" [class.text-white]="toastType==='success'||toastType==='danger'" [class.bg-danger]="toastType==='danger'">
+    <div class="d-flex"><div class="toast-body fw-semibold">{{ toastMsg }}</div><button class="btn-close me-2 m-auto" (click)="showToast=false"></button></div>
+  </div>
+</div>
+
+<div class="row">
+
+  <!-- STATS -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-primary"><i class="ti ti-bell text-primary f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.total }}</h3><p class="mb-0 text-muted f-13">Total alertes</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-danger"><i class="ti ti-alert-triangle text-danger f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.critiques }}</h3><p class="mb-0 text-muted f-13">Critiques</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-warning"><i class="ti ti-clock text-warning f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.nonTraitees }}</h3><p class="mb-0 text-muted f-13">Non traitées</p></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card"><div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar bg-light-info"><i class="ti ti-user-x text-info f-20"></i></div>
+        <div><h3 class="mb-0 f-w-600">{{ stats.sansSpecialiste }}</h3><p class="mb-0 text-muted f-13">Sans spécialiste</p></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- GRAPHIQUE ÉVOLUTION RISQUE GLOBAL -->
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-header"><h5 class="mb-0">Évolution du risque global — 7 jours</h5></div>
+      <div class="card-body">
+        <div class="d-flex align-items-end gap-2" style="height:130px">
+          <div *ngFor="let e of evolutionRisque" class="d-flex flex-column align-items-center gap-1 flex-grow-1">
+            <span class="f-11 text-muted">{{ e.score }}</span>
+            <div class="w-100 rounded-top"
+                 [style.height.px]="(e.score / getMaxScore()) * 110"
+                 [class.bg-danger]="e.score >= 70"
+                 [class.bg-warning]="e.score >= 50 && e.score < 70"
+                 [class.bg-success]="e.score < 50">
+            </div>
+            <span class="f-11 text-muted">{{ e.jour }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIORITÉS URGENTES -->
+  <div class="col-xl-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Urgences</h5>
+        <span class="badge bg-light-danger text-danger">{{ stats.nonTraitees }} en attente</span>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" *ngFor="let a of alertesFiltrees.slice(0,4)" [class.bg-light-danger]="a.niveauRisque >= 8 && !a.traitee">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-xs" [class.bg-danger]="a.niveauRisque >= 8" [class.bg-warning]="a.niveauRisque < 8">
+                <span class="text-white f-10 fw-bold">{{ a.niveauRisque }}</span>
+              </div>
+              <div class="flex-grow-1">
+                <div class="f-12 fw-semibold">{{ a.utilisateurPrenom }} {{ a.utilisateurNom }}</div>
+                <div class="f-11 text-muted">{{ getTypeLabel(a.typeAlerte) }}</div>
+              </div>
+              <button class="btn btn-sm btn-light-primary" *ngIf="!a.traitee" (click)="ouvrirAssigner(a)" title="Assigner">
+                <i class="ti ti-user-plus f-11"></i>
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE PRINCIPALE -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center g-2">
+          <div class="col"><h5 class="mb-0">Toutes les alertes</h5></div>
+          <div class="col-auto">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="ti ti-search"></i></span>
+              <input type="text" class="form-control" placeholder="Rechercher..." style="width:160px" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreNiveau" (ngModelChange)="applyFilters()" style="width:140px">
+              <option value="tous">Tous niveaux</option>
+              <option value="critique">🔴 Critique</option>
+              <option value="eleve">🟠 Élevé</option>
+              <option value="modere">🟢 Modéré</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreType" (ngModelChange)="applyFilters()" style="width:170px">
+              <option value="tous">Tous types</option>
+              <option *ngFor="let t of typesAlertes" [value]="t.value">{{ t.label }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreStatut" (ngModelChange)="applyFilters()" style="width:140px">
+              <option value="tous">Tous statuts</option>
+              <option value="non_traitee">Non traitées</option>
+              <option value="traitee">Traitées</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="f-12 text-muted fw-semibold">UTILISATEUR</th>
+                <th class="f-12 text-muted fw-semibold">TYPE</th>
+                <th class="f-12 text-muted fw-semibold">RISQUE</th>
+                <th class="f-12 text-muted fw-semibold">DATE</th>
+                <th class="f-12 text-muted fw-semibold">SOURCE</th>
+                <th class="f-12 text-muted fw-semibold">SPÉCIALISTE</th>
+                <th class="f-12 text-muted fw-semibold">STATUT</th>
+                <th class="f-12 text-muted fw-semibold">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of alertesFiltrees" [class.table-danger]="a.niveauRisque >= 8 && !a.traitee" [class.opacity-60]="a.traitee">
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar avatar-sm" [class.bg-light-danger]="a.niveauRisque >= 8" [class.bg-light-warning]="a.niveauRisque < 8">
+                      <span class="f-11 fw-bold" [class.text-danger]="a.niveauRisque >= 8" [class.text-warning]="a.niveauRisque < 8">{{ getInitiales(a) }}</span>
+                    </div>
+                    <div><div class="f-13 fw-semibold">{{ a.utilisateurPrenom }} {{ a.utilisateurNom }}</div><div class="f-11 text-muted">{{ a.utilisateurEmail }}</div></div>
+                  </div>
+                </td>
+                <td>
+                  <span class="d-flex align-items-center gap-1">
+                    <i [class]="getTypeIcon(a.typeAlerte) + ' ' + getTypeColor(a.typeAlerte)"></i>
+                    <span class="f-12">{{ getTypeLabel(a.typeAlerte) }}</span>
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span [class]="getNiveauClass(a.niveauRisque)">{{ a.niveauRisque }}/10</span>
+                    <div class="progress flex-grow-1" style="height:4px;min-width:40px">
+                      <div class="progress-bar" [style.width.%]="a.niveauRisque * 10" [class.bg-danger]="a.niveauRisque >= 8" [class.bg-warning]="a.niveauRisque >= 5 && a.niveauRisque < 8" [class.bg-success]="a.niveauRisque < 5"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="f-12 text-muted">{{ formatDate(a.dateAlerte) }}</td>
+                <td class="f-12 text-muted" style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ a.sourceDescription }}</td>
+                <td>
+                  <span class="f-12" *ngIf="a.specialisteAssigne" class="text-success"><i class="ti ti-check me-1"></i>{{ a.specialisteAssigne }}</span>
+                  <span class="badge bg-light-secondary text-secondary" *ngIf="!a.specialisteAssigne">Non assigné</span>
+                </td>
+                <td>
+                  <span class="badge" [class.bg-light-success]="a.traitee" [class.text-success]="a.traitee" [class.bg-light-danger]="!a.traitee" [class.text-danger]="!a.traitee">
+                    {{ a.traitee ? '✓ Traitée' : '⏳ En attente' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-light-primary" title="Assigner spécialiste" *ngIf="!a.traitee" (click)="ouvrirAssigner(a)"><i class="ti ti-user-plus"></i></button>
+                    <button class="btn btn-sm btn-light-success" title="Marquer traitée" *ngIf="!a.traitee" (click)="marquerTraitee(a)"><i class="ti ti-check"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center py-4" *ngIf="alertesFiltrees.length === 0">
+            <i class="ti ti-bell-off f-36 text-muted opacity-25 d-block mb-2"></i>
+            <p class="text-muted f-13 mb-0">Aucune alerte trouvée</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ASSIGNER -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showAssignerModal" style="background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" *ngIf="alerteSelectionnee">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ti ti-user-plus me-2 text-primary"></i>Assigner un spécialiste</h5>
+        <button class="btn-close" (click)="showAssignerModal=false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert border-0 mb-3" [class.alert-danger]="alerteSelectionnee.niveauRisque >= 8" [class.alert-warning]="alerteSelectionnee.niveauRisque < 8">
+          <strong>{{ alerteSelectionnee.utilisateurPrenom }} {{ alerteSelectionnee.utilisateurNom }}</strong> · Risque {{ alerteSelectionnee.niveauRisque }}/10 · {{ getTypeLabel(alerteSelectionnee.typeAlerte) }}
+        </div>
+        <label class="form-label fw-semibold f-13">Choisir un spécialiste *</label>
+        <div class="d-flex flex-column gap-2">
+          <div *ngFor="let s of specialistes"
+               class="p-3 rounded border cursor-pointer"
+               [class.border-primary]="specialisteChoisi === s.id"
+               [class.bg-light-primary]="specialisteChoisi === s.id"
+               (click)="specialisteChoisi = s.id"
+               style="cursor:pointer">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm bg-light-primary"><span class="text-primary f-11 fw-bold">{{ s.prenom[0] }}{{ s.nom[0] }}</span></div>
+              <div><div class="f-13 fw-semibold">Dr {{ s.prenom }} {{ s.nom }}</div><div class="f-11 text-muted">{{ s.specialite }}</div></div>
+              <i class="ti ti-check ms-auto text-primary f-16" *ngIf="specialisteChoisi === s.id"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="showAssignerModal=false">Annuler</button>
+        <button class="btn btn-primary" (click)="confirmerAssignation()" [disabled]="!specialisteChoisi || assigning">
+          <span *ngIf="assigning" class="spinner-border spinner-border-sm me-1"></span>
+          Assigner et créer une séance
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

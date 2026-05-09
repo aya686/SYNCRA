@@ -1,0 +1,318 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- TOASTS -->
+<div class="toast-container">
+  <div *ngFor="let t of toasts" class="toast-item"
+       [class.toast-success]="t.type==='success'"
+       [class.toast-warning]="t.type==='warning'"
+       [class.toast-danger]="t.type==='danger'"
+       [class.toast-hiding]="!t.visible">
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="dismissToast(t.id)">×</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap"><span class="brand-hex">⬡</span></div>
+      <span class="brand-name">SYNCRA</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/dashboard-bienetre">Tableau de bord</a>
+      <a class="nav-link" routerLink="/dossier-sante">Mon dossier</a>
+      <a class="nav-link" routerLink="/mes-seances">Séances</a>
+      <a class="nav-link" routerLink="/mon-programme">Programme</a>
+      <a class="nav-link active" routerLink="/bibliotheque">Bibliothèque</a>
+    </div>
+    <div class="nav-actions-group">
+      <div class="nav-count-badge">
+        <span class="nc-icon">📚</span>
+        <span class="nc-val">{{ totalRessources }}</span>
+        <span class="nc-label">ressources</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADER -->
+<div class="page-loader" *ngIf="loading">
+  <div class="loader-inner">
+    <span class="loader-hex">⬡</span>
+    <div class="loader-text">Chargement de la bibliothèque...</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+
+<!-- HERO -->
+<section class="sc-hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-blob blob-3"></div>
+  <div class="hero-grid-overlay"></div>
+
+  <div class="sc-hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-pulse"></span>
+        BIBLIOTHÈQUE BIEN-ÊTRE · {{ totalRessources }} RESSOURCES
+      </div>
+      <h1 class="sc-hero-title">
+        Explorez votre
+        <span class="title-accent">Bibliothèque <em>Bien-être</em></span>
+      </h1>
+      <p class="sc-hero-sub">
+        Catalogue complet de ressources bien-être — exercices, articles, vidéos, méditations.
+        Filtrez, découvrez, et ajoutez directement à votre programme personnalisé.
+      </p>
+
+      <!-- STATS PILLS -->
+      <div class="hero-stats-row">
+        <div class="stat-pill">
+          <span class="sp-icon">💪</span>
+          <div>
+            <span class="sp-val">{{ getCountByType('exercice') }}</span>
+            <span class="sp-label">Exercices</span>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">📖</span>
+          <div>
+            <span class="sp-val">{{ getCountByType('article') }}</span>
+            <span class="sp-label">Articles</span>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">🧘</span>
+          <div>
+            <span class="sp-val">{{ getCountByType('meditation') }}</span>
+            <span class="sp-label">Méditations</span>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">🎬</span>
+          <div>
+            <span class="sp-val">{{ getCountByType('video') }}</span>
+            <span class="sp-label">Vidéos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO RIGHT : aperçu featured -->
+    <div class="hero-featured-card">
+      <div class="featured-badge">✦ Ressource populaire</div>
+      <div class="featured-icon-wrap">🧘</div>
+      <h3 class="featured-title">Cohérence Cardiaque 5-5</h3>
+      <p class="featured-desc">Technique de régulation cardiaque par la respiration synchronisée. Pratiquée 3×/jour, réduit significativement l'anxiété.</p>
+      <div class="featured-meta-row">
+        <span class="feat-tag gratuit">✓ Gratuit</span>
+        <span class="feat-tag niveau">🟢 Débutant</span>
+        <span class="feat-views">👁 8 901 vues</span>
+      </div>
+      <div class="featured-bar-wrap">
+        <div class="featured-bar-label">Popularité</div>
+        <div class="featured-bar-track"><div class="featured-bar-fill" style="width:91%"></div></div>
+        <span class="featured-bar-pct">91%</span>
+      </div>
+      <button class="btn-featured-add" (click)="ajouterFeatured()">
+        <span>+ Ajouter à mon programme</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="sc-marquee">
+  <div class="marquee-track">
+    <span>BIBLIOTHÈQUE BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>EXERCICES GUIDÉS</span><span class="sep">◆</span>
+    <span>ARTICLES SANTÉ</span><span class="sep">◆</span>
+    <span>MÉDITATIONS</span><span class="sep">◆</span>
+    <span>VIDÉOS BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>RESSOURCES GRATUITES</span><span class="sep">◆</span>
+    <span>PROGRAMME PERSONNALISÉ</span><span class="sep">◆</span>
+    <span>BIBLIOTHÈQUE BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>EXERCICES GUIDÉS</span><span class="sep">◆</span>
+    <span>ARTICLES SANTÉ</span><span class="sep">◆</span>
+    <span>MÉDITATIONS</span><span class="sep">◆</span>
+    <span>VIDÉOS BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>RESSOURCES GRATUITES</span><span class="sep">◆</span>
+    <span>PROGRAMME PERSONNALISÉ</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="sc-main">
+
+  <!-- BARRE DE RECHERCHE + FILTRES -->
+  <div class="filters-section">
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Rechercher une ressource, un thème, un auteur..."
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()" />
+      <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery=''; applyFilters()">×</button>
+    </div>
+
+    <!-- TYPE TABS -->
+    <div class="type-tabs">
+      <button class="type-tab" [class.active]="filtreType==='tous'" (click)="setType('tous')">
+        <span>✨</span> Tous <span class="tab-count">{{ totalRessources }}</span>
+      </button>
+      <button class="type-tab" [class.active]="filtreType==='exercice'" (click)="setType('exercice')">
+        <span>💪</span> Exercices <span class="tab-count">{{ getCountByType('exercice') }}</span>
+      </button>
+      <button class="type-tab" [class.active]="filtreType==='article'" (click)="setType('article')">
+        <span>📖</span> Articles <span class="tab-count">{{ getCountByType('article') }}</span>
+      </button>
+      <button class="type-tab" [class.active]="filtreType==='meditation'" (click)="setType('meditation')">
+        <span>🧘</span> Méditations <span class="tab-count">{{ getCountByType('meditation') }}</span>
+      </button>
+      <button class="type-tab" [class.active]="filtreType==='video'" (click)="setType('video')">
+        <span>🎬</span> Vidéos <span class="tab-count">{{ getCountByType('video') }}</span>
+      </button>
+    </div>
+
+    <!-- FILTRES AVANCÉS -->
+    <div class="advanced-filters">
+      <div class="filter-group">
+        <label class="filter-label">Niveau</label>
+        <select class="filter-select" [(ngModel)]="filtreNiveau" (change)="applyFilters()">
+          <option value="tous">Tous niveaux</option>
+          <option value="debutant">🟢 Débutant</option>
+          <option value="intermediaire">🟡 Intermédiaire</option>
+          <option value="avance">🔴 Avancé</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Accès</label>
+        <select class="filter-select" [(ngModel)]="filtreAcces" (change)="applyFilters()">
+          <option value="tous">Tout accès</option>
+          <option value="gratuit">✓ Gratuit</option>
+          <option value="premium">⭐ Premium</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Trier par</label>
+        <select class="filter-select" [(ngModel)]="sortBy" (change)="applyFilters()">
+          <option value="recent">Plus récents</option>
+          <option value="niveau">Niveau</option>
+          <option value="type">Type</option>
+        </select>
+      </div>
+      <div class="filter-results-count">
+        <span class="rc-num">{{ ressourcesFiltrees.length }}</span>
+        <span class="rc-label">résultat{{ ressourcesFiltrees.length > 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION TITRE -->
+  <div class="section-title-row">
+    <div class="section-tag-wrap">
+      <div class="section-tag">{{ filtreType === 'tous' ? 'Catalogue complet' : getTypeLabel(filtreType) }}</div>
+      <h2 class="section-h2">
+        <ng-container *ngIf="filtreType==='tous'">Toutes les <em>Ressources</em></ng-container>
+        <ng-container *ngIf="filtreType==='exercice'">Exercices <em>Guidés</em></ng-container>
+        <ng-container *ngIf="filtreType==='article'">Articles <em>Santé</em></ng-container>
+        <ng-container *ngIf="filtreType==='meditation'">Méditations <em>Guidées</em></ng-container>
+        <ng-container *ngIf="filtreType==='video'">Vidéos <em>Bien-être</em></ng-container>
+      </h2>
+    </div>
+    <div class="sort-info" *ngIf="searchQuery">
+      <span>Résultats pour : </span><strong>"{{ searchQuery }}"</strong>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="ressourcesFiltrees.length === 0">
+    <span class="empty-icon">🔍</span>
+    <h3>Aucune ressource trouvée</h3>
+    <p>Essayez de modifier vos filtres ou votre recherche.</p>
+    <button class="btn-save" (click)="resetFilters()">
+      <div class="btn-bg"></div>
+      ↺ Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- GRILLE RESSOURCES -->
+  <div class="ressources-grid" *ngIf="ressourcesFiltrees.length > 0">
+    <div
+      class="ressource-card"
+      *ngFor="let r of ressourcesFiltrees"
+      [class.card-added]="r.ajouteProgramme"
+      (click)="voirRessource(r)">
+
+      <!-- BADGE PREMIUM -->
+      <div class="card-premium-badge" *ngIf="!r.gratuit">⭐ Premium</div>
+      <div class="card-added-badge" *ngIf="r.ajouteProgramme">✓ Ajouté</div>
+
+      <!-- HEADER -->
+      <div class="rc-header">
+        <div class="rc-icon-wrap" [class]="'icon-' + r.type">
+          {{ getTypeIcon(r.type) }}
+        </div>
+        <div class="rc-header-meta">
+          <span class="rc-type-label">{{ getTypeLabel(r.type) }}</span>
+          <span class="rc-niveau" [class]="'niveau-' + r.niveau">{{ getNiveauLabel(r.niveau) }}</span>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <h3 class="rc-titre">{{ r.titre }}</h3>
+      <p class="rc-desc">{{ r.description | slice:0:110 }}{{ r.description.length > 110 ? '...' : '' }}</p>
+
+      <!-- META ROW -->
+      <div class="rc-meta-row">
+        <span class="rc-duree" *ngIf="r.dureeEstimee">
+          ⏱ {{ r.dureeEstimee }} min
+        </span>
+        <span class="rc-vues" *ngIf="r.vues">
+          👁 {{ r.vues | number }}
+        </span>
+        <span class="rc-gratuit" [class.rc-gratuit-yes]="r.gratuit" [class.rc-gratuit-no]="!r.gratuit">
+          {{ r.gratuit ? '✓ Gratuit' : '⭐ Premium' }}
+        </span>
+      </div>
+
+      <!-- POPULARITE BAR -->
+      <div class="rc-popularity" *ngIf="r.vues">
+        <div class="pop-bar-track">
+          <div class="pop-bar-fill" [style.width.%]="getPopularityPct(r.vues)"></div>
+        </div>
+      </div>
+
+      <!-- FOOTER ACTIONS -->
+      <div class="rc-footer" (click)="$event.stopPropagation()">
+        <button
+          class="btn-ajouter"
+          [class.btn-added]="r.ajouteProgramme"
+          [disabled]="r.ajouteProgramme"
+          (click)="ajouterAuProgramme(r, $event)">
+          <span *ngIf="!r.ajouteProgramme">+ Ajouter au programme</span>
+          <span *ngIf="r.ajouteProgramme">✓ Dans mon programme</span>
+        </button>
+        <button class="btn-voir" (click)="voirRessource(r)">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOAD MORE -->
+  <div class="load-more-section" *ngIf="ressourcesFiltrees.length > 0">
+    <div class="load-more-line"></div>
+    <span class="load-more-text">{{ ressourcesFiltrees.length }} ressource{{ ressourcesFiltrees.length > 1 ? 's' : '' }} affichée{{ ressourcesFiltrees.length > 1 ? 's' : '' }}</span>
+    <div class="load-more-line"></div>
+  </div>
+
+</main>
+
+</ng-container>

@@ -1,0 +1,269 @@
+<canvas class="particle-canvas" #particleCanvas></canvas>
+<div class="cursor-glow" #cursorGlow></div>
+
+<!-- TOASTS -->
+<div class="toast-container">
+  <div *ngFor="let t of toasts" class="toast-item"
+       [class.toast-success]="t.type==='success'" [class.toast-warning]="t.type==='warning'"
+       [class.toast-danger]="t.type==='danger'" [class.toast-hiding]="!t.visible">
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="dismissToast(t.id)">×</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="syncra-nav" [class.scrolled]="navScrolled">
+  <div class="nav-container">
+    <a class="brand" routerLink="/">
+      <div class="brand-icon-wrap"><span class="brand-hex">⬡</span></div>
+      <span class="brand-name">SYNCRA</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/dashboard-bienetre">Tableau de bord</a>
+      <a class="nav-link" routerLink="/dossier-sante">Mon dossier</a>
+      <a class="nav-link" routerLink="/mes-seances">Séances</a>
+      <a class="nav-link active" routerLink="/mon-programme">Programme</a>
+      <a class="nav-link" routerLink="/bibliotheque">Bibliothèque</a>
+    </div>
+    <div class="nav-actions-group">
+      <button class="btn-planifier-nav" (click)="regenererProgramme()">✦ Régénérer IA</button>
+    </div>
+  </div>
+</nav>
+
+<!-- LOADER -->
+<div class="page-loader" *ngIf="loading">
+  <div class="loader-inner">
+    <span class="loader-hex">⬡</span>
+    <div class="loader-text">Chargement de votre programme...</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+
+<!-- HERO -->
+<section class="sc-hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-grid-overlay"></div>
+  <div class="sc-hero-inner">
+
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-pulse"></span>
+        PROGRAMME BIEN-ÊTRE · PERSONNALISÉ
+      </div>
+      <h1 class="sc-hero-title">
+        Mon Programme
+        <span class="title-accent">Bien-être <em>IA</em></span>
+      </h1>
+      <p class="sc-hero-sub">Programme personnalisé généré automatiquement suite à vos alertes burnout. Adapté en temps réel par l'intelligence artificielle.</p>
+
+      <div class="hero-stats-row" *ngIf="programme">
+        <div class="stat-pill">
+          <span class="sp-icon">🎯</span>
+          <div><span class="sp-val">{{ programme.progression || 0 }}%</span><span class="sp-label">Progression</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">📅</span>
+          <div><span class="sp-val">{{ programme.dureeSemaines }}</span><span class="sp-label">Semaines</span></div>
+        </div>
+        <div class="stat-pill">
+          <span class="sp-icon">✓</span>
+          <div><span class="sp-val">{{ exercicesEffectues }}/{{ totalExercices }}</span><span class="sp-label">Exercices</span></div>
+        </div>
+      </div>
+
+      <!-- PROGRESSION GLOBALE -->
+      <div class="progression-card" *ngIf="programme">
+        <div class="prog-header">
+          <span class="prog-label">Progression globale</span>
+          <span class="prog-pct">{{ programme.progression || 0 }}%</span>
+        </div>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-fill" [style.width.%]="programme.progression || 0"></div>
+        </div>
+        <div class="prog-meta">{{ programme.nom }} · {{ programme.dureeSemaines }} semaines</div>
+      </div>
+    </div>
+
+    <!-- IA COACH CARD -->
+    <div class="hero-ia-card">
+      <div class="ia-card-header">
+        <div class="ia-icon">🧬</div>
+        <div>
+          <div class="ia-card-title">Coach IA Bien-être</div>
+          <div class="ia-card-sub">Groq · Llama 3.3-70b · Analyse en temps réel</div>
+        </div>
+        <button class="ia-refresh-btn" (click)="loadCoachIA()" [disabled]="coachLoading">
+          <span [class.spin]="coachLoading">↻</span>
+        </button>
+      </div>
+
+      <div class="ia-loading" *ngIf="coachLoading">
+        <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+        <span>Analyse de votre progression...</span>
+      </div>
+
+      <ng-container *ngIf="!coachLoading && coachIA">
+        <!-- SCORE BIEN-ÊTRE -->
+        <div class="score-bienetre-wrap">
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100" class="score-svg">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#e8f0f9" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none"
+                      [attr.stroke]="getScoreColor(coachIA.scoreBienetre)"
+                      stroke-width="8" stroke-linecap="round"
+                      [attr.stroke-dasharray]="(coachIA.scoreBienetre / 100) * 263.9 + ' 263.9'"
+                      stroke-dashoffset="65.97" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="score-center">
+              <span class="score-num" [style.color]="getScoreColor(coachIA.scoreBienetre)">{{ coachIA.scoreBienetre }}</span>
+              <span class="score-sub">/ 100</span>
+            </div>
+          </div>
+          <div class="score-meta">
+            <span class="score-label">Score Bien-être</span>
+            <span class="score-badge" [style.background]="getScoreColor(coachIA.scoreBienetre) + '18'" [style.color]="getScoreColor(coachIA.scoreBienetre)">{{ getScoreLabel(coachIA.scoreBienetre) }}</span>
+            <span class="score-tendance">{{ coachIA.tendance === 'progression' ? '📈 En progression' : coachIA.tendance === 'stagnation' ? '➡️ Stable' : '📉 À améliorer' }}</span>
+          </div>
+        </div>
+
+        <div class="ia-message-box">
+          <span class="ia-msg-icon">💬</span>
+          <p>{{ coachIA.messageCoach }}</p>
+        </div>
+
+        <div class="ia-tips">
+          <div class="ia-tip" *ngFor="let tip of coachIA.conseilsJour">
+            <span class="tip-icon">✦</span>
+            <span>{{ tip }}</span>
+          </div>
+        </div>
+
+        <div class="ia-prochaine">
+          <span class="ia-prochaine-label">💡 Focus du jour :</span>
+          <span class="ia-prochaine-val">{{ coachIA.focusDuJour }}</span>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="sc-marquee">
+  <div class="marquee-track">
+    <span>PROGRAMME BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>COACH IA GROQ</span><span class="sep">◆</span>
+    <span>EXERCICES PERSONNALISÉS</span><span class="sep">◆</span>
+    <span>ARTICLES SANTÉ</span><span class="sep">◆</span>
+    <span>SUIVI EN TEMPS RÉEL</span><span class="sep">◆</span>
+    <span>PROGRAMME BIEN-ÊTRE</span><span class="sep">◆</span>
+    <span>COACH IA GROQ</span><span class="sep">◆</span>
+    <span>EXERCICES PERSONNALISÉS</span><span class="sep">◆</span>
+    <span>ARTICLES SANTÉ</span><span class="sep">◆</span>
+    <span>SUIVI EN TEMPS RÉEL</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="sc-main">
+
+  <!-- AUCUN PROGRAMME -->
+  <div class="empty-state" *ngIf="!programme">
+    <span class="empty-icon">🌱</span>
+    <h3>Aucun programme actif</h3>
+    <p>Votre programme bien-être est généré automatiquement après une alerte critique.</p>
+    <button class="btn-save" (click)="creerProgrammeDemo()"><div class="btn-bg"></div>✦ Générer un programme IA</button>
+  </div>
+
+  <ng-container *ngIf="programme">
+
+    <!-- OBJECTIF CARD -->
+    <div class="objectif-card">
+      <div class="objectif-icon">🎯</div>
+      <div class="objectif-content">
+        <span class="objectif-label">Objectif du programme</span>
+        <p class="objectif-text">{{ programme.objectif }}</p>
+      </div>
+      <div class="objectif-status">
+        <span class="status-badge" [class.active]="programme.actif">{{ programme.actif ? '● Actif' : '○ Terminé' }}</span>
+      </div>
+    </div>
+
+    <!-- EXERCICES SECTION -->
+    <div class="section-title-row">
+      <div class="section-tag-wrap">
+        <div class="section-tag">Exercices</div>
+        <h2 class="section-h2">Mes Exercices <em>Hebdomadaires</em></h2>
+      </div>
+      <span class="section-count">{{ exercicesEffectues }}/{{ totalExercices }} effectués</span>
+    </div>
+
+    <div class="exercices-grid">
+      <div class="exercice-card"
+           *ngFor="let ex of exercices; let i = index"
+           [class.exercice-done]="ex.effectue"
+           [class.exercice-focus]="coachIA?.focusDuJour?.toLowerCase().includes(ex.nom?.toLowerCase() || '')">
+
+        <div class="ex-done-overlay" *ngIf="ex.effectue">
+          <span class="done-check">✓</span>
+        </div>
+
+        <div class="ex-header">
+          <div class="ex-icon-wrap" [style.background]="getExerciceColor(ex.nom, 0.12)" [style.color]="getExerciceColor(ex.nom, 1)">
+            {{ getExerciceIcon(ex.nom) }}
+          </div>
+          <div class="ex-title-col">
+            <h3 class="ex-nom">{{ ex.nom }}</h3>
+            <span class="ex-frequence">🔁 {{ ex.frequence }}</span>
+          </div>
+          <span class="ex-duree">⏱ {{ ex.dureeMinutes }} min</span>
+        </div>
+
+        <p class="ex-instructions">{{ ex.instructions }}</p>
+
+        <div class="ex-footer">
+          <button class="btn-effectuer"
+                  [class.btn-done]="ex.effectue"
+                  (click)="marquerExercice(ex)">
+            <span *ngIf="!ex.effectue">▶ Marquer effectué</span>
+            <span *ngIf="ex.effectue">✓ Effectué aujourd'hui</span>
+          </button>
+          <a [routerLink]="['/ressource', ex.ressourceBienetreId]" class="ex-btn-detail" *ngIf="ex.ressourceBienetreId">→</a>
+        </div>
+
+        <div class="ex-ia-tip" *ngIf="coachIA?.focusDuJour?.toLowerCase().includes(ex.nom?.toLowerCase() || '')">
+          <span>✦ Focus IA du jour</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARTICLES SECTION -->
+    <div class="section-title-row" style="margin-top:48px">
+      <div class="section-tag-wrap">
+        <div class="section-tag">Ressources</div>
+        <h2 class="section-h2">Articles Santé <em>Recommandés</em></h2>
+      </div>
+      <a routerLink="/bibliotheque" class="btn-voir-tout">Voir la bibliothèque →</a>
+    </div>
+
+    <div class="articles-grid">
+      <div class="article-card" *ngFor="let art of articles">
+        <div class="art-meta">
+          <span class="art-date">{{ art.datePublication | date:'dd MMM yyyy' }}</span>
+          <span class="art-auteur">{{ art.auteur }}</span>
+        </div>
+        <div class="art-tags" *ngIf="art.tags">
+          <span class="art-tag" *ngFor="let tag of art.tags.split(',').slice(0,2)">{{ tag.trim() }}</span>
+        </div>
+        <p class="art-contenu">{{ art.contenu | slice:0:120 }}...</p>
+        <a [routerLink]="['/ressource', art.ressourceBienetreId]" class="art-btn-lire">Lire l'article →</a>
+      </div>
+    </div>
+
+  </ng-container>
+</main>
+
+</ng-container>

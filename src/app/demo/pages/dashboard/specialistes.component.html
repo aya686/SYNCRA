@@ -1,0 +1,269 @@
+<!-- TOAST -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999" *ngIf="showToast">
+  <div class="toast show align-items-center border-0"
+       [class.bg-success]="toastType==='success'" [class.text-white]="toastType==='success'"
+       [class.bg-warning]="toastType==='warning'"
+       [class.bg-danger]="toastType==='danger'" [class.text-white]="toastType==='danger'">
+    <div class="d-flex">
+      <div class="toast-body fw-semibold">{{ toastMsg }}</div>
+      <button class="btn-close me-2 m-auto" (click)="showToast = false"></button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+
+  <!-- STATS -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar bg-light-primary"><i class="ti ti-users text-primary f-20"></i></div>
+          <div><h3 class="mb-0 f-w-600">{{ stats.total }}</h3><p class="mb-0 text-muted f-13">Total spécialistes</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar bg-light-success"><i class="ti ti-check text-success f-20"></i></div>
+          <div><h3 class="mb-0 f-w-600">{{ stats.actifs }}</h3><p class="mb-0 text-muted f-13">Actifs</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar bg-light-warning"><i class="ti ti-calendar text-warning f-20"></i></div>
+          <div><h3 class="mb-0 f-w-600">{{ stats.disponibles }}</h3><p class="mb-0 text-muted f-13">Disponibles</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar bg-light-info"><i class="ti ti-activity text-info f-20"></i></div>
+          <div><h3 class="mb-0 f-w-600">{{ stats.seancesTotales }}</h3><p class="mb-0 text-muted f-13">Séances ce mois</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE PRINCIPALE -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center g-2">
+          <div class="col">
+            <h5 class="mb-0">Gestion des Spécialistes</h5>
+          </div>
+          <!-- FILTRES -->
+          <div class="col-auto">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="ti ti-search"></i></span>
+              <input type="text" class="form-control" placeholder="Rechercher..." style="width: 180px;"
+                     [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreSpecialite" (ngModelChange)="applyFilters()" style="width: 170px;">
+              <option value="tous">Toutes spécialités</option>
+              <option *ngFor="let s of specialites" [value]="s.value">{{ s.label }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" [(ngModel)]="filtreDisponibilite" (ngModelChange)="applyFilters()" style="width: 140px;">
+              <option value="tous">Disponibilité</option>
+              <option value="disponible">Disponible</option>
+              <option value="indisponible">Indisponible</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary btn-sm" (click)="ouvrirCreer()">
+              <i class="ti ti-plus me-1"></i> Nouveau spécialiste
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <!-- LOADING -->
+        <div class="text-center py-5" *ngIf="loading">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2 mb-0">Chargement...</p>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="f-12 text-muted fw-semibold">SPÉCIALISTE</th>
+                <th class="f-12 text-muted fw-semibold">SPÉCIALITÉ</th>
+                <th class="f-12 text-muted fw-semibold">N° ORDRE</th>
+                <th class="f-12 text-muted fw-semibold">TARIF</th>
+                <th class="f-12 text-muted fw-semibold">SÉANCES / MOIS</th>
+                <th class="f-12 text-muted fw-semibold">NOTE</th>
+                <th class="f-12 text-muted fw-semibold">STATUT</th>
+                <th class="f-12 text-muted fw-semibold">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of specialistesFiltres" [class.table-secondary]="!s.actif" [class.opacity-50]="!s.actif">
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar" [class]="getSpecialiteInfo(s.specialite).bg">
+                      <span class="fw-bold f-13" [class]="getSpecialiteInfo(s.specialite).color">{{ getInitiales(s) }}</span>
+                    </div>
+                    <div>
+                      <div class="f-14 fw-semibold">Dr {{ s.prenom }} {{ s.nom }}</div>
+                      <div class="f-11 text-muted">{{ s.email }}</div>
+                      <div class="f-11 text-muted">{{ s.telephone }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge {{ getSpecialiteInfo(s.specialite).bg }} {{ getSpecialiteInfo(s.specialite).color }}">
+                    <i class="{{ getSpecialiteInfo(s.specialite).icon }} me-1"></i>
+                    {{ getSpecialiteInfo(s.specialite).label }}
+                  </span>
+                </td>
+                <td class="f-13 text-muted font-monospace">{{ s.numeroOrdre }}</td>
+                <td>
+                  <span class="f-14 fw-semibold">{{ s.tarif }}€</span>
+                  <span class="f-11 text-muted">/séance</span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height: 5px; max-width: 60px;">
+                      <div class="progress-bar bg-primary" [style.width.%]="(s.seancesMois / 30) * 100"></div>
+                    </div>
+                    <span class="f-13 fw-semibold">{{ s.seancesMois }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-1">
+                    <ng-container *ngFor="let star of getStars(s.notemoyenne); let i = index">
+                      <i class="ti ti-star-filled f-11" [class.text-warning]="i < s.notemoyenne" [class.text-muted]="i >= s.notemoyenne"></i>
+                    </ng-container>
+                    <span class="f-11 text-muted ms-1">{{ s.notemoyenne | number:'1.1-1' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <span class="badge" [class.bg-light-success]="s.actif" [class.text-success]="s.actif" [class.bg-light-secondary]="!s.actif" [class.text-secondary]="!s.actif">
+                      {{ s.actif ? '● Actif' : '○ Inactif' }}
+                    </span>
+                    <span class="badge" [class.bg-light-primary]="s.disponible" [class.text-primary]="s.disponible" [class.bg-light-secondary]="!s.disponible" [class.text-muted]="!s.disponible">
+                      {{ s.disponible ? '✓ Disponible' : '✕ Indisponible' }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-light-primary" title="Modifier" (click)="ouvrirEditer(s)">
+                      <i class="ti ti-edit"></i>
+                    </button>
+                    <button class="btn btn-sm" title="{{ s.actif ? 'Désactiver' : 'Activer' }}"
+                            [class.btn-light-warning]="s.actif" [class.btn-light-success]="!s.actif"
+                            (click)="toggleActif(s)">
+                      <i class="ti" [class.ti-toggle-right]="s.actif" [class.ti-toggle-left]="!s.actif"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light-danger" title="Supprimer" (click)="supprimer(s)">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- EMPTY -->
+          <div class="text-center py-5" *ngIf="specialistesFiltres.length === 0">
+            <i class="ti ti-users-group f-48 text-muted opacity-25 d-block mb-2"></i>
+            <p class="text-muted mb-3">Aucun spécialiste trouvé</p>
+            <button class="btn btn-primary btn-sm" (click)="ouvrirCreer()">
+              <i class="ti ti-plus me-1"></i> Ajouter un spécialiste
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CRÉER / MODIFIER -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showModal" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="ti ti-user-plus me-2 text-primary"></i>
+          {{ isEdit ? 'Modifier le spécialiste' : 'Nouveau spécialiste' }}
+        </h5>
+        <button class="btn-close" (click)="fermerModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Prénom *</label>
+            <input type="text" class="form-control" placeholder="Sophie" [(ngModel)]="form.prenom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Nom *</label>
+            <input type="text" class="form-control" placeholder="Martin" [(ngModel)]="form.nom">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Email *</label>
+            <input type="email" class="form-control" placeholder="dr.martin@clinic.fr" [(ngModel)]="form.email">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Téléphone</label>
+            <input type="text" class="form-control" placeholder="06 00 00 00 00" [(ngModel)]="form.telephone">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Spécialité *</label>
+            <select class="form-select" [(ngModel)]="form.specialite">
+              <option *ngFor="let s of specialites" [value]="s.value">{{ s.label }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Numéro d'ordre</label>
+            <input type="text" class="form-control" placeholder="PSY-2020-XXXX" [(ngModel)]="form.numeroOrdre">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Tarif (€/séance)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" [(ngModel)]="form.tarif" min="0">
+              <span class="input-group-text">€</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold f-13">Statut</label>
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="form.actif" id="actifSwitch">
+              <label class="form-check-label" for="actifSwitch">
+                <span [class.text-success]="form.actif" [class.text-muted]="!form.actif">
+                  {{ form.actif ? 'Actif' : 'Inactif' }}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-light" (click)="fermerModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="sauvegarder()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isEdit ? 'Mettre à jour' : 'Créer le spécialiste' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
