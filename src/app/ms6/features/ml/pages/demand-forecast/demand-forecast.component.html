@@ -1,0 +1,193 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1><i class="bi bi-bar-chart"></i> Prévision de Demande (Time Series)</h1>
+    <p class="subtitle">Holt-Winters Triple Exponential Smoothing - Prédit les ventes futures avec niveau, tendance et saisonnalité</p>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="stats-bar" *ngIf="stats">
+    <div class="stat-item">
+      <span class="stat-label">Algorithme</span>
+      <span class="stat-value">{{ stats.algorithm }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Saisonnalité</span>
+      <span class="stat-value">{{ stats.seasonalityPeriod }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Optimisation</span>
+      <span class="stat-value">{{ stats.optimization }}</span>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Forecast Form -->
+    <div class="section-card">
+      <h2>Générer Prévisions</h2>
+      <p class="section-desc">Prédisez la demande future pour un produit spécifique</p>
+
+      <div class="form-group">
+        <label>ID Produit</label>
+        <input type="number" [(ngModel)]="productId" min="1" placeholder="1">
+      </div>
+
+      <div class="form-group">
+        <label>Jours à prédire</label>
+        <input type="number" [(ngModel)]="days" min="7" max="30" value="14">
+      </div>
+
+      <button class="btn btn-primary" (click)="getForecast()" [disabled]="loadingForecast">
+        <span *ngIf="loadingForecast">Calcul en cours...</span>
+        <span *ngIf="!loadingForecast">Générer Prévisions</span>
+      </button>
+
+      <button class="btn btn-secondary" (click)="getStockRisks()" [disabled]="loadingRisks">
+        <span *ngIf="loadingRisks">Analyse...</span>
+        <span *ngIf="!loadingRisks">Analyser Risques Stock</span>
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="section-card results-card" *ngIf="forecast">
+      <div class="forecast-header">
+        <div>
+          <h2>Prévisions pour {{ forecast.productName || 'Produit #' + forecast.productId }}</h2>
+          <span class="total-badge">Total: {{ forecast.totalPredictedDemand }} unités</span>
+        </div>
+        <div class="stock-status" *ngIf="forecast.recommendation">
+          <span class="status-badge" [class]="'status-' + (forecast.recommendation === 'OK' ? 'ok' : 'alert')">
+            {{ forecast.recommendation }}
+          </span>
+          <span class="stock-level" *ngIf="forecast.currentStock !== undefined">
+            Stock: {{ forecast.currentStock }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Trend Analysis -->
+      <div class="trend-card" *ngIf="forecast.trendAnalysis">
+        <div class="trend-icon">
+          {{ forecast.trendAnalysis.trendPercent > 0 ? '📈' : '📉' }}
+        </div>
+        <div class="trend-info">
+          <h4>{{ forecast.trendAnalysis.description }}</h4>
+          <p>Saisonnalité détectée: {{ (forecast.trendAnalysis.seasonalityStrength * 100).toFixed(0) }}%</p>
+        </div>
+      </div>
+
+      <!-- Debug info (supprimer après test) -->
+      <div *ngIf="forecast.forecasts" style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-size: 12px;">
+        <strong>Debug:</strong> {{ forecast.forecasts.length }} prévisions chargées
+        <pre style="margin: 5px 0; max-height: 100px; overflow: auto;">{{ forecast.forecasts[0] | json }}</pre>
+      </div>
+
+      <!-- Forecast Table -->
+      <div class="table-container">
+        <table class="forecast-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Prévision</th>
+              <th>Intervalle (95%)</th>
+              <th>Confiance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of forecast.forecasts; let i = index">
+              <td>{{ f.date || 'N/A' }}</td>
+              <td class="prediction">
+                {{ f.predictedValue !== undefined && f.predictedValue !== null ? (f.predictedValue | number:'1.1-1') : '-' }}
+              </td>
+              <td class="interval">
+                <span *ngIf="f.lowerBound !== undefined && f.upperBound !== undefined">
+                  [{{ f.lowerBound | number:'1.1-1' }} - {{ f.upperBound | number:'1.1-1' }}]
+                </span>
+                <span *ngIf="f.lowerBound === undefined || f.upperBound === undefined">-</span>
+              </td>
+              <td>
+                <div class="confidence-bar" *ngIf="f.confidence !== undefined && f.confidence !== null">
+                  <div class="confidence-fill" 
+                       [style.width.%]="f.confidence * 100"
+                       [style.background-color]="getConfidenceColor(f.confidence)">
+                  </div>
+                  <span>{{ (f.confidence * 100) | number:'1.0-0' }}%</span>
+                </div>
+                <span *ngIf="f.confidence === undefined || f.confidence === null">-</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Stock Risks -->
+      <div class="stock-risks" *ngIf="forecast.stockRisks?.length > 0">
+        <h4>⚠️ Alertes Stock</h4>
+        <div class="risk-item" *ngFor="let risk of forecast.stockRisks" [class]="'risk-level-' + (risk.level?.toLowerCase() || 'medium')">
+          <strong>{{ risk.level }}</strong>: {{ risk.message }}
+          <p *ngIf="risk.recommendation">💡 {{ risk.recommendation }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Risks All Products -->
+    <div class="section-card" *ngIf="stockRisks">
+      <h2>⚠️ Risques de Stock - Tous Produits</h2>
+      <div class="risks-list">
+        <div class="risk-product" *ngFor="let risk of stockRisks.risks" [class]="'risk-' + (risk.riskLevel?.toLowerCase() || 'medium')">
+          <div class="risk-header">
+            <span class="product-name">{{ risk.produitNom || 'Produit #' + risk.produitId }}</span>
+            <span class="risk-badge">{{ risk.riskLevel }}</span>
+          </div>
+          <p class="risk-message">{{ risk.message }}</p>
+          <p class="risk-recommendation" *ngIf="risk.recommendation">→ {{ risk.recommendation }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Algorithm Explanation -->
+  <div class="info-section">
+    <h3>🔬 Composantes de Holt-Winters</h3>
+    
+    <div class="components-grid">
+      <div class="component-card level">
+        <div class="component-icon">L</div>
+        <h4>Level (Niveau)</h4>
+        <div class="formula">L(t) = α × [y(t) - S(t-m)] + (1-α) × [L(t-1) + T(t-1)]</div>
+        <p>Moyenne lissée des ventes, ajustée pour la saisonnalité</p>
+      </div>
+
+      <div class="component-card trend">
+        <div class="component-icon">T</div>
+        <h4>Trend (Tendance)</h4>
+        <div class="formula">T(t) = β × [L(t) - L(t-1)] + (1-β) × T(t-1)</div>
+        <p>Vitesse de croissance ou déclin des ventes</p>
+      </div>
+
+      <div class="component-card seasonality">
+        <div class="component-icon">S</div>
+        <h4>Seasonality (Saisonnalité)</h4>
+        <div class="formula">S(t) = γ × [y(t) - L(t)] + (1-γ) × S(t-m)</div>
+        <p>Patterns récurrents (ex: week-ends +30%)</p>
+      </div>
+
+      <div class="component-card forecast">
+        <div class="component-icon">F</div>
+        <h4>Forecast (Prévision)</h4>
+        <div class="formula">F(t+k) = L(t) + k×T(t) + S(t+k-m)</div>
+        <p>Combinaison des 3 composantes pour prédire</p>
+      </div>
+    </div>
+
+    <div class="params-info">
+      <h4>Paramètres optimisés par Grid Search:</h4>
+      <ul>
+        <li><strong>α (alpha)</strong> = 0.1-0.5 : Réactivité au niveau</li>
+        <li><strong>β (beta)</strong> = 0.01-0.3 : Vitesse de tendance</li>
+        <li><strong>γ (gamma)</strong> = 0.1-0.5 : Force saisonnière</li>
+        <li><strong>m</strong> = 7 jours : Période hebdomadaire</li>
+      </ul>
+    </div>
+  </div>
+</div>

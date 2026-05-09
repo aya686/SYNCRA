@@ -1,0 +1,169 @@
+<div class="dashboard-alerts">
+  <!-- Header -->
+  <div class="alerts-header">
+    <h2>
+      <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+      Dashboard des Alertes de Stock
+    </h2>
+    <div class="actions-bar">
+      <button (click)="rafraichir()" [disabled]="loading" class="btn-refresh">
+        <i class="bi bi-arrow-clockwise" *ngIf="!loading"></i>
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ loading ? 'Chargement...' : 'Rafraîchir' }}
+      </button>
+      <button (click)="testerEmail()" [disabled]="emailTestLoading" class="btn-test">
+        <i class="bi bi-envelope" *ngIf="!emailTestLoading"></i>
+        <span *ngIf="emailTestLoading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ emailTestLoading ? 'Test en cours...' : 'Tester Email' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Résultat du test email -->
+  <div *ngIf="emailTestResult" class="alert" [class.alert-success]="emailTestResult.includes('succès')" [class.alert-error]="!emailTestResult.includes('succès')">
+    {{ emailTestResult }}
+  </div>
+
+  <!-- Cartes de résumé - Berry Design -->
+  <div class="stats-grid" *ngIf="resume">
+    <div class="stat-card total">
+      <div class="stat-icon bg-primary">
+        <i class="bi bi-box-seam"></i>
+      </div>
+      <div class="stat-value">{{ resume.totalProduits }}</div>
+      <div class="stat-label">Total Produits</div>
+    </div>
+    <div class="stat-card ok">
+      <div class="stat-icon bg-success">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div class="stat-value">{{ resume.stocksOk }}</div>
+      <div class="stat-label">Stocks OK</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon bg-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-value">{{ resume.stocksEnAlerte }}</div>
+      <div class="stat-label">En Alerte</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon bg-danger">
+        <i class="bi bi-x-circle"></i>
+      </div>
+      <div class="stat-value">{{ resume.stocksEpuises }}</div>
+      <div class="stat-label">Épuisés</div>
+    </div>
+  </div>
+
+  <!-- Stocks Épuisés -->
+  <div class="section" *ngIf="stocksEpuises.length > 0">
+    <h3 class="section-title danger">
+      <i class="bi bi-x-circle"></i>
+      Stocks Épuisés ({{ stocksEpuises.length }})
+    </h3>
+    <div class="stock-list">
+      <div *ngFor="let stock of stocksEpuises" class="stock-card danger">
+        <div class="stock-header">
+          <div class="product-info">
+            <i class="bi bi-box-seam text-danger"></i>
+            <strong>{{ stock.produit.nom || 'Produit #' + stock.produit.produitId }}</strong>
+          </div>
+          <span class="badge badge-danger">ÉPUISÉ</span>
+        </div>
+        <div class="stock-details">
+          <span><i class="bi bi-archive"></i> Quantité: <strong>0</strong></span>
+          <span><i class="bi bi-bell"></i> Seuil: {{ stock.seuilAlerte }}</span>
+          <span *ngIf="stock.produit.boutique"><i class="bi bi-shop"></i> {{ stock.produit.boutique.nom }}</span>
+        </div>
+        <div class="stock-actions">
+          <button (click)="reapprovisionner(stock.produit.produitId, 50)" class="btn-restock">
+            <i class="bi bi-plus-lg"></i> +50 unités
+          </button>
+          <button (click)="reapprovisionner(stock.produit.produitId, 100)" class="btn-restock">
+            <i class="bi bi-plus-lg"></i> +100 unités
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stocks en Alerte -->
+  <div class="section" *ngIf="stocksEnAlerte.length > 0">
+    <h3 class="section-title warning">
+      <i class="bi bi-exclamation-triangle"></i>
+      Stocks en Alerte ({{ stocksEnAlerte.length }})
+    </h3>
+    <div class="stock-list">
+      <div *ngFor="let stock of stocksEnAlerte" class="stock-card warning">
+        <div class="stock-header">
+          <div class="product-info">
+            <i class="bi bi-box-seam text-warning"></i>
+            <strong>{{ stock.produit.nom || 'Produit #' + stock.produit.produitId }}</strong>
+          </div>
+          <span class="badge badge-warning">ALERTE</span>
+        </div>
+        <div class="stock-details">
+          <span><i class="bi bi-archive"></i> Quantité: <strong>{{ stock.quantite }}</strong> / Seuil: {{ stock.seuilAlerte }}</span>
+          <span *ngIf="stock.produit.boutique"><i class="bi bi-shop"></i> {{ stock.produit.boutique.nom }}</span>
+        </div>
+        <div class="stock-actions">
+          <input type="number" #quantiteInput placeholder="Qté" class="input-small">
+          <button (click)="reapprovisionner(stock.produit.produitId, +quantiteInput.value || 10)" class="btn-restock">
+            <i class="bi bi-plus-lg"></i> Réappro.
+          </button>
+          <input type="number" #seuilInput placeholder="Seuil" class="input-small">
+          <button (click)="modifierSeuil(stock.produit.produitId, +seuilInput.value || stock.seuilAlerte)" class="btn-edit">
+            <i class="bi bi-pencil"></i> Seuil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historique des Alertes -->
+  <div class="section" *ngIf="alertesRecentes.length > 0">
+    <h3 class="section-title info">
+      <i class="bi bi-clock-history"></i>
+      Historique des Alertes (7 derniers jours)
+    </h3>
+    <div class="table-responsive">
+      <table class="alertes-table">
+        <thead>
+          <tr>
+            <th><i class="bi bi-calendar"></i> Date</th>
+            <th><i class="bi bi-box"></i> Produit</th>
+            <th><i class="bi bi-tag"></i> Type</th>
+            <th><i class="bi bi-123"></i> Quantité</th>
+            <th><i class="bi bi-bell"></i> Seuil</th>
+            <th><i class="bi bi-envelope"></i> Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let alerte of alertesRecentes">
+            <td>{{ alerte.dateAlerte | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ alerte.produit.nom }}</td>
+            <td>
+              <span class="badge" [ngClass]="getAlerteClass(alerte.type)">
+                {{ alerte.type }}
+              </span>
+            </td>
+            <td>{{ alerte.quantiteApres }} (avant: {{ alerte.quantiteAvant }})</td>
+            <td>{{ alerte.seuilAlerte }}</td>
+            <td>
+              <span *ngIf="alerte.emailEnvoye" class="badge badge-success"><i class="bi bi-check-lg"></i> Envoyé</span>
+              <span *ngIf="!alerte.emailEnvoye" class="badge badge-error"><i class="bi bi-x-lg"></i> Non envoyé</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Message si tout va bien -->
+  <div *ngIf="!loading && stocksEnAlerte.length === 0 && stocksEpuises.length === 0" class="all-good">
+    <i class="bi bi-check-circle-fill text-success"></i>
+    <h4>Tous les stocks sont en bon état !</h4>
+    <p>Aucune alerte à signaler pour le moment.</p>
+  </div>
+</div>

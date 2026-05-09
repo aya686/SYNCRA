@@ -1,0 +1,167 @@
+<div class="client-layout">
+  <!-- CURSOR GLOW -->
+  <div class="cursor-glow" #cursorGlow></div>
+
+  <!-- Client Header SYNCRA -->
+  <header class="syncra-nav" [class.scrolled]="navScrolled">
+    <div class="nav-container">
+      <!-- Brand -->
+      <a class="brand" routerLink="/">
+        <div class="brand-icon-wrap">
+          <div class="brand-hex">⬡</div>
+        </div>
+        <span class="brand-name">SYNCRA</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="nav-links">
+        <a routerLink="/boutiques" 
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: false}"
+           class="nav-link">
+          <i class="bi bi-shop"></i>
+          <span>Boutiques</span>
+        </a>
+        <a routerLink="/produits"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: false}"
+           class="nav-link">
+          <i class="bi bi-box-seam"></i>
+          <span>Produits</span>
+        </a>
+        <a routerLink="/commandes"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: false}"
+           class="nav-link">
+          <i class="bi bi-cart"></i>
+          <span>Commandes</span>
+        </a>
+        <a routerLink="/livraisons"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: false}"
+           class="nav-link">
+          <i class="bi bi-truck"></i>
+          <span>Livraisons</span>
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="nav-actions">
+        <button class="btn-dashboard" (click)="goToDashboard()" title="Dashboard Admin">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
+          <span>Dashboard</span>
+        </button>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="nav-mobile-toggle" (click)="toggleMobileMenu()" [class.open]="mobileMenuOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" [class.open]="mobileMenuOpen">
+      <div class="mobile-menu-inner">
+        <a routerLink="/boutiques" 
+           routerLinkActive="active"
+           (click)="mobileMenuOpen = false"
+           class="mobile-nav-link">
+          <i class="bi bi-shop"></i>
+          <span>Boutiques</span>
+        </a>
+        <a routerLink="/produits"
+           routerLinkActive="active"
+           (click)="mobileMenuOpen = false"
+           class="mobile-nav-link">
+          <i class="bi bi-box-seam"></i>
+          <span>Produits</span>
+        </a>
+        <a routerLink="/commandes"
+           routerLinkActive="active"
+           (click)="mobileMenuOpen = false"
+           class="mobile-nav-link">
+          <i class="bi bi-cart"></i>
+          <span>Commandes</span>
+        </a>
+        <a routerLink="/livraisons"
+           routerLinkActive="active"
+           (click)="mobileMenuOpen = false"
+           class="mobile-nav-link">
+          <i class="bi bi-truck"></i>
+          <span>Livraisons</span>
+        </a>
+        <div class="mobile-divider"></div>
+        <button class="mobile-btn-dashboard" (click)="goToDashboard(); mobileMenuOpen = false">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
+          <span>Dashboard Admin</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="client-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Client Footer SYNCRA -->
+  <footer class="syncra-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="brand-icon-wrap small">
+            <div class="brand-hex">⬡</div>
+          </div>
+          <span class="brand-name">SYNCRA</span>
+        </div>
+        <p>Votre plateforme de commerce en ligne de confiance. Découvrez nos boutiques et produits de qualité.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="social-btn" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="social-btn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="social-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+      
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a routerLink="/boutiques">Boutiques</a></li>
+            <li><a routerLink="/produits">Produits</a></li>
+            <li><a routerLink="/commandes">Commandes</a></li>
+            <li><a routerLink="/livraisons">Livraisons</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Mon Compte</h4>
+          <ul>
+            <li><a routerLink="/commandes">Mes Commandes</a></li>
+            <li><a routerLink="/livraisons">Mes Livraisons</a></li>
+            <li><a href="#">Paramètres</a></li>
+            <li><a href="#">Support</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Administration</h4>
+          <ul>
+            <li><a (click)="goToDashboard()">Dashboard Admin</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <span>© 2026 SYNCRA — Tous droits réservés.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Confidentialité</a>
+        <a href="#">Conditions</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+</div>

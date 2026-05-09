@@ -1,0 +1,75 @@
+<div class="admin-layout">
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <span class="section-title">Principal</span>
+        <a [class.active]="isActive('/admin/dashboard')" (click)="router.navigate(['/admin/dashboard'])">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="section-title">Gestion</span>
+        <a [class.active]="isActive('/admin/boutiques')" (click)="router.navigate(['/admin/boutiques'])">
+          <i class="bi bi-shop"></i>
+          <span>Boutiques</span>
+        </a>
+        <a [class.active]="isActive('/admin/produits')" (click)="router.navigate(['/admin/produits'])">
+          <i class="bi bi-box-seam"></i>
+          <span>Produits</span>
+        </a>
+        <a [class.active]="isActive('/admin/commandes')" (click)="router.navigate(['/admin/commandes'])">
+          <i class="bi bi-cart"></i>
+          <span>Commandes</span>
+        </a>
+        <a [class.active]="isActive('/admin/livraisons')" (click)="router.navigate(['/admin/livraisons'])">
+          <i class="bi bi-truck"></i>
+          <span>Livraisons</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="section-title">Marketing</span>
+        <a [class.active]="isActive('/admin/promotions')" (click)="router.navigate(['/admin/promotions'])">
+          <i class="bi bi-tag"></i>
+          <span>Promotions</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-client" (click)="goToClient()">
+        <i class="bi bi-arrow-left"></i>
+        Retour au site
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Top Header -->
+    <header class="admin-header">
+      <h2 class="page-title">{{ getPageTitle() }}</h2>
+      <div class="header-actions">
+        <span class="admin-badge">
+          <i class="bi bi-shield-lock"></i>
+          Mode Admin
+        </span>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

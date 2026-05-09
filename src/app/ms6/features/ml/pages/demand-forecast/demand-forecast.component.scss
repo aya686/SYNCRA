@@ -1,0 +1,512 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    color: #1e293b;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+  }
+}
+
+// Stats Bar
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+
+  .stat-item {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid #22c55e;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 200px;
+
+    .stat-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+  }
+}
+
+// Content Grid
+.content-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Section Card
+.section-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #1e293b;
+  }
+
+  .section-desc {
+    margin: 0 0 20px 0;
+    font-size: 13px;
+    color: #64748b;
+  }
+}
+
+// Form
+.form-group {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 13px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+  }
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+
+  &.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+  }
+
+  &.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+
+    &:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Results Card
+.results-card {
+  .forecast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    h2 {
+      margin: 0;
+    }
+
+    .total-badge {
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 12px;
+    }
+  }
+
+  .stock-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+
+      &.status-ok {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &.status-alert {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .stock-level {
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+}
+
+// Trend Card
+.trend-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+  .trend-icon {
+    font-size: 32px;
+  }
+
+  .trend-info {
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      color: #1e293b;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+}
+
+// Table
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.forecast-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  td {
+    color: #475569;
+
+    &.prediction {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    &.interval {
+      font-family: monospace;
+      font-size: 12px;
+    }
+  }
+
+  tr:hover {
+    background: #f8fafc;
+  }
+}
+
+.confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .confidence-fill {
+    width: 60px;
+    height: 6px;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  span {
+    font-size: 11px;
+    color: #64748b;
+    min-width: 30px;
+  }
+}
+
+// Stock Risks
+.stock-risks {
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #1e293b;
+  }
+
+  .risk-item {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+
+    &.risk-level-low {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    &.risk-level-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &.risk-level-high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    p {
+      margin: 4px 0 0 0;
+      font-style: italic;
+    }
+  }
+}
+
+// Risks List (All Products)
+.risks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.risk-product {
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 4px solid;
+
+  &.risk-low {
+    background: #dcfce7;
+    border-left-color: #22c55e;
+  }
+
+  &.risk-medium {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+  }
+
+  &.risk-high {
+    background: #fee2e2;
+    border-left-color: #ef4444;
+  }
+
+  .risk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+
+    .product-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .risk-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  .risk-message {
+    margin: 0;
+    font-size: 13px;
+    color: #475569;
+  }
+
+  .risk-recommendation {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: #667eea;
+    font-weight: 500;
+  }
+}
+
+// Info Section
+.info-section {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+  h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #1e293b;
+  }
+}
+
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.component-card {
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid;
+
+  &.level {
+    background: #dbeafe;
+    border-left-color: #3b82f6;
+  }
+
+  &.trend {
+    background: #dcfce7;
+    border-left-color: #22c55e;
+  }
+
+  &.seasonality {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+  }
+
+  &.forecast {
+    background: #f3e8ff;
+    border-left-color: #a855f7;
+  }
+
+  .component-icon {
+    width: 36px;
+    height: 36px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    color: #1e293b;
+  }
+
+  .formula {
+    background: #1e293b;
+    color: #22c55e;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 11px;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #475569;
+  }
+}
+
+.params-info {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 10px;
+
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #1e293b;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #475569;
+
+      strong {
+        color: #667eea;
+      }
+    }
+  }
+}
+
+// Error
+.error-message {
+  grid-column: 1 / -1;
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+}

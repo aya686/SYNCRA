@@ -1,0 +1,300 @@
+<div class="ml-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>Machine Learning Dashboard</h1>
+    <p class="subtitle">Démonstration des modèles ML implémentés from scratch en Java</p>
+  </div>
+
+  <!-- Alert -->
+  <div *ngIf="alertMessage" class="alert" [class.success]="alertType === 'success'" [class.error]="alertType === 'error'" [class.info]="alertType === 'info'">
+    {{ alertMessage }}
+  </div>
+
+  <!-- Stats Overview Cards -->
+  <div class="stats-grid" *ngIf="mlStats">
+    <div class="stat-card delivery">
+      <div class="stat-icon"><i class="bi bi-truck"></i></div>
+      <div class="stat-content">
+        <h3>Prédiction Livraison</h3>
+        <div class="stat-badge" [class.active]="mlStats.deliveryPrediction?.stats?.trained">
+          {{ mlStats.deliveryPrediction?.stats?.trained ? 'Entraîné' : 'Non entraîné' }}
+        </div>
+        <p *ngIf="mlStats.deliveryPrediction?.stats?.trained">
+          {{ mlStats.deliveryPrediction?.stats?.samples || 0 }} échantillons | 
+          Précision: {{ ((mlStats.deliveryPrediction?.stats?.accuracy || 0) * 100).toFixed(1) }}%
+        </p>
+        <p class="algorithm">{{ mlStats.deliveryPrediction?.algorithm }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card recommendation">
+      <div class="stat-icon"><i class="bi bi-bullseye"></i></div>
+      <div class="stat-content">
+        <h3>Recommandation</h3>
+        <div class="stat-badge" [class.active]="mlStats.recommendation?.modelTrained">
+          {{ mlStats.recommendation?.modelTrained ? 'Entraîné' : 'Non entraîné' }}
+        </div>
+        <p *ngIf="mlStats.recommendation?.modelTrained">
+          {{ mlStats.recommendation?.totalUsers || 0 }} utilisateurs | 
+          {{ mlStats.recommendation?.totalInteractions || 0 }} interactions
+        </p>
+        <p class="algorithm">{{ mlStats.recommendation?.algorithm }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card forecasting">
+      <div class="stat-icon"><i class="bi bi-bar-chart"></i></div>
+      <div class="stat-content">
+        <h3>Prévision Demande</h3>
+        <div class="stat-badge active">Opérationnel</div>
+        <p>{{ mlStats.demandForecasting?.algorithm }}</p>
+        <p class="algorithm">{{ mlStats.demandForecasting?.components?.join(' + ') }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh Stats Button -->
+  <div class="section-actions">
+    <button class="btn btn-primary" (click)="loadStats()" [disabled]="loadingStats">
+      <span *ngIf="loadingStats">Chargement...</span>
+      <span *ngIf="!loadingStats">Rafraîchir Stats</span>
+    </button>
+    <button class="btn btn-warning" (click)="retrainModels()" [disabled]="loadingRetrain">
+      <span *ngIf="loadingRetrain">Entraînement...</span>
+      <span *ngIf="!loadingRetrain">Réentraîner Modèles</span>
+    </button>
+  </div>
+
+  <!-- DELIVERY PREDICTION SECTION -->
+  <div class="feature-section">
+    <div class="section-header">
+      <h2>Prédiction de Retards de Livraison</h2>
+      <p class="section-desc">Régression Logistique avec Gradient Descent - Prédit le risque de retard basé sur la météo, le transporteur et la saison</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ville</label>
+          <input type="text" [(ngModel)]="deliveryForm.city" placeholder="Tunis, Sfax, Sousse...">
+        </div>
+        <div class="form-group">
+          <label>Transporteur</label>
+          <select [(ngModel)]="deliveryForm.transporteur">
+            <option value="Aramex">Aramex</option>
+            <option value="DHL">DHL</option>
+            <option value="FedEx">FedEx</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date d'expédition</label>
+          <input type="datetime-local" [(ngModel)]="deliveryForm.dateExpedition">
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-primary" (click)="predictDelivery()" [disabled]="loadingDelivery">
+          <span *ngIf="loadingDelivery">Prédiction...</span>
+          <span *ngIf="!loadingDelivery">Prédire le Risque</span>
+        </button>
+        <button class="btn btn-secondary" (click)="predictWinterDelivery()">Test Hiver</button>
+        <button class="btn btn-secondary" (click)="predictSummerDelivery()">Test Été</button>
+      </div>
+    </div>
+
+    <!-- Delivery Result -->
+    <div class="result-card" *ngIf="deliveryResult">
+      <div class="result-header">
+        <h3>Résultat de la Prédiction</h3>
+      </div>
+      <div class="prediction-result">
+        <div class="probability-gauge" [style.--probability.%]="deliveryResult.probability">
+          <div class="gauge-circle" [class]="'risk-' + (deliveryResult.riskLevel?.toLowerCase() || 'medium')">
+            <span class="gauge-value">{{ deliveryResult.probability }}%</span>
+          </div>
+          <p class="gauge-label">Probabilité de Retard</p>
+        </div>
+        
+        <div class="risk-details">
+          <div class="risk-badge" [class]="'risk-' + (deliveryResult.riskLevel?.toLowerCase() || 'medium')">
+            {{ deliveryResult.riskLabel }}
+          </div>
+          <p class="risk-description">{{ deliveryResult.riskDescription }}</p>
+          <p class="explanation">{{ deliveryResult.explanation }}</p>
+          
+          <div class="risk-factors" *ngIf="deliveryResult.riskFactors?.length > 0">
+            <h4>Facteurs de Risque:</h4>
+            <ul>
+              <li *ngFor="let factor of deliveryResult.riskFactors">
+                <strong>{{ factor.name }}</strong>: {{ factor.description }} (Impact: +{{ (factor.impact * 100).toFixed(0) }}%)
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATIONS SECTION -->
+  <div class="feature-section">
+    <div class="section-header">
+      <h2>Système de Recommandation</h2>
+      <p class="section-desc">Collaborative Filtering (k-NN) avec Cosine Similarity - Recommande des produits basé sur les utilisateurs similaires</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>ID Utilisateur</label>
+          <input type="number" [(ngModel)]="userId" min="1" placeholder="1">
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="getRecommendations()" [disabled]="loadingRecommendations">
+        <span *ngIf="loadingRecommendations">Chargement...</span>
+        <span *ngIf="!loadingRecommendations">Obtenir Recommandations</span>
+      </button>
+    </div>
+
+    <!-- Recommendations Result -->
+    <div class="result-card" *ngIf="recommendationsResult">
+      <div class="result-header">
+        <h3>Recommandations pour Utilisateur #{{ recommendationsResult.userId }}</h3>
+        <span class="badge">{{ recommendationsResult.count }} produits</span>
+      </div>
+      <div class="recommendations-grid">
+        <div class="recommendation-item" *ngFor="let rec of recommendationsResult.recommendations">
+          <div class="product-icon"><i class="bi bi-box"></i></div>
+          <div class="recommendation-info">
+            <h4>Produit #{{ rec.productId }}</h4>
+            <div class="score-bar">
+              <div class="score-fill" [style.width.%]="(rec.score / 5) * 100"></div>
+              <span class="score-value">{{ rec.score.toFixed(2) }}/5.0</span>
+            </div>
+            <p class="recommendation-reason">{{ rec.reason }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="model-stats" *ngIf="recommendationsResult.modelStats">
+        <p>Modèle entraîné sur {{ recommendationsResult.modelStats.totalUsers }} utilisateurs, {{ recommendationsResult.modelStats.totalInteractions }} interactions</p>
+      </div>
+    </div>
+
+    <!-- Similar Products -->
+    <div class="form-card secondary">
+      <h4>Produits Similaires</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ID Produit</label>
+          <input type="number" [(ngModel)]="similarProductId" min="1" placeholder="1">
+        </div>
+      </div>
+      <button class="btn btn-secondary" (click)="getSimilarProducts()" [disabled]="loadingSimilarProducts">
+        <span *ngIf="loadingSimilarProducts">...</span>
+        <span *ngIf="!loadingSimilarProducts">Trouver Similaires</span>
+      </button>
+    </div>
+
+    <div class="result-card" *ngIf="similarProductsResult">
+      <h4>Produits similaires à #{{ similarProductsResult.productId }}</h4>
+      <div class="similar-products-list">
+        <div class="similar-item" *ngFor="let sim of similarProductsResult.similarProducts">
+          <span class="similar-icon"><i class="bi bi-bag"></i></span>
+          <span class="similar-name">Produit #{{ sim.productId }}</span>
+          <span class="similar-score">({{ (sim.score * 100).toFixed(0) }}% similarité)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMAND FORECAST SECTION -->
+  <div class="feature-section">
+    <div class="section-header">
+      <h2>Prévision de Demande (Time Series)</h2>
+      <p class="section-desc">Holt-Winters Triple Exponential Smoothing - Prédit les ventes futures avec niveau, tendance et saisonnalité</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label>ID Produit</label>
+          <input type="number" [(ngModel)]="forecastProductId" min="1" placeholder="1">
+        </div>
+        <div class="form-group">
+          <label>Jours à prédire</label>
+          <input type="number" [(ngModel)]="forecastDays" min="7" max="30" value="14">
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="getDemandForecast()" [disabled]="loadingForecast">
+        <span *ngIf="loadingForecast">Calcul...</span>
+        <span *ngIf="!loadingForecast">Générer Prévisions</span>
+      </button>
+    </div>
+
+    <!-- Forecast Result -->
+    <div class="result-card" *ngIf="forecastResult">
+      <div class="result-header">
+        <h3>Prévisions pour {{ forecastResult.productName || 'Produit #' + forecastResult.productId }}</h3>
+        <span class="badge">{{ forecastResult.totalPredictedDemand }} total</span>
+      </div>
+
+      <!-- Trend Analysis -->
+      <div class="trend-analysis" *ngIf="forecastResult.trendAnalysis">
+        <div class="trend-card" [class.up]="forecastResult.trendAnalysis.trendPercent > 0" [class.down]="forecastResult.trendAnalysis.trendPercent < 0">
+          <span class="trend-icon"><i class="bi" [class.bi-graph-up-arrow]="forecastResult.trendAnalysis.trendPercent > 0" [class.bi-graph-down-arrow]="forecastResult.trendAnalysis.trendPercent <= 0"></i></span>
+          <div class="trend-info">
+            <h4>{{ forecastResult.trendAnalysis.description }}</h4>
+            <p>Saisonnalité: {{ (forecastResult.trendAnalysis.seasonalityStrength * 100).toFixed(0) }}%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forecast Table -->
+      <div class="forecast-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Prévision</th>
+              <th>Intervalle (95%)</th>
+              <th>Confiance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of forecastResult.forecasts">
+              <td>{{ f.date }}</td>
+              <td class="prediction">{{ f.predictedValue.toFixed(1) }}</td>
+              <td>[{{ f.lowerBound.toFixed(1) }} - {{ f.upperBound.toFixed(1) }}]</td>
+              <td>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" [style.width.%]="f.confidence * 100" [style.background-color]="getConfidenceColor(f.confidence)"></div>
+                  <span>{{ (f.confidence * 100).toFixed(0) }}%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Stock Info -->
+      <div class="stock-info" *ngIf="forecastResult.currentStock !== undefined">
+        <div class="stock-card" [class]="'stock-' + (forecastResult.recommendation === 'OK' ? 'ok' : 'alert')">
+          <h4>Stock Actuel: {{ forecastResult.currentStock }} unités</h4>
+          <p class="recommendation">{{ forecastResult.recommendation }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Risks Button -->
+    <div class="form-card secondary">
+      <button class="btn btn-secondary" (click)="getStockRisks()" [disabled]="loadingStockRisks">
+        <span *ngIf="loadingStockRisks">Analyse...</span>
+        <span *ngIf="!loadingStockRisks">Analyser Risques de Stock</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Projet ML - Implémentations from scratch en Java Spring Boot | Algorithmes: Logistic Regression, k-NN, Holt-Winters</p>
+  </div>
+</div>

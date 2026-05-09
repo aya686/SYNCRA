@@ -1,0 +1,47 @@
+// Import du thème client partagé
+@import '../../styles/client-theme';
+
+// Styles spécifiques à la liste des commandes
+.commandes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+.commande-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.commande-id {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  i {
+    font-size: 1.25rem;
+    color: var(--primary-light);
+  }
+  
+  span {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.commande-info {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.commande-actions {
+  display: flex;
+  gap: 0.75rem;
+  
+  .btn-view {
+    flex: 1;
+    justify-content: center;
+  }
+}

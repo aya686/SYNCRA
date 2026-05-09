@@ -1,0 +1,226 @@
+<div class="container-fluid p-4">
+  <h1 class="mb-4"><i class="bi bi-truck"></i> Optimiseur de Routes de Livraison</h1>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = null"></button>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">
+    <div class="spinner-border spinner-border-sm me-2"></div>
+    Chargement...
+  </div>
+
+  <!-- Vue liste / détails -->
+  <div class="row">
+    <!-- Panneau gauche: Liste des routes -->
+    <div [class]="selectedRoute ? 'col-md-4' : 'col-md-12'">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Routes</h5>
+          <button class="btn btn-primary btn-sm" (click)="loadRoutes()"><i class="bi bi-arrow-clockwise"></i> Rafraîchir</button>
+        </div>
+        <div class="card-body">
+          <!-- Formulaire nouvelle route -->
+          <div class="mb-4 p-3 bg-light rounded">
+            <h6 class="mb-3"><i class="bi bi-plus-lg"></i> Nouvelle Route</h6>
+            <div class="mb-2">
+              <input type="text" class="form-control" placeholder="Nom de la route" [(ngModel)]="newRoute.routeName">
+            </div>
+            <div class="mb-2">
+              <small class="text-muted">Dépôt: {{ newRoute.depot.adresse }}</small>
+            </div>
+
+            <!-- Points de livraison -->
+            <div *ngFor="let point of newRoute.points; let i = index" class="border p-2 mb-2 rounded">
+              <div class="d-flex justify-content-between">
+                <strong>Point {{ i + 1 }}</strong>
+                <button class="btn btn-sm btn-outline-danger" (click)="removePoint(i)"><i class="bi bi-x-lg"></i></button>
+              </div>
+              <input type="text" class="form-control form-control-sm mb-1" placeholder="Adresse" [(ngModel)]="point.adresse">
+              <div class="row">
+                <div class="col-6">
+                  <input type="number" class="form-control form-control-sm" placeholder="Lat" [(ngModel)]="point.latitude" step="0.0001">
+                </div>
+                <div class="col-6">
+                  <input type="number" class="form-control form-control-sm" placeholder="Lng" [(ngModel)]="point.longitude" step="0.0001">
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-sm btn-outline-secondary mb-2" (click)="addPoint()"><i class="bi bi-plus-lg"></i> Ajouter point</button>
+
+            <div class="mb-2">
+              <input type="number" class="form-control" placeholder="Capacité max" [(ngModel)]="newRoute.maxCapacity">
+            </div>
+            <button class="btn btn-success w-100" (click)="createRoute()"><i class="bi bi-rocket"></i> Optimiser Route</button>
+          </div>
+
+          <!-- Liste des routes existantes -->
+          <div *ngIf="routes.length === 0" class="text-muted">
+            Aucune route. Créez-en une!
+          </div>
+
+          <div class="list-group">
+            <div *ngFor="let route of routes" class="list-group-item list-group-item-action"
+                 [class.active]="selectedRoute?.routeId === route.routeId"
+                 (click)="viewRouteDetails(route.routeId)"
+                 style="cursor: pointer;">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="mb-1">{{ route.nom }}</h6>
+                  <small class="text-muted">{{ route.distanceTotaleKm.toFixed(2) }} km • {{ route.nbPoints }} points</small>
+                </div>
+                <span class="badge" [ngClass]="getStatusClass(route.statut)">{{ route.statut }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panneau droit: Détails de la route -->
+    <div *ngIf="selectedRoute" class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">{{ selectedRoute.nom }}</h5>
+            <small class="text-muted">ID: {{ selectedRoute.routeId }}</small>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-secondary" (click)="closeDetails()">Fermer</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Statistiques -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h3>{{ selectedRoute.distanceTotaleKm.toFixed(2) }} km</h3>
+                  <small class="text-muted">Distance totale</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h3>{{ selectedRoute.dureeEstimeeMinutes }} min</h3>
+                  <small class="text-muted">Durée estimée</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h3>{{ selectedRoute.nbPoints }}</h3>
+                  <small class="text-muted">Points livraison</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h3 class="text-success">{{ selectedRoute.amelioration2OptPercent.toFixed(2) }}%</h3>
+                  <small class="text-muted">Amélioration 2-Opt</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Infos détaillées -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p><strong>Statut:</strong> <span class="badge" [ngClass]="getStatusClass(selectedRoute.statut)">{{ selectedRoute.statut }}</span></p>
+              <p><strong>Transporteur:</strong> {{ selectedRoute.transporteur || 'Non assigné' }}</p>
+              <p><strong>Algorithme:</strong> {{ selectedRoute.algorithmeUtilise }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Poids total:</strong> {{ selectedRoute.poidsTotalKg }} kg</p>
+              <p><strong>Volume total:</strong> {{ selectedRoute.volumeTotalM3 }} m³</p>
+              <p><strong>Colis:</strong> {{ selectedRoute.nbColis }}</p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mb-4">
+            <div class="btn-group w-100">
+              <button *ngIf="selectedRoute.statut === 'PLANIFIEE'" class="btn btn-warning" (click)="assignRoute(selectedRoute.routeId)">
+                📋 Assigner
+              </button>
+              <button *ngIf="selectedRoute.statut === 'ASSIGNEE'" class="btn btn-primary" (click)="startRoute(selectedRoute.routeId)">
+                ▶️ Démarrer
+              </button>
+              <button *ngIf="selectedRoute.statut === 'EN_COURS'" class="btn btn-success" (click)="completeRoute(selectedRoute.routeId)">
+                ✓ Terminer
+              </button>
+              <button class="btn btn-info" (click)="reoptimizeRoute(selectedRoute.routeId)">
+                🔄 Réoptimiser
+              </button>
+              <button class="btn btn-danger" (click)="deleteRoute(selectedRoute.routeId)">
+                🗑️ Supprimer
+              </button>
+            </div>
+
+            <!-- Input transporteur -->
+            <div *ngIf="selectedRoute.statut === 'PLANIFIEE'" class="mt-2">
+              <div class="input-group">
+                <span class="input-group-text">Transporteur</span>
+                <input type="text" class="form-control" [(ngModel)]="transporteur" placeholder="Nom du transporteur">
+              </div>
+            </div>
+          </div>
+
+          <!-- Points de livraison -->
+          <h6 class="mb-3">📍 Points de Livraison (ordre optimisé)</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Ordre</th>
+                  <th>Adresse</th>
+                  <th>Distance</th>
+                  <th>Heure estimée</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let point of selectedRoute.points" [class.table-success]="point.statut === 'LIVRE'" [class.table-info]="point.statut === 'EN_ROUTE'">
+                  <td><span class="badge bg-secondary">{{ point.ordre }}</span></td>
+                  <td>
+                    <strong>{{ point.adresse }}</strong><br>
+                    <small class="text-muted">{{ point.ville }}</small>
+                  </td>
+                  <td>
+                    {{ point.distancePrecedentKm.toFixed(2) }} km<br>
+                    <small class="text-muted">cumul: {{ point.distanceCumuleeKm.toFixed(2) }} km</small>
+                  </td>
+                  <td>{{ point.heureArriveeEstimee | date:'HH:mm' }}</td>
+                  <td><span class="badge" [ngClass]="getStatusClass(point.statut)">{{ point.statut }}</span></td>
+                  <td>
+                    <div class="btn-group btn-group-sm" *ngIf="point.statut !== 'LIVRE' && point.statut !== 'NON_LIVRE'">
+                      <button class="btn btn-outline-primary" (click)="updatePointStatus(point.pointId, 'EN_ROUTE')">🚛</button>
+                      <button class="btn btn-outline-success" (click)="updatePointStatus(point.pointId, 'LIVRE')">✓</button>
+                      <button class="btn btn-outline-danger" (click)="updatePointStatus(point.pointId, 'NON_LIVRE')">✗</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Algorithme info -->
+          <div class="alert alert-info mt-3">
+            <h6>🧮 Informations Optimisation</h6>
+            <small>
+              Cette route a été optimisée avec l'algorithme <strong>{{ selectedRoute.algorithmeUtilise }}</strong>.
+              Le 2-Opt a amélioré la solution initiale de <strong>{{ selectedRoute.amelioration2OptPercent.toFixed(2) }}%</strong>.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
