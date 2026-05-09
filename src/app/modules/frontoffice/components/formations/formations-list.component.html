@@ -1,0 +1,139 @@
+<!-- formations-list.component.html -->
+<div class="formations-app">
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Hero Wave Section -->
+    <section class="hero-wave">
+      <div class="wave-bg"></div>
+      <div class="hero-container">
+        <div class="hero-left">
+          <span class="trend-badge">🎓 Excellence</span>
+          <h1>Formations <span class="gradient-text">Professionnelles</span></h1>
+          <p>Développez vos compétences avec nos experts et certifiez-vous</p>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{formations.length}}+</span>
+              <span class="hero-stat-label">Formations</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{getCertifiedCount()}}</span>
+              <span class="hero-stat-label">Certifiantes</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">100%</span>
+              <span class="hero-stat-label">Satisfaction</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="floating-card card-1">
+            <span>🎓</span>
+            <p>+500 certifiés</p>
+          </div>
+          <div class="floating-card card-2">
+            <span>🏅</span>
+            <p>Experts reconnus</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-container">
+        <div class="filter-controls">
+          <div class="search-field">
+            <i>🔍</i>
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (ngModelChange)="filterFormations()"
+              placeholder="Rechercher une formation...">
+          </div>
+          <div class="sort-field">
+            <select [(ngModel)]="niveauFilter" (ngModelChange)="filterFormations()">
+              <option value="">Tous les niveaux</option>
+              <option value="debutant">🎓 Débutant</option>
+              <option value="intermediaire">📚 Intermédiaire</option>
+              <option value="avance">🚀 Avancé</option>
+            </select>
+          </div>
+          <button class="reset-filter" (click)="resetFilters()" *ngIf="searchTerm || niveauFilter">
+            ✕ Réinitialiser
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formations Grid -->
+    <section class="formations-section">
+      <div class="formations-container">
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-grid">
+          <div class="loading-card" *ngFor="let _ of [1,2,3,4,5,6]">
+            <div class="loading-shimmer"></div>
+          </div>
+        </div>
+
+        <!-- Formations - Version sans image -->
+        <div *ngIf="!loading" class="formations-masonry">
+          <div *ngFor="let formation of filteredFormations" class="formation-item">
+            
+            <!-- ✅ NIVEAU (badge en haut) -->
+            <div class="formation-badge">
+              <span class="formation-level" [class]="formation.niveau">
+                {{formation.niveau === 'debutant' ? '🎓 Débutant' : formation.niveau === 'intermediaire' ? '📚 Intermédiaire' : '🚀 Avancé'}}
+              </span>
+              <span *ngIf="formation.certificate" class="certif-badge">🎓 Certifiante</span>
+            </div>
+            
+            <!-- ✅ TITRE -->
+            <div class="formation-header">
+              <h3 class="formation-title">{{formation.titre}}</h3>
+            </div>
+            
+            <!-- ✅ DESCRIPTION -->
+            <p class="formation-description">{{formation.description | slice:0:100}}...</p>
+            
+            <!-- ✅ MÉTADONNÉES -->
+            <div class="formation-meta">
+              <div class="meta-item">
+                <span class="meta-icon">⏱️</span>
+                <span>{{formation.dureeTotale}} heures</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">💰</span>
+                <span class="price" [class.free]="formation.prix === 0">
+                  {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">📊</span>
+                <span>{{formation.niveau === 'debutant' ? 'Accessible' : formation.niveau === 'intermediaire' ? 'Confirmé' : 'Expert'}}</span>
+              </div>
+            </div>
+            
+            <!-- ✅ BOUTON -->
+            <div class="formation-footer">
+              <a [routerLink]="['/formations', formation.id]" class="formation-link">
+                Découvrir la formation
+                <span>→</span>
+              </a>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && filteredFormations.length === 0" class="empty-state">
+          <div class="empty-illustration">📚</div>
+          <h3>Aucune formation trouvée</h3>
+          <p>Essayez d'autres critères de recherche</p>
+          <button class="empty-btn" (click)="resetFilters()">Explorer toutes</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+</div>

@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:host {
+  --primary:        #0a6ebd;
+  --primary-mid:    #1588d8;
+  --primary-light:  #e8f4fd;
+  --accent:         #00c2d4;
+  --accent-soft:    #e0f8fa;
+  --teal:           #00d4a8;
+  --navy:           #071a2f;
+  --navy-mid:       #0d2844;
+  --text:           #0d1f33;
+  --text-2:         #2b4263;
+  --text-muted:     #607a96;
+  --text-faint:     #9ab3cc;
+  --surface:        #ffffff;
+  --surface-2:      #f4f8fd;
+  --surface-3:      #e8f0f9;
+  --border:         #d4e4f4;
+  --border-light:   #eaf2fb;
+  --shadow-sm:      0 2px 8px rgba(10,110,189,0.06);
+  --shadow-md:      0 8px 32px rgba(10,110,189,0.10);
+  --shadow-lg:      0 24px 64px rgba(10,110,189,0.14);
+  --shadow-xl:      0 40px 100px rgba(10,110,189,0.18);
+  --radius:         16px;
+  --radius-lg:      24px;
+  --radius-xl:      32px;
+  --font-display:   'Bricolage Grotesque', sans-serif;
+  --font-body:      'DM Sans', sans-serif;
+}
+
+:root {
+  --primary: #5E35B1;
+  --primary-dark: #4527A0;
+  --primary-light: #E1D8F1;
+  --secondary: #1E88E5;
+  --secondary-dark: #1565C0;
+  --accent: #FFBE00;
+  --gray-light: #EBECEF;
+  --gray-dark: #2C3E50;
+  --white: #FFFFFF;
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Thème clair (défaut) */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+  --primary: #5E35B1;
+  --primary-dark: #4527A0;
+  --secondary: #1E88E5;
+  --accent: #FFBE00;
+}
+
+/* Thème sombre */
+body.dark-theme {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-card: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --border-color: #333333;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Appliquer les variables dans tes composants */
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Scrollbar personnalisé */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Utilitaires */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+/* Back Office - toujours en mode clair */
+body.admin-mode {
+  --bg-primary: #ffffff !important;
+  --bg-secondary: #f8f9fa !important;
+  --bg-card: #ffffff !important;
+  --text-primary: #1a1a2e !important;
+  --text-secondary: #666666 !important;
+  --border-color: #e0e0e0 !important;
+}
+
+/* Front Office - peut changer */
+body:not(.admin-mode) {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-theme:not(.admin-mode) {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-card: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --border-color: #333333;
+}

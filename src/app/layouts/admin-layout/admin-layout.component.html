@@ -1,0 +1,201 @@
+<div class="app-container">
+  <!-- PARTICLES & CURSOR GLOW -->
+  <canvas class="particle-canvas" #particleCanvas></canvas>
+  <div class="cursor-glow" #cursorGlow></div>
+
+  <!-- NAVBAR avec bouton toggle -->
+  <nav class="syncra-nav admin-topbar" [class.scrolled]="navScrolled">
+    <div class="nav-container">
+      
+            <!-- BRAND -->
+        <span class="brand-name">SYNCRA</span>
+
+
+      <!-- BOUTON TOGGLE HAMBURGER (AJOUTÉ ICI) -->
+      <button class="nav-toggle-btn" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- LINKS -->
+      <div class="nav-links">
+        <a routerLink="/admin/events" routerLinkActive="active" class="nav-link">
+          Home
+        </a>
+        <a routerLink="/admin/formations" routerLinkActive="active" class="nav-link">
+          Dashboard
+        </a>
+        <a routerLink="/admin/formateurs" routerLinkActive="active" class="nav-link">
+          Documentation
+        </a>
+        <a class="btn-purchase" routerLink="/">
+          Get Started
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- MOBILE -->
+      <button class="nav-mobile-toggle" (click)="mobileMenuOpen = !mobileMenuOpen">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- SIDEBAR - disparaît complètement quand collapsed -->
+<!-- SIDEBAR - STYLE EXACT SYNCRA -->
+<aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+  <div class="sidebar-inner">
+    <ul class="nav-menu">
+      <li class="nav-section" *ngIf="!isSidebarCollapsed">
+        <span class="section-text">
+          <span class="section-dot"></span>
+          ADMINISTRATION
+        </span>
+      </li>
+      
+      <li>
+        <a routerLink="/admin/events" routerLinkActive="active">
+          <span class="icon">📅</span>
+          <span *ngIf="!isSidebarCollapsed">Événements</span>
+        </a>
+      </li>
+      
+      <li>
+        <a routerLink="/admin/formations" routerLinkActive="active">
+          <span class="icon">🎓</span>
+          <span *ngIf="!isSidebarCollapsed">Formations</span>
+        </a>
+      </li>
+      
+      <li>
+        <a routerLink="/admin/formateurs" routerLinkActive="active">
+          <span class="icon">👨‍🏫</span>
+          <span *ngIf="!isSidebarCollapsed">Formateurs</span>
+        </a>
+      </li>
+      
+      <li class="nav-divider" *ngIf="!isSidebarCollapsed">
+        <span>Reporting & Analyse</span>
+      </li>
+      
+      <li>
+        <a routerLink="/admin/reporting/analytics" routerLinkActive="active">
+          <span class="icon">📊</span>
+          <span *ngIf="!isSidebarCollapsed">Analytique</span>
+        </a>
+      </li>
+      
+      <li>
+        <a routerLink="/admin/reporting/heatmap" routerLinkActive="active">
+          <span class="icon">🔥</span>
+          <span *ngIf="!isSidebarCollapsed">Heatmap</span>
+        </a>
+      </li>
+      
+      <li>
+  <a routerLink="/admin/simulation" routerLinkActive="active">
+    <span class="icon">🧬</span>
+    <span *ngIf="!isSidebarCollapsed">Simulation Agents</span>
+  </a>
+</li>
+<li>
+<a routerLink="/admin/event-generator" class="nav-link">
+  <span class="icon">🤖</span>
+  <span>Générateur IA</span>
+</a>
+</li>
+
+      <li class="nav-divider" *ngIf="!isSidebarCollapsed"></li>
+      
+      <li>
+        <a routerLink="/" routerLinkActive="active">
+          <span class="icon">🌐</span>
+          <span *ngIf="!isSidebarCollapsed">Voir le site</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+<footer class="syncra-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="brand-icon-wrap small">
+          <div class="brand-hex">⬡</div>
+        </div>
+        <span class="brand-name">SYNCRA</span>
+      </div>
+      <p>SYNCRA is the unified network intelligence platform built for enterprises that demand real-time visibility, automated control, and AI-driven insights.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" title="Facebook">f</a>
+        <a href="#" class="social-btn" title="Twitter">𝕏</a>
+        <a href="#" class="social-btn" title="LinkedIn">in</a>
+        <a href="#" class="social-btn" title="GitHub">◈</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Monitoring</a></li>
+          <li><a href="#">Topology</a></li>
+          <li><a href="#">Automation</a></li>
+          <li><a href="#">Analytics</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Case Studies</a></li>
+          <li><a href="#">Status Page</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Integrations</h4>
+        <ul>
+          <li><a href="#">Kubernetes</a></li>
+          <li><a href="#">Terraform</a></li>
+          <li><a href="#">Prometheus</a></li>
+          <li><a href="#">Grafana</a></li>
+          <li><a href="#">PagerDuty <span class="badge-new">New</span></a></li>
+          <li><a href="#">Datadog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Partners</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Legal</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 SYNCRA — All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Security</a>
+    </div>
+  </div>
+</footer>

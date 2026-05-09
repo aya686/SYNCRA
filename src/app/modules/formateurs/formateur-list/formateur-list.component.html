@@ -1,0 +1,71 @@
+<div class="formateur-list-container">
+  <div class="header">
+    <h1>Gestion des Formateurs</h1>
+    <button class="btn-primary" routerLink="/admin/formateurs/new">+ Nouveau Formateur</button>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">👨‍🏫</div>
+      <div class="stat-info">
+        <h3>{{totalFormateurs}}</h3>
+        <p>Total Formateurs</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-info">
+        <h3>{{topFormateurs}}</h3>
+        <p>Top formateurs</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Rechercher un formateur..." 
+        [(ngModel)]="searchTerm" 
+        (input)="filterFormateurs()" 
+        class="search-input">
+    </div>
+  </div>
+
+  <div class="formateurs-grid">
+    <div *ngFor="let formateur of filteredFormateurs" class="formateur-card">
+      <div class="formateur-header">
+        <div class="formateur-avatar">
+          <span class="avatar-icon">👨‍🏫</span>
+        </div>
+        <div class="formateur-info">
+          <h3>{{formateur.expertise}}</h3>
+          <div class="rating">
+            <span class="stars">
+              <span *ngFor="let s of starArray" class="star" [class.filled]="s <= (formateur.noteMoyenne || 0)">
+                ★
+              </span>
+            </span>
+            <span class="note">{{getNoteDisplay(formateur.noteMoyenne)}} / 5</span>
+          </div>
+        </div>
+      </div>
+      <div class="formateur-body">
+        <p class="bio">{{getBioDisplay(formateur.bio)}}</p>
+      </div>
+      <div class="formateur-actions">
+        <button class="btn-primary" [routerLink]="['/admin/formateurs', formateur.formateurId, 'edit']">
+          Modifier
+        </button>
+        <button class="btn-danger" (click)="deleteFormateur(formateur.formateurId)">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="filteredFormateurs.length === 0" class="no-results">
+    <p>Aucun formateur trouvé</p>
+  </div>
+</div>

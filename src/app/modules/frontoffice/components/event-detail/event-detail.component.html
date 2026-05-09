@@ -1,0 +1,88 @@
+<div class="event-detail-page">
+  <div class="container">
+    <!-- Bouton retour -->
+    <div class="back-button-wrapper">
+      <a routerLink="/events" class="btn-back">
+        ← Retour aux événements
+      </a>
+    </div>
+
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    
+    <div *ngIf="!loading && event" class="event-detail">
+      <div class="event-header">
+        <h1>{{event?.titre}}</h1>
+        <span class="event-type">{{event?.type}}</span>
+      </div>
+      
+      <div class="event-content">
+        <div class="event-main-info">
+<div class="info-card">
+  <div class="info-icon">📅</div>
+  <div class="info-text">
+    <h4>Date et heure</h4>
+    <p>{{event?.dateDebut | date:'dd/MM/yyyy HH:mm'}}</p>
+    <p *ngIf="!isSameDay()">au {{event?.dateFin | date:'dd/MM/yyyy HH:mm'}}</p>
+  </div>
+</div>
+
+          <div class="info-card">
+            <div class="info-icon">📍</div>
+            <div class="info-text">
+              <h4>Lieu</h4>
+              <p>{{event?.lieu}}</p>
+            </div>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-icon">👥</div>
+            <div class="info-text">
+              <h4>Places disponibles</h4>
+              <p>{{event?.placesDisponibles}} / {{event?.capaciteMax}}</p>
+            </div>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-icon">💰</div>
+            <div class="info-text">
+              <h4>Prix</h4>
+              <p>{{event?.prix === 0 ? 'Gratuit' : event?.prix + '€'}}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="event-description">
+          <h3>Description</h3>
+          <p>{{event?.description}}</p>
+        </div>
+
+        <!-- Carte - visible seulement si les coordonnées existent -->
+        <div class="info-card" *ngIf="event?.latitude && event?.longitude">
+          <div class="info-icon">🗺️</div>
+          <div class="info-text">
+            <h4>Carte</h4>
+            <app-map-viewer 
+              [latitude]="event.latitude" 
+              [longitude]="event.longitude"
+              [address]="event.lieu">
+            </app-map-viewer>
+          </div>
+        </div>
+        
+        <div class="event-actions">
+          <button class="btn-inscription" [disabled]="event?.placesDisponibles === 0" [routerLink]="['/inscription/event', event?.id]">
+            {{event?.placesDisponibles === 0 ? 'Complet' : 'S\'inscrire à cet événement'}}
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!loading && !event" class="not-found">
+      <h2>Événement non trouvé</h2>
+      <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
+      <a routerLink="/events" class="btn-back">← Retour aux événements</a>
+    </div>
+  </div>
+</div>

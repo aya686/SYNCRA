@@ -1,0 +1,282 @@
+<!-- src/app/modules/admin/components/event-generator/event-generator.component.html -->
+<div class="event-generator-container">
+  
+  <!-- Header -->
+  <div class="generator-header">
+    <h1>🤖 Générateur d'Événements par IA</h1>
+    <p>Laissez l'IA analyser votre base de données et générer des événements optimisés</p>
+  </div>
+  
+  <!-- Sélection catégorie -->
+  <div class="category-section">
+    <div class="section-title">
+      <span>1.</span>
+      <h3>Choisissez une catégorie</h3>
+    </div>
+    
+    <div class="category-buttons">
+      <button *ngFor="let cat of categories"
+              class="category-btn"
+              [class.active]="selectedCategory === cat.value"
+              (click)="selectedCategory = cat.value">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        <span class="cat-label">{{ cat.label }}</span>
+      </button>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn-analyze" (click)="analyzeCategory()" [disabled]="isAnalyzing">
+        {{ isAnalyzing ? '🔍 Analyse en cours...' : '📊 Analyser la base de données' }}
+      </button>
+      <button class="btn-generate" (click)="generateEvent()" [disabled]="isLoading || !selectedCategory">
+    <span *ngIf="!isLoading">🚀 Générer un événement</span>
+    <span *ngIf="isLoading" class="loading-text">
+      <span class="spinner-small"></span>
+      🧠 IA en réflexion...
+    </span>
+  </button>
+  <button class="btn-generate-outline" (click)="generateAndRedirect()" [disabled]="isLoading || !selectedCategory">
+    <span *ngIf="!isLoading">📝 Générer et remplir le formulaire</span>
+    <span *ngIf="isLoading" class="loading-text">
+      <span class="spinner-small"></span>
+      🧠 Préparation...
+    </span>
+  </button>
+    </div>
+  </div>
+  
+  <!-- Statistiques de la catégorie -->
+  <div class="stats-section" *ngIf="showStats && categoryStats">
+    <div class="section-title">
+      <span>2.</span>
+      <h3>Analyse de la base de données</h3>
+      <button class="toggle-stats" (click)="showStats = !showStats">−</button>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <span class="stat-label">Prix moyen</span>
+          <span class="stat-value">{{ categoryStats.prixMoyen | number:'1.0-0' }}€</span>
+          <span class="stat-range">{{ categoryStats.prixMin }}€ - {{ categoryStats.prixMax }}€</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <span class="stat-label">Capacité moyenne</span>
+          <span class="stat-value">{{ categoryStats.capaciteMoyenne | number:'1.0-0' }}</span>
+          <span class="stat-range">personnes</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📍</div>
+        <div class="stat-info">
+          <span class="stat-label">Lieux populaires</span>
+          <span class="stat-value">{{ categoryStats.lieuxPopulaires.join(', ') }}</span>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-info">
+          <span class="stat-label">Durée idéale</span>
+          <span class="stat-value">{{ categoryStats.meilleureDuree }} jour(s)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keywords-section">
+      <div class="keywords-group">
+        <strong>🔑 Mots-clés des titres :</strong>
+        <span class="keyword" *ngFor="let word of categoryStats.motsClesTitres.slice(0,5)">{{ word }}</span>
+      </div>
+      <div class="keywords-group">
+        <strong>📝 Mots-clés des descriptions :</strong>
+        <span class="keyword" *ngFor="let word of categoryStats.motsClesDescriptions.slice(0,8)">{{ word }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Événement généré -->
+  <div class="generated-section" *ngIf="generatedEvent">
+    <div class="section-title">
+      <span>3.</span>
+      <h3>Événement généré par l'IA</h3>
+      <div class="confidence-badge" [class]="getConfidenceClass(generatedEvent.confidence)">
+        🤖 Confiance IA: {{ generatedEvent.confidence }}%
+      </div>
+    </div>
+    
+    <div class="event-card" [class.editing]="isEditing">
+      <!-- Mode visualisation -->
+      <div *ngIf="!isEditing" class="event-preview">
+        <div class="event-header">
+          <div class="event-category" [class]="generatedEvent.type">
+            {{ getCategoryIcon(generatedEvent.type) }} {{ generatedEvent.type | titlecase }}
+          </div>
+          <div class="event-prediction" [class]="getPopularityClass(generatedEvent.predictedPopularity)">
+            📈 Popularité prédite: {{ generatedEvent.predictedPopularity }}%
+          </div>
+        </div>
+        
+        <h2 class="event-title">{{ generatedEvent.titre }}</h2>
+        <p class="event-description">{{ generatedEvent.description }}</p>
+        
+        <div class="event-details-grid">
+          <div class="detail-item">
+            <span class="detail-icon">💰</span>
+            <div>
+              <div class="detail-label">Prix</div>
+              <div class="detail-value">{{ generatedEvent.prix === 0 ? 'GRATUIT' : generatedEvent.prix + ' €' }}</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-icon">👥</span>
+            <div>
+              <div class="detail-label">Capacité</div>
+              <div class="detail-value">{{ generatedEvent.capacite }} places</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-icon">📍</span>
+            <div>
+              <div class="detail-label">Lieu</div>
+              <div class="detail-value">{{ generatedEvent.lieu }}</div>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-icon">📅</span>
+            <div>
+              <div class="detail-label">Date</div>
+              <div class="detail-value">{{ generatedEvent.dateDebut | date:'dd/MM/yyyy' }} - {{ generatedEvent.dateFin | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reasoning-section">
+          <strong>🧠 Pourquoi l'IA a choisi ces valeurs :</strong>
+          <ul>
+            <li *ngFor="let reason of generatedEvent.reasoning">{{ reason }}</li>
+          </ul>
+        </div>
+        
+        <div class="event-actions">
+          <button class="btn-edit" (click)="editEvent()">✏️ Modifier</button>
+          <button class="btn-regenerate" (click)="regenerate()" [disabled]="isLoading">
+  <span *ngIf="!isLoading">🔄 Régénérer</span>
+  <span *ngIf="isLoading" class="loading-text">
+    <span class="spinner-small"></span>
+    Régénération...
+  </span>
+</button>
+          <button class="btn-save" (click)="confirmAndSave()">✅ Confirmer et créer</button>
+        </div>
+      </div>
+      
+      <!-- Mode édition -->
+      <div *ngIf="isEditing" class="event-edit">
+        <h3>✏️ Édition de l'événement</h3>
+        
+        <div class="edit-form">
+          <div class="form-group">
+            <label>Titre</label>
+            <input type="text" [(ngModel)]="editableEvent.titre" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label>Description</label>
+            <textarea rows="4" [(ngModel)]="editableEvent.description" class="form-control"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prix (€)</label>
+              <input type="number" [(ngModel)]="editableEvent.prix" class="form-control">
+            </div>
+            
+            <div class="form-group">
+              <label>Capacité</label>
+              <input type="number" [(ngModel)]="editableEvent.capacite" class="form-control">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Lieu</label>
+              <input type="text" [(ngModel)]="editableEvent.lieu" class="form-control">
+            </div>
+            
+            <div class="form-group">
+              <label>Type</label>
+              <select [(ngModel)]="editableEvent.type" class="form-control">
+                <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+              </select>
+            </div>
+          </div>
+          
+<div class="form-row">
+  <div class="form-group">
+    <label>Date et heure de début</label>
+    <input type="datetime-local" [(ngModel)]="editableEvent.dateDebut" class="form-control">
+  </div>
+  <div class="form-group">
+    <label>Date et heure de fin</label>
+    <input type="datetime-local" [(ngModel)]="editableEvent.dateFin" class="form-control">
+  </div>
+</div>
+          <div class="form-group">
+      <label>🖼️ Image de l'événement</label>
+      
+      <!-- Affichage de l'image actuelle -->
+      <div *ngIf="generatedEvent?.imageUrl && !imagePreview" class="current-image">
+        <img [src]="generatedEvent.imageUrl" alt="Image actuelle" class="current-img">
+        <button type="button" class="btn-remove-img" (click)="generatedEvent!.imageUrl = ''; editableEvent.imageUrl = ''">
+          ✕ Supprimer
+        </button>
+      </div>
+      
+      <!-- Upload nouvelle image -->
+      <div class="upload-area">
+        <input type="file" id="eventImage" accept="image/*" (change)="onFileSelected($event)" hidden>
+        <label for="eventImage" class="upload-label">
+          <span class="upload-icon">📸</span>
+          <span>{{ imagePreview ? 'Changer l\'image' : 'Choisir une image' }}</span>
+        </label>
+      </div>
+      
+      <!-- Aperçu -->
+      <div *ngIf="imagePreview" class="image-preview">
+        <img [src]="imagePreview" alt="Aperçu">
+        <button type="button" class="remove-preview" (click)="imagePreview = null; selectedFile = null">✕</button>
+      </div>
+      
+      <!-- Bouton upload -->
+      <button *ngIf="selectedFile" class="btn-upload" (click)="uploadImage()" [disabled]="isUploading">
+        {{ isUploading ? '📤 Upload en cours...' : '📤 Uploader l\'image' }}
+      </button>
+      
+      <small class="helper-text">Formats acceptés: JPG, PNG (max 2MB)</small>
+    </div>
+        </div>
+        
+        <div class="edit-actions">
+          <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
+          <button class="btn-save-edit" (click)="saveEdit()">💾 Enregistrer les modifications</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Loading spinner -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>L'IA analyse les données et génère l'événement...</p>
+  </div>
+</div>

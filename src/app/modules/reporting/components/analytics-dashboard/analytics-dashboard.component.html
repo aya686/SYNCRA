@@ -1,0 +1,66 @@
+<div class="analytics-dashboard">
+  <div class="dashboard-header">
+    <h1>📊 Tableau de bord analytique</h1>
+    <p>Visualisez les performances de votre plateforme</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>Total Inscrits</h3>
+        <p class="stat-value">{{stats.totalInscrits | number}}</p>
+        <span class="trend up">+12%</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>Événements</h3>
+        <p class="stat-value">{{stats.totalEvents | number}}</p>
+        <span class="trend up">+8%</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-info">
+        <h3>Formations</h3>
+        <p class="stat-value">{{stats.totalFormations | number}}</p>
+        <span class="trend up">+15%</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-info">
+        <h3>Taux participation</h3>
+        <p class="stat-value">{{stats.tauxParticipation}}%</p>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="stats.tauxParticipation"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>📈 Évolution des inscriptions</h3>
+      <div class="chart-container">
+        <canvas id="evolutionChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>🥧 Répartition par type</h3>
+      <div class="chart-container">
+        <canvas id="typeChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card full-width">
+      <h3>📊 Tendances hebdomadaires</h3>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

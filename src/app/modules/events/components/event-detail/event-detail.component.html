@@ -1,0 +1,92 @@
+<div class="event-detail-container" *ngIf="event">
+  <div class="detail-header">
+    <button class="back-btn" routerLink="/admin/events">← Retour</button>
+    <div class="header-actions">
+      <button class="btn-primary" [routerLink]="['/admin/events', event.id, 'edit']">Modifier</button>
+      <button class="btn-danger" (click)="deleteEvent()">Supprimer</button>
+    </div>
+  </div>
+
+  <div class="detail-content">
+    <div class="main-info">
+      <h1>{{event.titre}}</h1>
+      <span class="status-badge" [class]="event.statut">{{getStatusLabel(event.statut)}}</span>
+      <p class="description">{{event.description}}</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">📅</div>
+        <div class="info-text">
+          <h4>Dates</h4>
+          <p>Du {{event.dateDebut | date:'dd/MM/yyyy à HH:mm'}}</p>
+          <p>Au {{event.dateFin | date:'dd/MM/yyyy à HH:mm'}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          <h4>Lieu</h4>
+          <p>{{event.lieu}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">👥</div>
+        <div class="info-text">
+          <h4>Capacité max</h4>
+          <p>{{event.capaciteMax}} </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">🏷️</div>
+        <div class="info-text">
+          <h4>Type</h4>
+          <p>{{event.type}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="inscriptions-section">
+      <div class="section-header">
+        <h2>Inscriptions</h2>
+        <button class="btn-primary" (click)="showInscriptionForm = !showInscriptionForm">
+          + Nouvelle inscription
+        </button>
+      </div>
+
+      <div class="inscription-form" *ngIf="showInscriptionForm">
+        <h3>Ajouter un participant</h3>
+        <div class="form-group">
+          <label>ID Participant</label>
+          <input type="number" [(ngModel)]="newInscription.participantId" placeholder="ID du participant">
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" (click)="showInscriptionForm = false">Annuler</button>
+          <button class="btn-primary" (click)="inscrire()">Confirmer</button>
+        </div>
+      </div>
+
+      <div class="inscriptions-list">
+        <div class="inscription-card" *ngFor="let inscription of inscriptions">
+          <div class="inscription-info">
+            <strong>Participant #{{inscription.participantId}}</strong>
+            <span class="inscription-date">Inscrit le {{inscription.dateInscription | date:'dd/MM/yyyy'}}</span>
+            <span class="status" [class.present]="inscription.presence">
+              {{inscription.presence ? '✓ Présent' : '○ Absent'}}
+            </span>
+          </div>
+          <div class="inscription-actions" *ngIf="!inscription.presence">
+            <button class="btn-success" (click)="marquerPresence(inscription.id)">Marquer présence</button>
+          </div>
+        </div>
+
+        <div *ngIf="inscriptions.length === 0" class="no-data">
+          <p>Aucune inscription pour le moment</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

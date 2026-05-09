@@ -1,0 +1,64 @@
+<div class="heatmap-container">
+  <div class="heatmap-header">
+    <h1>🔥 Heatmap des Présences</h1>
+    <p>Visualisez les pics de participation par jour et par heure</p>
+    <div class="period-selector">
+      <button [class.active]="selectedPeriod === 'week'" (click)="changePeriod('week')">Semaine</button>
+      <button [class.active]="selectedPeriod === 'month'" (click)="changePeriod('month')">Mois</button>
+      <button [class.active]="selectedPeriod === 'year'" (click)="changePeriod('year')">Année</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="heatmap-content" *ngIf="!loading">
+    <div class="legend">
+  <h4>Légende</h4>
+  <div class="legend-colors">
+    <div class="legend-item">
+      <div class="color-box" style="background: #3498db;"></div>
+      <span>0-5 participants</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box" style="background: #2ecc71;"></div>
+      <span>5-10 participants</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box" style="background: #f1c40f;"></div>
+      <span>10-15 participants</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box" style="background: #f39c12;"></div>
+      <span>15-20 participants</span>
+    </div>
+    <div class="legend-item">
+      <div class="color-box" style="background: #e74c3c;"></div>
+      <span>20+ participants</span>
+    </div>
+  </div>
+</div>
+
+    <div class="chart-wrapper">
+<canvas id="heatmapCanvas" #heatmapCanvas style="height: 400px; width: 100%;"></canvas>    </div>
+
+    <div class="heatmap-stats">
+      <div class="stat-card">
+        <h3>📊 Pic d'affluence maximal</h3>
+        <p class="stat-value">{{peakDay}} {{peakHour}}</p>
+        <p>{{peakValue}} participants</p>
+      </div>
+      <div class="stat-card">
+        <h3>📉 Heure la moins fréquentée</h3>
+        <p class="stat-value">{{lowDay}} {{lowHour}}</p>
+        <p>Faible affluence</p>
+      </div>
+      <div class="stat-card">
+        <h3>⭐ Jour le plus populaire</h3>
+        <p class="stat-value">{{peakDay || 'Jeudi'}}</p>
+        <p>Meilleur taux de participation</p>
+      </div>
+    </div>
+  </div>
+</div>

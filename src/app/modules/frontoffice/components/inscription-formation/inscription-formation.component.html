@@ -1,0 +1,339 @@
+<div class="inscription-formation-page">
+  <div class="container">
+    <!-- Bouton retour -->
+    <div class="back-button-wrapper">
+      <a [routerLink]="['/formations', formationId]" class="btn-back">
+        ← Retour à la formation
+      </a>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading && !formation" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement de la formation...</p>
+    </div>
+
+    <!-- Succès -->
+    <div *ngIf="inscriptionSuccess" class="success-card">
+      <div class="success-icon">✅</div>
+      <h2>Inscription confirmée !</h2>
+      <p>Vous êtes maintenant inscrit à cette formation.</p>
+      <p>Un email de confirmation vous a été envoyé.</p>
+      <p class="small">Redirection vers la formation...</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div *ngIf="!loading && formation && !inscriptionSuccess" class="inscription-card">
+      <!-- En-tête -->
+      <div class="inscription-header">
+        <div class="header-icon">🎓</div>
+        <h1>Inscription à la formation</h1>
+        <p>Complétez le formulaire ci-dessous</p>
+      </div>
+
+      <!-- Informations formation -->
+      <div class="formation-summary">
+        <div class="formation-title">{{formation.titre}}</div>
+        <div class="formation-level" [class]="getFormationLevelClass()">
+          Niveau: {{formation.niveau}}
+        </div>
+        <div class="formation-details">
+          <div class="detail">
+            <span class="detail-icon">⏱️</span>
+            <span>{{formation.dureeHeures}} heures</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon">💰</span>
+            <span>{{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
+          </div>
+          <div class="detail">
+            <span class="detail-icon">🎓</span>
+            <span>{{formation.certificate ? 'Certification incluse' : 'Sans certification'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire -->
+<!-- Formulaire -->
+<form #inscriptionForm="ngForm" (ngSubmit)="onSubmit(inscriptionForm)" class="inscription-form">
+  <div class="form-section">
+    <h3>Vos informations</h3>
+
+    <div class="form-row">
+      <div class="form-group" [class.has-error]="submitted && inscriptionForm.controls['prenom']?.invalid">
+        <label for="prenom">Prénom <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="prenom" 
+          name="prenom"
+          [(ngModel)]="inscription.participant.prenom"
+          #prenom="ngModel"
+          required
+          minlength="2"
+          class="form-control"
+          placeholder="Votre prénom">
+        <div class="error-message" *ngIf="submitted && prenom?.invalid">
+          <span *ngIf="prenom?.errors?.['required']">Le prénom est obligatoire</span>
+        </div>
+      </div>
+
+      <div class="form-group" [class.has-error]="submitted && inscriptionForm.controls['nom']?.invalid">
+        <label for="nom">Nom <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="nom" 
+          name="nom"
+          [(ngModel)]="inscription.participant.nom"
+          #nom="ngModel"
+          required
+          minlength="2"
+          class="form-control"
+          placeholder="Votre nom">
+        <div class="error-message" *ngIf="submitted && nom?.invalid">
+          <span *ngIf="nom?.errors?.['required']">Le nom est obligatoire</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email <span class="required">*</span></label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email"
+        [(ngModel)]="inscription.participant.email"
+        #email="ngModel"
+        required
+        email
+        class="form-control"
+        placeholder="votre@email.com">
+      <div class="error-message" *ngIf="submitted && email?.invalid">
+        <span *ngIf="email?.errors?.['required']">L'email est obligatoire</span>
+        <span *ngIf="email?.errors?.['email']">Email invalide</span>
+      </div>
+    </div>
+
+    <!-- ✅ AJOUTER TÉLÉPHONE -->
+    <div class="form-group">
+      <label for="telephone">Téléphone</label>
+      <input 
+        type="tel" 
+        id="telephone" 
+        name="telephone"
+        [(ngModel)]="inscription.participant.telephone"
+        class="form-control"
+        placeholder="Votre numéro de téléphone (optionnel)">
+    </div>
+
+    <!-- ✅ AJOUTER MESSAGE -->
+    <div class="form-group">
+      <label for="commentaire">Message (optionnel)</label>
+      <textarea 
+        id="commentaire" 
+        name="commentaire"
+        [(ngModel)]="inscription.commentaire"
+        rows="3"
+        class="form-control"
+        placeholder="Questions ou remarques..."></textarea>
+    </div>
+<!-- Dans le template, remplacez les événements -->
+
+<!-- Numéro de carte -->
+<div class="form-group" [class.has-error]="paymentSubmitted && paymentErrors.cardNumber">
+  <label for="cardNumber">Numéro de carte <span class="required">*</span></label>
+  <div class="input-with-icon">
+    <input 
+      type="text" 
+      id="cardNumber" 
+      name="cardNumber"
+      [(ngModel)]="paymentInfo.cardNumber"
+      (input)="onCardNumberInput($event)"
+      (blur)="onCardNumberBlur()"
+      class="form-control"
+      placeholder="1234 5678 9012 3456"
+      maxlength="19">
+    <span class="input-icon">💳</span>
+  </div>
+  <div class="error-message" *ngIf="paymentSubmitted && paymentErrors.cardNumber">
+    {{paymentErrors.cardNumber}}
+  </div>
+  <small class="helper-text">16 chiffres, sans espace</small>
+</div>
+
+<!-- Titulaire de la carte -->
+<div class="form-group" [class.has-error]="paymentSubmitted && paymentErrors.cardHolder">
+  <label for="cardHolder">Titulaire de la carte <span class="required">*</span></label>
+  <input 
+    type="text" 
+    id="cardHolder" 
+    name="cardHolder"
+    [(ngModel)]="paymentInfo.cardHolder"
+    (blur)="onCardHolderBlur()"
+    class="form-control"
+    placeholder="Nom comme sur la carte">
+  <div class="error-message" *ngIf="paymentSubmitted && paymentErrors.cardHolder">
+    {{paymentErrors.cardHolder}}
+  </div>
+</div>
+
+<!-- Date d'expiration -->
+<div class="form-group half" [class.has-error]="paymentSubmitted && paymentErrors.expiryDate">
+  <label for="expiryDate">Date d'expiration <span class="required">*</span></label>
+  <input 
+    type="text" 
+    id="expiryDate" 
+    name="expiryDate"
+    [(ngModel)]="paymentInfo.expiryDate"
+    (input)="onExpiryDateInput($event)"
+    (blur)="onExpiryDateBlur()"
+    class="form-control"
+    placeholder="MM/AA"
+    maxlength="5">
+  <div class="error-message" *ngIf="paymentSubmitted && paymentErrors.expiryDate">
+    {{paymentErrors.expiryDate}}
+  </div>
+</div>
+
+<!-- CVV -->
+<div class="form-group half" [class.has-error]="paymentSubmitted && paymentErrors.cvv">
+  <label for="cvv">CVV <span class="required">*</span></label>
+  <input 
+    type="password" 
+    id="cvv" 
+    name="cvv"
+    [(ngModel)]="paymentInfo.cvv"
+    (blur)="onCvvBlur()"
+    class="form-control"
+    placeholder="123"
+    maxlength="3">
+  <div class="error-message" *ngIf="paymentSubmitted && paymentErrors.cvv">
+    {{paymentErrors.cvv}}
+  </div>
+  <small class="helper-text">3 chiffres au dos de la carte</small>
+</div>
+    
+  </div>
+
+  <!-- Résumé -->
+  <div class="form-summary">
+    <h3>Résumé de votre inscription</h3>
+    <div class="summary-item">
+      <span>Formation :</span>
+      <strong>{{formation.titre}}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Niveau :</span>
+      <strong>{{formation.niveau}}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Prix :</span>
+      <strong>{{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Certification :</span>
+      <strong>{{formation.certificate ? 'Oui' : 'Non'}}</strong>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" [routerLink]="['/formations', formationId]">
+      Annuler
+    </button>
+    <button type="submit" class="btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-small"></span>
+      {{loading ? 'Inscription en cours...' : 'Confirmer mon inscription'}}
+    </button>
+  </div>
+</form>
+    </div>
+  </div>
+  
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-wrapper">
+      
+      <div class="footer-brand-section">
+        <div class="brand-header">
+          <div class="resolvo-logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              <defs>
+                <linearGradient id="grad1" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4f46e5"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h3>RESOLVO</h3>
+        </div>
+        <p class="brand-desc">
+          Propulsez votre carrière grâce à des formations certifiantes et un réseau professionnel dynamique. <br>
+          Développez vos compétences et connectez-vous aux opportunités de demain.
+        </p>
+      </div>
+
+      <div class="footer-links-section">
+        <div class="footer-grid">
+          
+          <div class="footer-column">
+            <h4>HELP</h4>
+            <ul>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">Change Log</a></li>
+              <li><a href="#">Support</a></li>
+              <li><a href="#">Discord</a></li>
+              <li><a href="#">License</a></li>
+              <li><a href="#">Refund Policy</a></li>
+              <li><a href="#">Submit a Request</a></li>
+
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Écosystème Berry</h4>
+            <ul>
+              <li><a href="#">Angular Bundle</a></li>
+              <li><a href="#">Berry Figma</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Technologies</h4>
+            <ul>
+              <li><a href="#">.Net</a></li>
+              <li><a href="#">CodeIgniter</a></li>
+              <li><a href="#">Django</a></li>
+              <li><a href="#" class="badge-link">Shopify <small>Bientôt</small></a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Gratuit</h4>
+            <ul>
+              <li><a href="#">React MUI</a></li>
+              <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">Angular</a></li>
+              <li><a href="#">Figma</a></li>
+               <li><a href="#">Bootstrap 5</a></li>
+              <li><a href="#">React</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+      
+    </div> <div class="footer-bottom">
+      <p>&copy; 2026 RESOLVO. Tous droits réservés.</p>
+      <div class="footer-legal">
+        <a href="#">Licence</a>
+        <a href="#">Politique de remboursement</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</div>

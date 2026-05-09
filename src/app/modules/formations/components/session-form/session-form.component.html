@@ -1,0 +1,136 @@
+<div class="session-form-container">
+  <div class="form-header">
+    <h1>{{isEditMode ? 'Modifier' : 'Créer'}} une Session</h1>
+    <p class="form-subtitle" *ngIf="formationTitre">Formation : {{formationTitre}}</p>
+    <p class="form-subtitle">Tous les champs marqués d'un * sont obligatoires</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <form #sessionForm="ngForm" (ngSubmit)="onSubmit(sessionForm)" class="session-form">
+    
+    <div class="form-row">
+      <!-- Type de lieu -->
+      <div class="form-group" [class.has-error]="isInvalid('typeLieu', sessionForm)">
+        <label for="typeLieu">Type de session <span class="required">*</span></label>
+        <select 
+          id="typeLieu" 
+          name="typeLieu"
+          [(ngModel)]="session.typeLieu" 
+          #typeLieu="ngModel"
+          required
+          class="form-control"
+          (change)="onTypeLieuChange()">
+          <option value="">-- Sélectionnez le type --</option>
+          <option value="en-ligne">🌐 En ligne (distanciel)</option>
+          <option value="presentiel">🏢 Présentiel</option>
+        </select>
+        <div class="error-message" *ngIf="isInvalid('typeLieu', sessionForm)">
+          {{getErrorMessage('typeLieu', sessionForm)}}
+        </div>
+      </div>
+
+      <!-- Lieu (affiché seulement si Présentiel) -->
+      <div class="form-group" *ngIf="session.typeLieu === 'presentiel'" [class.has-error]="isInvalid('lieu', sessionForm)">
+        <label for="lieu">Lieu <span class="required">*</span></label>
+        <select 
+          id="lieu" 
+          name="lieu"
+          [(ngModel)]="session.lieu" 
+          #lieu="ngModel"
+          required
+          class="form-control">
+          <option value="">-- Sélectionnez un lieu --</option>
+          <option value="Esprit Ariana Soghra">Esprit Ariana Soghra</option>
+          <option value="TeckUp">TeckUp</option>
+          <option value="Sesame">Sesame</option>
+        </select>
+        <div class="error-message" *ngIf="isInvalid('lieu', sessionForm)">
+          {{getErrorMessage('lieu', sessionForm)}}
+        </div>
+      </div>
+
+      <!-- Message pour En ligne -->
+      <div class="form-group" *ngIf="session.typeLieu === 'en-ligne'">
+        <div class="info-message">
+          <i class="info-icon">🌐</i>
+          <span>Session en ligne - Le lien de connexion sera disponible au temps</span>
+        </div>
+        <input type="hidden" name="lieu" [(ngModel)]="session.lieu" value="En ligne">
+      </div>
+
+      <!-- Champ Formateur -->
+     
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" [class.has-error]="isInvalid('dateDebut', sessionForm)">
+        <label for="dateDebut">Date et heure de début <span class="required">*</span></label>
+        <input 
+          type="datetime-local" 
+          id="dateDebut" 
+          name="dateDebut"
+          [(ngModel)]="session.dateDebut" 
+          #dateDebut="ngModel"
+          required
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('dateDebut', sessionForm)">
+          {{getErrorMessage('dateDebut', sessionForm)}}
+        </div>
+        <small class="helper-text">La date doit être dans le futur</small>
+      </div>
+
+      <div class="form-group" [class.has-error]="isInvalid('dateFin', sessionForm)">
+        <label for="dateFin">Date et heure de fin <span class="required">*</span></label>
+        <input 
+          type="datetime-local" 
+          id="dateFin" 
+          name="dateFin"
+          [(ngModel)]="session.dateFin" 
+          #dateFin="ngModel"
+          required
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('dateFin', sessionForm)">
+          {{getErrorMessage('dateFin', sessionForm)}}
+        </div>
+        <small class="helper-text">Doit être après la date de début</small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" [class.has-error]="isInvalid('capaciteMax', sessionForm)">
+        <label for="capaciteMax">Capacité maximale <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="capaciteMax" 
+          name="capaciteMax"
+          [(ngModel)]="session.capaciteMax" 
+          #capaciteMax="ngModel"
+          required
+          min="1"
+          max="500"
+          class="form-control">
+        <div class="error-message" *ngIf="isInvalid('capaciteMax', sessionForm)">
+          {{getErrorMessage('capaciteMax', sessionForm)}}
+        </div>
+        <small class="helper-text">Entre 1 et 500 participants</small>
+      </div>
+    </div>
+
+    <div class="error-summary" *ngIf="submitted && sessionForm.invalid">
+      <i class="error-icon">⚠️</i>
+      <p>Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.</p>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-small"></span>
+        {{loading ? 'Enregistrement...' : 'Enregistrer'}}
+      </button>
+    </div>
+  </form>
+</div>

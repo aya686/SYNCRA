@@ -1,0 +1,232 @@
+<div class="formation-detail-page">
+  <div class="container">
+    <!-- Bouton retour -->
+    <a routerLink="/formations" class="btn-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Retour aux formations
+    </a>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement de la formation...</p>
+    </div>
+    
+    <!-- Formation trouvée -->
+    <div *ngIf="!loading && formation" class="formation-detail">
+      <!-- Hero Section -->
+      <div class="formation-hero">
+        <div class="hero-badge">
+          <span class="badge-certification" *ngIf="formation.certificate">
+            🎓 Certifiante
+          </span>
+          <span class="formation-level" [class]="formation.niveau">
+            {{formation.niveau}}
+          </span>
+        </div>
+        <h1 class="formation-title">{{formation.titre}}</h1>
+        <p class="formation-subtitle">{{formation.description}}</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value">{{formation.prix === 0 ? 'Gratuit' : (formation.prix + '€')}}</span>
+            <span class="stat-label" *ngIf="formation.prix > 0">TTC</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{sessions.length}}</span>
+            <span class="stat-label">sessions</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📜</div>
+          <div class="stat-info">
+            <span class="stat-value">{{formation.certificate ? 'Oui' : 'Non'}}</span>
+            <span class="stat-label">certification</span>
+          </div>
+        </div>
+        <div class="stat-card">
+    <div class="stat-icon">👨‍🏫</div>
+    <div class="stat-info">
+      <span class="stat-value">{{formation.formateurPrenom}} {{formation.formateurNom}}</span>
+      <span class="stat-label">{{formation.formateurExpertise || 'Formateur'}}</span>
+    </div>
+  </div>
+      </div>
+
+      <!-- Description détaillée -->
+      <div class="description-section">
+        <h2>📖 Description de la formation</h2>
+        <div class="description-content">
+          <p>{{formation.description}}</p>
+        </div>
+      </div>
+
+      <!-- Prérequis (optionnel) -->
+      <div class="prerequisites-section" *ngIf="formation.prerequis">
+        <h2>✅ Prérequis</h2>
+        <div class="prerequisites-content">
+          <p>{{formation.prerequis}}</p>
+        </div>
+      </div>
+
+      <!-- Sessions disponibles -->
+      <div class="sessions-section" *ngIf="sessions.length > 0">
+        <div class="section-header">
+          <h2>📅 Sessions disponibles</h2>
+          <p>Choisissez la session qui vous convient</p>
+        </div>
+        
+        <div class="sessions-grid">
+          <div *ngFor="let session of sessions" class="session-card">
+            <div class="session-header">
+              <div class="session-date-icon">
+                <span class="day">{{session.dateDebut | date:'dd'}}</span>
+                <span class="month">{{session.dateDebut | date:'MMM' | uppercase}}</span>
+              </div>
+              <div class="session-info">
+                <h3>Session du {{session.dateDebut | date:'dd/MM/yyyy'}}</h3>
+                <div class="session-meta">
+                  <span>🕐 {{session.dateDebut | date:'HH:mm'}} - {{session.dateFin | date:'HH:mm'}}</span>
+                  <span>👨‍🏫 {{session.formateur || 'Formateur expert'}}</span>
+                  <span>📍 {{session.lieu || 'En ligne'}}</span>
+                </div>
+              </div>
+            </div>
+            <!-- Ajouter dans la session-card, avant le footer -->
+      <div class="session-actions" *ngIf="isSessionLive(session)">
+        <button class="btn-join-live" (click)="joinLive(session)">
+          🔴 REJOINDRE LE LIVE
+        </button>
+      </div>
+
+          <!-- Ajouter à la fin du template, avant la fermeture du container -->
+          <!-- Modal Live -->
+          <div *ngIf="showLive && selectedSession" class="live-modal-overlay">
+            <div class="live-modal">
+              <div class="live-modal-header">
+                <h3>🎥 {{selectedSession.titre || 'Session en direct'}}</h3>
+                <button class="close-btn" (click)="leaveLive()">✕</button>
+              </div>
+              <div class="live-modal-body">
+                <app-jitsi-meet 
+                  [roomName]="'session-' + selectedSession.id"
+                  [displayName]="currentUser.name"
+                  [isModerator]="currentUser.isModerator">
+                </app-jitsi-meet>
+              </div>
+            </div>
+          </div>
+            <div class="session-footer">
+              <div class="places-info">
+                <div class="places-bar">
+                  <div class="places-fill" [style.width.%]="((session.capaciteMax - session.nbInscrits) / session.capaciteMax) * 100"></div>
+                </div>
+                <span class="places-text">
+                  <strong>{{session.capaciteMax - session.nbInscrits}}</strong> / {{session.capaciteMax}} places disponibles
+                </span>
+              </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Programme de la formation -->
+      <div class="program-section">
+        <h2>📚 Programme de la formation</h2>
+        <div class="program-list">
+          <div class="program-item" *ngFor="let module of formation.modules; let i = index">
+            <div class="program-number">{{i + 1}}</div>
+            <div class="program-content">
+              <h4>{{module.titre}}</h4>
+              <p>{{module.description || 'Module en cours de préparation'}}</p>
+              <span class="program-duration">⏱️ {{module.duree}} heures</span>
+            </div>
+          </div>
+          <div class="program-item" *ngIf="!formation.modules?.length">
+            <div class="program-number">1</div>
+            <div class="program-content">
+              <h4>Programme complet</h4>
+              <p>Cette formation couvre tous les aspects essentiels du sujet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objectifs -->
+      <div class="objectives-section">
+        <h2>🎯 Objectifs de la formation</h2>
+        <div class="objectives-grid">
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Maîtriser les concepts fondamentaux</p>
+          </div>
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Acquérir des compétences pratiques</p>
+          </div>
+          <div class="objective-card">
+            <div class="objective-icon">✅</div>
+            <p>Obtenir une certification reconnue</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Final -->
+      <div class="cta-section">
+        <div class="cta-content">
+          <h3>Prêt à commencer votre formation ?</h3>
+          <p>Rejoignez les {{sessions.length}} sessions disponibles avec un seul clic</p>
+          <a [routerLink]="['/inscription/formation', formation.id]" class="btn-inscription">
+            S'inscrire maintenant
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Formation non trouvée -->
+    <div *ngIf="!loading && !formation" class="not-found">
+      <div class="not-found-icon">🔍</div>
+      <h2>Formation non trouvée</h2>
+      <p>La formation que vous recherchez n'existe pas ou a été supprimée.</p>
+      <a routerLink="/formations" class="btn-back-outline">Explorer les formations</a>
+    </div>
+    <!-- Ajouter à la fin du fichier, avant la fermeture du container -->
+
+<!-- Modal Code Secret -->
+<app-secret-code-modal 
+  *ngIf="showCodeModal"
+  (onSuccess)="onCodeSuccess()"
+  (onCancel)="onCodeCancel()">
+</app-secret-code-modal>
+
+<!-- Modal Live -->
+<div *ngIf="showLive && selectedSession" class="live-modal-overlay">
+  <div class="live-modal">
+    <div class="live-modal-header">
+      <h3>🎥 {{selectedSession.titre || 'Session en direct'}}</h3>
+      <button class="close-btn" (click)="leaveLive()">✕</button>
+    </div>
+    <div class="live-modal-body">
+      <app-jitsi-meet 
+        [roomName]="'session-' + selectedSession.id"
+        [displayName]="currentUser.name"
+        [isModerator]="true">
+      </app-jitsi-meet>
+    </div>
+  </div>
+</div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<div class="session-detail-container" *ngIf="session">
+  <div class="detail-header">
+    <button class="back-btn" routerLink="/admin/formations">← Retour</button>
+    <div class="header-actions">
+      <button class="btn-primary" [routerLink]="['/admin/formations/sessions', session.id, 'edit']">
+        Modifier
+      </button>
+      <button class="btn-danger" (click)="deleteSession()">Supprimer</button>
+    </div>
+  </div>
+
+  <div class="detail-content">
+    <div class="main-info">
+      <h1>Session de formation</h1>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">📅</div>
+        <div class="info-text">
+          <h4>Dates</h4>
+          <p>Du {{session.dateDebut | date:'dd/MM/yyyy à HH:mm'}}</p>
+          <p>Au {{session.dateFin | date:'dd/MM/yyyy à HH:mm'}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          <h4>Lieu</h4>
+          <p>{{session.lieu}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">👨‍🏫</div>
+        <div class="info-text">
+          <h4>Formateur</h4>
+          <p>{{session.formateur}}</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">👥</div>
+        <div class="info-text">
+          <h4>Capacité</h4>
+          <p>{{session.capaciteMax}} places</p>
+          <p>{{participations.length}} inscrits</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="competences-section" *ngIf="competences.length > 0">
+      <h2>Compétences à acquérir</h2>
+      <div class="competences-list">
+        <div class="competence-card" *ngFor="let competence of competences">
+          <strong>{{competence.nom}}</strong>
+          <p>{{competence.description}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- session-detail.component.html -->
+
+<!-- session-detail.component.html -->
+
+<div class="participants-section">
+  <div class="section-header">
+    <h2>👥 Participants inscrits</h2>
+    <button class="btn-toggle" (click)="showParticipantsList = !showParticipantsList">
+      {{ showParticipantsList ? '▼ Masquer' : '▶ Afficher' }} ({{ participants.length }})
+    </button>
+  </div>
+
+  <div *ngIf="showParticipantsList" class="participants-list">
+    <div *ngIf="participants.length === 0" class="no-data">
+      <p>Aucun participant inscrit</p>
+    </div>
+    
+    <table *ngIf="participants.length > 0" class="participants-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nom complet</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of participants; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td><strong>{{ p.prenom }} {{ p.nom }}</strong></td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.telephone || '-' }}</td>
+          <td>{{ p.dateInscription | date:'dd/MM/yyyy' }}</td>
+          <td>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="formation-list-container">
+  
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Gestion des Formations</h1>
+    <button class="btn-primary" routerLink="/admin/formations/new">+ Nouvelle Formation</button>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-info">
+        <h3>{{totalFormations}}</h3>
+        <p>Total Formations</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-info">
+        <h3>{{avanceCount}}</h3>
+        <p>Niveau Avancé</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-info">
+        <h3>{{certifieCount}}</h3>
+        <p>Avec Certification</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ FILTRES (UNE SEULE FOIS, EN DEHORS DE LA BOUCLE) -->
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Rechercher une formation..." [(ngModel)]="searchTerm" (input)="filterFormations()" class="search-input">
+    </div>
+    <select [(ngModel)]="niveauFilter" (change)="filterFormations()" class="filter-select">
+      <option value="">Tous les niveaux</option>
+      <option value="debutant">Débutant</option>
+      <option value="intermediaire">Intermédiaire</option>
+      <option value="avance">Avancé</option>
+    </select>
+  </div>
+
+  <!-- ✅ GRILLE DES FORMATIONS -->
+  <div class="formations-grid">
+    <div *ngFor="let formation of filteredFormations" class="formation-card">
+      
+      <!-- En-tête de la formation -->
+      <div class="formation-header">
+        <h3 class="formation-title">{{ formation.titre }}</h3>
+        <div class="formation-badges">
+          <span class="badge-level" [class]="formation.niveau">
+            {{ getNiveauLabel(formation.niveau) }}
+          </span>
+          <span class="badge-certification" *ngIf="formation.certificate">
+            🎓 Certifiante
+          </span>
+        </div>
+      </div>
+      <!-- Statistiques -->
+      <div class="formation-stats">
+        <div class="stat">
+          <span class="stat-icon">💰</span>
+          <span class="stat-value">{{ formation.prix === 0 ? 'Gratuit' : formation.prix + '€' }}</span>
+        </div>
+<div class="stat">
+    <span class="stat-icon">👨‍🏫</span>
+    <span class="stat-value">
+      {{ formation.formateurPrenom }} {{ formation.formateurNom }}
+      <span class="formateur-expertise" *ngIf="formation.formateurExpertise">
+        ({{ formation.formateurExpertise }})
+      </span>
+    </span>
+  </div>
+  </div>
+
+      <!-- Sessions -->
+      <div class="sessions-section">
+        <div class="sessions-header">
+          <h4>📅 Sessions disponibles</h4>
+          <button class="btn-add-session" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+            + Ajouter
+          </button>
+        </div>
+        
+        <div *ngIf="formationSessions[formation.id] && formationSessions[formation.id].length > 0" class="sessions-list">
+          <div *ngFor="let session of formationSessions[formation.id]" class="session-item">
+            <div class="session-info">
+              <span class="session-date">{{session.dateDebut | date:'dd/MM/yyyy'}}</span>
+              <span class="session-lieu">{{session.lieu}}</span>
+              <span class="session-formateur">{{session.formateur}}</span>
+            </div>
+            <div class="session-actions">
+              <button class="btn-view-session" [routerLink]="['/admin/formations/sessions', session.id]">
+                Voir
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="!formationSessions[formation.id] || formationSessions[formation.id].length === 0" class="no-sessions">
+          <p class="text-muted">Aucune session planifiée</p>
+          <button class="btn-add-session-small" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+            + Planifier une session
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="formation-actions">
+        <button class="btn-secondary" [routerLink]="['/admin/formations/sessions/new', formation.id]">
+          + Ajouter session
+        </button>
+        <button class="btn-primary" [routerLink]="['/admin/formations', formation.id, 'edit']">
+          Modifier
+        </button>
+        <button class="btn-danger" (click)="deleteFormation(formation.id)">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun résultat -->
+  <div *ngIf="filteredFormations.length === 0" class="no-results">
+    <p>Aucune formation trouvée</p>
+  </div>
+
+</div>

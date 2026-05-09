@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Angular import
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
@@ -107,3 +108,25 @@ export class AppComponent implements OnInit {
   private getCurrentUserName(): string { return localStorage.getItem('userName') || 'Utilisateur'; }
 }
 >>>>>>> e-commerce
+=======
+import { Component } from '@angular/core';
+import { NotificationService } from './modules/shared/services/notification.service';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
+})
+export class AppComponent {
+  title = 'event-formation-platform';
+
+  constructor(public notificationService: NotificationService) {}
+
+  closeNotification(id: number): void {
+    // Méthode pour fermer manuellement une notification
+    // La suppression se fait automatiquement après la durée définie
+  }
+  
+}
+>>>>>>> events

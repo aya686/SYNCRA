@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 
 import { AdminRoutingModule } from './admin-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -28,3 +29,23 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ]
 })
 export class AdminModule { }
+=======
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { EventGeneratorComponent } from './components/event-generator.component';
+
+@NgModule({
+  declarations: [
+    EventGeneratorComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule
+  ],
+  exports: [
+    EventGeneratorComponent
+  ]
+})
+export class AdminModule { }
+>>>>>>> events

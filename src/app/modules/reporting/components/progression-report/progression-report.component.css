@@ -1,0 +1,182 @@
+.report-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.report-header {
+  margin-bottom: 2rem;
+}
+
+.report-header h1 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+  font-size: 3rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chart-card h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+}
+
+.level-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.level-name {
+  width: 100px;
+  font-weight: 600;
+  color: #555;
+  text-transform: capitalize;
+}
+
+.level-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.level-bar {
+  height: 30px;
+  border-radius: 15px;
+  transition: width 0.3s ease;
+}
+
+.level-percent {
+  min-width: 45px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.session-progression {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.session-item {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.session-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.session-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.session-participants {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.progression-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progression-bar {
+  height: 20px;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progression-percent {
+  min-width: 45px;
+  font-weight: 600;
+  color: #555;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card, .chart-card {
+  animation: slideIn 0.3s ease-out;
+}

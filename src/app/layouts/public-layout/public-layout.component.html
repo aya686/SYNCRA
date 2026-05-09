@@ -1,0 +1,160 @@
+<div class="app-container">
+  <!-- PARTICLES & CURSOR GLOW -->
+  <canvas class="particle-canvas" #particleCanvas></canvas>
+  <div class="cursor-glow" #cursorGlow></div>
+
+  <!-- NAVBAR avec bouton toggle -->
+  <nav class="syncra-nav" [class.scrolled]="navScrolled">
+    <div class="nav-container">
+      <!-- BRAND -->
+      <span class="brand-name">SYNCRA</span>
+
+      <!-- BOUTON TOGGLE HAMBURGER -->
+      <button class="nav-toggle-btn" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- LINKS -->
+      <div class="nav-links">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Home</a>
+        <a routerLink="/events" routerLinkActive="active" class="nav-link">Dashboard</a>
+        <a routerLink="/formations" routerLinkActive="active" class="nav-link">Documentation</a>
+        <a routerLink="/favoris" class="nav-link favorites-link">
+    ❤️ Mes favoris
+    <span class="favorites-count" *ngIf="favoritesCount > 0">{{ favoritesCount }}</span>
+  </a>
+
+        <div class="user-menu" *ngIf="authService.isLoggedIn()">
+  <span class="user-name">{{ authService.getCurrentUser()?.nom }}</span>
+  <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+</div>
+      </div>
+
+      <!-- MOBILE -->
+      <button class="nav-mobile-toggle" (click)="mobileMenuOpen = !mobileMenuOpen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SIDEBAR -->
+<aside class="sidebar" [class.collapsed]="isSidebarCollapsed" [class.mobile-open]="mobileMenuOpen">
+
+  <div class="sidebar-inner">
+
+    <!-- MENU LIST -->
+    <ul class="nav-menu">
+
+      <!-- SECTION -->
+      <li class="nav-section" *ngIf="!isSidebarCollapsed">
+        <span class="section-text">
+          <span class="section-dot"></span>
+          MENU PRINCIPAL
+        </span>
+      </li>
+
+      <!-- ACCUEIL -->
+      <li>
+        <a (click)="toggleSubmenu()" style="cursor:pointer;" routerLink="/" routerLinkActive="active">
+          <span class="icon">🏠</span>
+          <span *ngIf="!isSidebarCollapsed">Accueil</span>
+        </a>
+
+        <!-- SUBMENU -->
+        <ul class="sub-menu"
+            *ngIf="submenuOpen && !isSidebarCollapsed">
+
+          <li>
+            <a routerLink="/events" routerLinkActive="active">
+              <span class="icon">📅</span>
+              <span>Événements</span>
+            </a>
+          </li>
+
+          <li>
+            <a routerLink="/formations" routerLinkActive="active">
+              <span class="icon">🎓</span>
+              <span>Formations</span>
+            </a>
+          </li>
+
+        </ul>
+      </li>
+    </ul>
+
+  </div>
+
+</aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- FOOTER SYNCRA -->
+  <footer class="syncra-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="brand-icon-wrap small">
+            <div class="brand-hex">⬡</div>
+          </div>
+          <span class="brand-name">SYNCRA</span>
+        </div>
+        <p>La plateforme qui connecte les talents aux opportunités — événements, formations et développement professionnel.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn" title="Facebook">f</a>
+          <a href="#" class="social-btn" title="Twitter">𝕏</a>
+          <a href="#" class="social-btn" title="LinkedIn">in</a>
+          <a href="#" class="social-btn" title="GitHub">◈</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorer</h4>
+          <ul>
+            <li><a routerLink="/events">Événements</a></li>
+            <li><a routerLink="/formations">Formations</a></li>
+            <li><a href="#">Conférences</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Aide</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Légal</h4>
+          <ul>
+            <li><a href="#">Mentions</a></li>
+            <li><a href="#">CGU</a></li>
+            <li><a href="#">Confidentialité</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Administration</h4>
+          <ul>
+            <li><a routerLink="/admin">Admin Panel</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Statistiques</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SYNCRA — Tous droits réservés.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </footer>
+</div>

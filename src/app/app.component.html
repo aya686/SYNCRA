@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <router-outlet>
   <app-spinner />
 </router-outlet>
@@ -115,3 +116,26 @@
   </div>
 </footer>
 >>>>>>> e-commerce
+=======
+<!-- Container pour les notifications toast -->
+<div class="toast-container">
+  <div *ngFor="let notif of (notificationService.notifications$ | async)" 
+       class="toast-notification" 
+       [class]="notif.type"
+       [style.animation]="'slideIn 0.3s ease'">
+    <div class="toast-icon">
+      <span *ngIf="notif.type === 'success'">✅</span>
+      <span *ngIf="notif.type === 'error'">❌</span>
+      <span *ngIf="notif.type === 'warning'">⚠️</span>
+      <span *ngIf="notif.type === 'info'">ℹ️</span>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">{{notif.title}}</div>
+      <div class="toast-message">{{notif.message}}</div>
+    </div>
+    <button class="toast-close" (click)="closeNotification(notif.id)">✕</button>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
+>>>>>>> events

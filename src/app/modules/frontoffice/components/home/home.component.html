@@ -1,0 +1,153 @@
+<div class="app-container">
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-wrapper">
+      <!-- Hero Section -->
+      <section class="hero-wave">
+        <div class="wave-bg"></div>
+        <div class="hero-container">
+          <div class="hero-left">
+            <span class="trend-badge">🚀 Plateforme Innovante</span>
+            <h1>Développez votre <span class="gradient-text">potentiel</span></h1>
+            <p>Rejoignez une communauté d'apprenants et de professionnels. Découvrez des événements inspirants et des formations certifiantes.</p>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{stats.events}}+</span>
+                <span class="hero-stat-label">Événements</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{stats.formations}}+</span>
+                <span class="hero-stat-label">Formations</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">{{stats.participants}}+</span>
+                <span class="hero-stat-label">Participants</span>
+              </div>
+            </div>
+            <div class="hero-buttons">
+              <a routerLink="/events" class="btn-primary-hero">
+                Explorer les événements
+                <span>→</span>
+              </a>
+              <a routerLink="/formations" class="btn-ghost-hero">
+                Voir les formations
+              </a>
+            </div>
+          </div>
+          <div class="hero-right">
+            <div class="floating-card card-1">
+              <span>🎉</span>
+              <p>+150 événements</p>
+            </div>
+            <div class="floating-card card-2">
+              <span>🏆</span>
+              <p>Certification</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Section -->
+      <section class="stats-cards-section">
+        <div class="stats-container">
+          <div class="stats-grid-modern">
+            <div class="stat-card-modern" *ngFor="let stat of statsList">
+              <div class="stat-icon">{{stat.icon}}</div>
+              <div class="stat-info">
+                <div class="stat-number">{{stat.value}}+</div>
+                <div class="stat-label">{{stat.label}}</div>
+              </div>
+              <div class="stat-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width]="stat.fill"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Prochains Événements -->
+      <section class="events-section">
+        <div class="events-container">
+          <div class="section-header">
+            <h2>📅 Prochains événements</h2>
+            <p>Ne manquez pas ces opportunités uniques</p>
+            <a routerLink="/events" class="view-all">Voir tous →</a>
+          </div>
+          
+          <div *ngIf="loading" class="loading-grid">
+            <div class="loading-card" *ngFor="let _ of [1,2,3]">
+              <div class="loading-shimmer"></div>
+            </div>
+          </div>
+          
+          <div class="events-masonry" *ngIf="!loading">
+            <div *ngFor="let event of upcomingEvents" class="event-item">
+              <div class="event-media" [style.backgroundImage]="'url(http://localhost:8089/event_db' + (event.imageUrl || '') + ')'" 
+                   [style.backgroundSize]="'cover'" [style.backgroundPosition]="'center'">
+                <div class="event-category">{{event.type}}</div>
+                <div class="event-date-badge">
+                  <span class="date-day">{{event.dateDebut | date:'dd'}}</span>
+                  <span class="date-month">{{event.dateDebut | date:'MMM'}}</span>
+                </div>
+                <div class="event-overlay"></div>
+              </div>
+              <div class="event-details">
+                <h3>{{event.titre}}</h3>
+                <div class="event-meta-row">
+                  <span>📍 {{event.lieu}}</span>
+                  <span>⏰ {{event.dateDebut | date:'HH:mm'}}</span>
+                </div>
+                <p>{{(event.description || 'Découvrez cet événement') | slice:0:80}}...</p>
+                <div class="event-footer-row">
+                  <div class="event-price">
+                    <span class="price-tag" [class.free]="event.prix === 0">
+                      {{event.prix === 0 ? 'GRATUIT' : event.prix + ' €'}}
+                    </span>
+                    <span class="places-left">{{event.placesDisponibles}} places</span>
+                  </div>
+                  <a [routerLink]="['/events', event.id]" class="event-link">
+                    S'inscrire →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Formations Populaires -->
+      <section class="formations-section">
+        <div class="formations-container">
+          <div class="section-header">
+            <h2>🎓 Formations populaires</h2>
+            <p>Développez vos compétences avec nos experts</p>
+            <a routerLink="/formations" class="view-all">Voir toutes →</a>
+          </div>
+          
+          <div class="formations-masonry" *ngIf="!loading">
+  <div *ngFor="let formation of popularFormations" class="formation-item">
+    <div class="formation-details">
+      <h3>{{formation.titre}}</h3>
+      <p>{{formation.description | slice:0:80}}...</p>
+      <div class="formation-meta-row">
+        <span>⏱️ {{formation.dureeTotale}} heures</span>
+        <span>💰 {{formation.prix === 0 ? 'Gratuit' : formation.prix + '€'}}</span>
+        <span *ngIf="formation.certificate">🎓 Certifiante</span>
+      </div>
+      <div class="formation-footer-row">
+        <a [routerLink]="['/formations', formation.id]" class="formation-link">
+          Découvrir →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+</div>
