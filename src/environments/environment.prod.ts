@@ -2,10 +2,14 @@ import packageInfo from '../../package.json';
 
 export const environment = {
   appVersion: packageInfo.version,
-<<<<<<< HEAD
-  production: true
-=======
   production: true,
-  useMockDossierSanteApi: false
->>>>>>> gestion-de-bienetre
+
+  // API principale
+  apiUrl: 'http://localhost:8085/api',
+
+  // Configuration mock API
+  useMockDossierSanteApi: false,
+
+  // OpenRouter API
+  openRouterApiKey: 'YOUR_OPENROUTER_API_KEY_HERE'
 };

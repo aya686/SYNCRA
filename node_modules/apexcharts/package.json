@@ -1,12 +1,14 @@
 {
   "name": "apexcharts",
-  "version": "3.54.1",
+  "version": "5.3.6",
   "description": "A JavaScript Chart Library",
   "repository": {
     "type": "git",
     "url": "https://github.com/apexcharts/apexcharts.js.git"
   },
   "main": "dist/apexcharts.common.js",
+  "es2020": "dist/apexcharts.esm.js",
+  "module": "dist/apexcharts.esm.js",
   "unpkg": "dist/apexcharts.js",
   "jsdelivr": "dist/apexcharts.js",
   "typings": "types/apexcharts.d.ts",
@@ -35,18 +37,18 @@
     "build:samples": "node samples/source/index.js generate"
   },
   "dependencies": {
-    "@yr/monotone-cubic-spline": "^1.0.3",
-    "svg.draggable.js": "^2.2.2",
-    "svg.easing.js": "^2.0.0",
-    "svg.filter.js": "^2.0.2",
-    "svg.pathmorphing.js": "^0.1.3",
-    "svg.resize.js": "^1.4.3",
-    "svg.select.js": "^3.0.1"
+    "@svgdotjs/svg.draggable.js": "^3.0.4",
+    "@svgdotjs/svg.filter.js": "^3.0.8",
+    "@svgdotjs/svg.js": "^3.2.4",
+    "@svgdotjs/svg.resize.js": "^2.0.2",
+    "@svgdotjs/svg.select.js": "^4.0.1",
+    "@yr/monotone-cubic-spline": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.8.7",
+    "@blazediff/core": "1.0.0",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-json": "4.0.1",
     "@rollup/plugin-node-resolve": "6.0.0",
@@ -72,11 +74,10 @@
     "jest-puppeteer": "^10.0.1",
     "nunjucks": "3.2.4",
     "nyc": "15.0.0",
-    "pixelmatch": "5.1.0",
     "pngjs": "3.4.0",
     "postcss": "^8.4.21",
     "prettier": "2.8.5",
-    "puppeteer": "22.12.1",
+    "puppeteer": "22.15.0",
     "puppeteer-cluster": "0.24.0",
     "rollup": "3.29.5",
     "rollup-plugin-babel": "4.4.0",
@@ -95,13 +96,7 @@
   "bugs": {
     "url": "https://github.com/apexcharts/apexcharts.js/issues"
   },
-  "license": "MIT",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
-    }
-  ],
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://apexcharts.com",
   "keywords": [
     "charts",

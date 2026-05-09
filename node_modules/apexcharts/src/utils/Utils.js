@@ -20,6 +20,10 @@ class Utils {
     return Object.prototype.toString.call(val) === '[object ' + type + ']'
   }
 
+  static isSafari() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  }
+
   static listToArray(list) {
     let i,
       array = []
@@ -92,29 +96,35 @@ class Utils {
     return month % 12
   }
 
-  static clone(source) {
-    if (Utils.is('Array', source)) {
-      let cloneResult = []
-      for (let i = 0; i < source.length; i++) {
-        cloneResult[i] = this.clone(source[i])
-      }
-      return cloneResult
-    } else if (Utils.is('Null', source)) {
-      // fixes an issue where null values were converted to {}
-      return null
-    } else if (Utils.is('Date', source)) {
-      return source
-    } else if (typeof source === 'object') {
-      let cloneResult = {}
-      for (let prop in source) {
-        if (source.hasOwnProperty(prop)) {
-          cloneResult[prop] = this.clone(source[prop])
-        }
-      }
-      return cloneResult
-    } else {
+  static clone(source, visited = new WeakMap()) {
+    if (source === null || typeof source !== 'object') {
       return source
     }
+
+    if (visited.has(source)) {
+      return visited.get(source)
+    }
+
+    let cloneResult
+
+    if (Array.isArray(source)) {
+      cloneResult = []
+      visited.set(source, cloneResult)
+      for (let i = 0; i < source.length; i++) {
+        cloneResult[i] = this.clone(source[i], visited)
+      }
+    } else if (source instanceof Date) {
+      cloneResult = new Date(source.getTime())
+    } else {
+      cloneResult = {}
+      visited.set(source, cloneResult)
+      for (let prop in source) {
+        if (source.hasOwnProperty(prop)) {
+          cloneResult[prop] = this.clone(source[prop], visited)
+        }
+      }
+    }
+    return cloneResult
   }
 
   static log10(x) {
@@ -130,7 +140,7 @@ class Utils {
   }
 
   static parseNumber(val) {
-    if (val === null) return val
+    if (typeof val === 'number' || val === null) return val
     return parseFloat(val)
   }
 
@@ -142,27 +152,68 @@ class Utils {
     return (Math.random() + 1).toString(36).substring(4)
   }
 
-  static noExponents(val) {
-    let data = String(val).split(/[eE]/)
-    if (data.length === 1) return data[0]
-
-    let z = '',
-      sign = val < 0 ? '-' : '',
-      str = data[0].replace('.', ''),
-      mag = Number(data[1]) + 1
-
-    if (mag < 0) {
-      z = sign + '0.'
-      while (mag++) z += '0'
-      return z + str.replace(/^-/, '')
+  static noExponents(num) {
+    // Check if the number contains 'e' (exponential notation)
+    if (num.toString().includes('e')) {
+      return Math.round(num) // Round the number
     }
-    mag -= str.length
-    while (mag--) z += '0'
-    return str + z
+    return num // Return as-is if no exponential notation
+  }
+
+  static elementExists(element) {
+    if (!element || !element.isConnected) {
+      return false
+    }
+    return true
+  }
+
+  /**
+   * detects if an element is inside a Shadow DOM
+   */
+  static isInShadowDOM(el) {
+    if (!el || !el.getRootNode) {
+      return false
+    }
+
+    const rootNode = el.getRootNode()
+
+    // check if root node is a ShadowRoot
+    return rootNode && rootNode !== document && Utils.is('ShadowRoot', rootNode)
+  }
+
+  /**
+   * gets the shadow root host element
+   */
+  static getShadowRootHost(el) {
+    if (!Utils.isInShadowDOM(el)) {
+      return null
+    }
+
+    const rootNode = el.getRootNode()
+    return rootNode.host || null
   }
 
   static getDimensions(el) {
-    const computedStyle = getComputedStyle(el, null)
+    if (!el) return [0, 0]
+
+    // check if in shadow DOM
+    const rootNode = el.getRootNode && el.getRootNode()
+    const inShadowDOM = rootNode && rootNode !== document
+
+    if (inShadowDOM && rootNode.host) {
+      // in shadow DOM: use host container dimensions
+      const hostRect = rootNode.host.getBoundingClientRect()
+      return [hostRect.width, hostRect.height]
+    }
+
+    // regular DOM
+    let computedStyle
+    try {
+      computedStyle = getComputedStyle(el, null)
+    } catch (e) {
+      // fallback to clientWidth/Height
+      return [el.clientWidth || 0, el.clientHeight || 0]
+    }
 
     let elementHeight = el.clientHeight
     let elementWidth = el.clientWidth
@@ -177,6 +228,19 @@ class Utils {
   }
 
   static getBoundingClientRect(element) {
+    if (!element) {
+      return {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        x: 0,
+        y: 0,
+      }
+    }
+
     const rect = element.getBoundingClientRect()
     return {
       top: rect.top,
@@ -368,14 +432,6 @@ class Utils {
     return Number(n) === n && n % 1 !== 0
   }
 
-  static isSafari() {
-    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-  }
-
-  static isFirefox() {
-    return navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-  }
-
   static isMsEdge() {
     let ua = window.navigator.userAgent
 
@@ -392,16 +448,20 @@ class Utils {
   // Find the Greatest Common Divisor of two numbers
   //
   static getGCD(a, b, p = 7) {
-    let big = Math.pow(10, p - Math.floor(Math.log10(Math.max(a, b))))
-    a = Math.round(Math.abs(a) * big)
-    b = Math.round(Math.abs(b) * big)
+    let factor = Math.pow(10, p - Math.floor(Math.log10(Math.max(a, b))))
+    if (factor > 1) {
+      a = Math.round(Math.abs(a) * factor)
+      b = Math.round(Math.abs(b) * factor)
+    } else {
+      factor = 1
+    }
 
     while (b) {
       let t = b
       b = a % b
       a = t
     }
-    return a / big
+    return a / factor
   }
 
   static getPrimeFactors(n) {

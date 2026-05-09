@@ -90,9 +90,7 @@ export default class Toolbar {
               : icoSelect,
           title:
             this.localeValues[z === 'zoom' ? 'selectionZoom' : 'selection'],
-          class: w.globals.isTouchDevice
-            ? 'apexcharts-element-hidden'
-            : `apexcharts-${z}-icon`,
+          class: `apexcharts-${z}-icon`,
         })
       }
     }
@@ -104,9 +102,7 @@ export default class Toolbar {
         el: this.elPan,
         icon: typeof this.t.pan === 'string' ? this.t.pan : icoPan,
         title: this.localeValues.pan,
-        class: w.globals.isTouchDevice
-          ? 'apexcharts-element-hidden'
-          : 'apexcharts-pan-icon',
+        class: 'apexcharts-pan-icon',
       })
     }
 
@@ -423,6 +419,7 @@ export default class Toolbar {
   zoomCallback(xaxis, yaxis) {
     if (typeof this.ev.zoomed === 'function') {
       this.ev.zoomed(this.ctx, { xaxis, yaxis })
+      this.ctx.events.fireEvent('zoomed', { xaxis, yaxis })
     }
   }
 

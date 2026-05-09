@@ -20,11 +20,10 @@ export default class Globals {
     gl.seriesLog = []
     gl.seriesColors = []
     gl.stackedSeriesTotals = []
-    gl.seriesXvalues = [] // we will need this in tooltip (it's x position)
-    // when we will have unequal x values, we will need
-    // some way to get x value depending on mouse pointer
-    gl.seriesYvalues = [] // we will need this when deciding which series
-    // user hovered on
+    gl.seriesXvalues = [] // we will need this in tooltip (it's x position) when we will have unequal x values, we will need some way to get x value depending on mouse pointer
+    gl.seriesYvalues = [] // we will need this when deciding which series user hovered on
+    gl.dataWasParsed = false
+    gl.originalSeries = null
     gl.labels = []
     gl.hasXaxisGroups = false
     gl.groups = []
@@ -188,7 +187,6 @@ export default class Globals {
       dataLabelsRects: [], // store the positions of datalabels to prevent collision
       lastDrawnDataLabelsIndexes: [],
       hasNullValues: false, // bool: whether series contains null values
-      easing: null, // function: animation effect to apply
       zoomed: false, // whether user has zoomed or not
       gridWidth: 0, // drawable width of actual graphs (series paths)
       gridHeight: 0, // drawable height of actual graphs (series paths)

@@ -134,22 +134,8 @@ export default class UpdateHelpers {
         this.ctx.series.getPreviousPaths()
       }
 
-      let existingSeries
-
-      // axis charts
-      if (w.globals.axisCharts) {
-        existingSeries = newSeries.map((s, i) => {
-          return this._extendSeries(s, i)
-        })
-
-        if (existingSeries.length === 0) {
-          existingSeries = [{ data: [] }]
-        }
-        w.config.series = existingSeries
-      } else {
-        // non-axis chart (pie/radialbar)
-        w.config.series = newSeries.slice()
-      }
+      this.ctx.data.resetParsingFlags()
+      this.ctx.data.parseData(newSeries)
 
       if (overwriteInitialSeries) {
         w.globals.initialConfig.series = Utils.clone(w.config.series)
@@ -183,15 +169,15 @@ export default class UpdateHelpers {
     const parent = `.apexcharts-series[data\\:realIndex='${seriesIndex}']`
 
     if (w.globals.axisCharts) {
-      elPath = w.globals.dom.Paper.select(
+      elPath = w.globals.dom.Paper.findOne(
         `${parent} path[j='${dataPointIndex}'], ${parent} circle[j='${dataPointIndex}'], ${parent} rect[j='${dataPointIndex}']`
-      ).members[0]
+      )
     } else {
       // dataPointIndex will be undefined here, hence using seriesIndex
       if (typeof dataPointIndex === 'undefined') {
-        elPath = w.globals.dom.Paper.select(
+        elPath = w.globals.dom.Paper.findOne(
           `${parent} path[j='${seriesIndex}']`
-        ).members[0]
+        )
 
         if (
           w.config.chart.type === 'pie' ||

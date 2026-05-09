@@ -1,5 +1,6 @@
-import Graphics from '../Graphics'
+import apexchartsLegendCSS from '../../assets/apexcharts-legend.css'
 import Utils from '../../utils/Utils'
+import Graphics from '../Graphics'
 
 export default class Helpers {
   constructor(lgCtx) {
@@ -16,74 +17,8 @@ export default class Helpers {
       stylesheet.setAttribute('nonce', nonce)
     }
 
-    const text = `
-      .apexcharts-flip-y {
-        transform: scaleY(-1) translateY(-100%);
-        transform-origin: top;
-        transform-box: fill-box;
-      }
-      .apexcharts-flip-x {
-        transform: scaleX(-1);
-        transform-origin: center;
-        transform-box: fill-box;
-      }
-      .apexcharts-legend {
-        display: flex;
-        overflow: auto;
-        padding: 0 10px;
-      }
-      .apexcharts-legend.apx-legend-position-bottom, .apexcharts-legend.apx-legend-position-top {
-        flex-wrap: wrap
-      }
-      .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
-        flex-direction: column;
-        bottom: 0;
-      }
-      .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-left, .apexcharts-legend.apx-legend-position-top.apexcharts-align-left, .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
-        justify-content: flex-start;
-      }
-      .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, .apexcharts-legend.apx-legend-position-top.apexcharts-align-center {
-        justify-content: center;
-      }
-      .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-right, .apexcharts-legend.apx-legend-position-top.apexcharts-align-right {
-        justify-content: flex-end;
-      }
-      .apexcharts-legend-series {
-        cursor: pointer;
-        line-height: normal;
-        display: flex;
-        align-items: center;
-      }
-      .apexcharts-legend-text {
-        position: relative;
-        font-size: 14px;
-      }
-      .apexcharts-legend-text *, .apexcharts-legend-marker * {
-        pointer-events: none;
-      }
-      .apexcharts-legend-marker {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        margin-right: 1px;
-      }
-
-      .apexcharts-legend-series.apexcharts-no-click {
-        cursor: auto;
-      }
-      .apexcharts-legend .apexcharts-hidden-zero-series, .apexcharts-legend .apexcharts-hidden-null-series {
-        display: none !important;
-      }
-      .apexcharts-inactive-legend {
-        opacity: 0.45;
-      }`
-
-    let rules = document.createTextNode(text)
-
-    stylesheet.appendChild(rules)
-
+    const rule = document.createTextNode(apexchartsLegendCSS)
+    stylesheet.appendChild(rule)
     return stylesheet
   }
 
@@ -103,7 +38,9 @@ export default class Helpers {
   appendToForeignObject() {
     const gl = this.w.globals
 
-    gl.dom.elLegendForeign.appendChild(this.getLegendStyles())
+    if (this.w.config.chart.injectStyleSheet !== false) {
+      gl.dom.elLegendForeign.appendChild(this.getLegendStyles())
+    }
   }
 
   toggleDataSeries(seriesCnt, isHidden) {
@@ -149,7 +86,7 @@ export default class Helpers {
       }
     } else {
       // for non-axis charts i.e pie / donuts
-      let seriesEl = w.globals.dom.Paper.select(
+      let seriesEl = w.globals.dom.Paper.findOne(
         ` .apexcharts-series[rel='${seriesCnt + 1}'] path`
       )
 
@@ -158,11 +95,8 @@ export default class Helpers {
         let dataLabels = w.config.plotOptions.pie.donut.labels
 
         const graphics = new Graphics(this.lgCtx.ctx)
-        graphics.pathMouseDown(seriesEl.members[0], null)
-        this.lgCtx.ctx.pie.printDataLabelsInner(
-          seriesEl.members[0].node,
-          dataLabels
-        )
+        graphics.pathMouseDown(seriesEl, null)
+        this.lgCtx.ctx.pie.printDataLabelsInner(seriesEl.node, dataLabels)
       }
 
       seriesEl.fire('click')
@@ -250,7 +184,9 @@ export default class Helpers {
           } else {
             series[realIndex] = collapsedSeries[c].data
           }
-          series[realIndex].hidden = false
+          if (typeof series[realIndex] !== 'number') {
+            series[realIndex].hidden = false
+          }
           collapsedSeries.splice(c, 1)
           seriesIndices.splice(c, 1)
           w.globals.risingSeries.push(realIndex)

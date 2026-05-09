@@ -38,6 +38,8 @@ export default class ApexCharts {
     const initCtx = new InitCtxVariables(this)
     initCtx.initModules()
 
+    this.lastUpdateOptions = null
+
     this.create = Utils.bind(this.create, this)
     this.windowResizeHandler = this._windowResizeHandler.bind(this)
     this.parentResizeHandler = this._parentResizeCallback.bind(this)
@@ -50,7 +52,7 @@ export default class ApexCharts {
     // main method
     return new Promise((resolve, reject) => {
       // only draw chart, if element found
-      if (this.el !== null) {
+      if (Utils.elementExists(this.el)) {
         if (typeof Apex._chartInstances === 'undefined') {
           Apex._chartInstances = []
         }
@@ -92,7 +94,7 @@ export default class ApexCharts {
           if (inShadowRoot) {
             // We are in Shadow DOM, add to shadow root
             rootNode.prepend(css)
-          } else {
+          } else if (this.w.config.chart.injectStyleSheet !== false) {
             // Add to <head> of element's document
             doc.head.appendChild(css)
           }
@@ -129,16 +131,16 @@ export default class ApexCharts {
     gl.noData = false
     gl.animationEnded = false
 
+    if (!Utils.elementExists(this.el)) {
+      gl.animationEnded = true
+      return null
+    }
+
     this.responsive.checkResponsiveConfig(opts)
 
     if (w.config.xaxis.convertedCatToNumeric) {
       const defaults = new Defaults(w.config)
       defaults.convertCatToNumericXaxis(w.config, this.ctx)
-    }
-
-    if (this.el === null) {
-      gl.animationEnded = true
-      return null
     }
 
     this.core.setupElements()
@@ -241,6 +243,10 @@ export default class ApexCharts {
 
     // after all the drawing calculations, shift the graphical area (actual charts/bars) excluding legends
     this.core.shiftGraphPosition()
+
+    if (w.globals.dataPoints > 50) {
+      w.globals.dom.elWrap.classList.add('apexcharts-disable-transitions')
+    }
 
     const dim = {
       plot: {
@@ -425,7 +431,17 @@ export default class ApexCharts {
     // fixes apexcharts.js#1488
     w.globals.selection = undefined
 
+    if (
+      this.lastUpdateOptions &&
+      JSON.stringify(this.lastUpdateOptions) === JSON.stringify(options)
+    ) {
+      // Options are identical, skip the update
+      return this
+    }
+
     if (options.series) {
+      this.data.resetParsingFlags()
+
       this.series.resetSeries(false, true, false)
       if (options.series.length && options.series[0].data) {
         options.series = options.series.map((s, i) => {
@@ -466,6 +482,8 @@ export default class ApexCharts {
    * @param {array} series - New series which will override the existing
    */
   updateSeries(newSeries = [], animate = true, overwriteInitialSeries = true) {
+    this.data.resetParsingFlags()
+
     this.series.resetSeries(false)
     this.updateHelpers.revertDefaultAxisMinMax()
     return this.updateHelpers._updateSeries(
@@ -481,6 +499,8 @@ export default class ApexCharts {
    * @param {array} newSerie - New serie which will be appended to the existing series
    */
   appendSeries(newSerie, animate = true, overwriteInitialSeries = true) {
+    this.data.resetParsingFlags()
+
     const newSeries = this.w.config.series.slice()
     newSeries.push(newSerie)
     this.series.resetSeries(false)
@@ -500,8 +520,8 @@ export default class ApexCharts {
   appendData(newData, overwriteInitialSeries = true) {
     let me = this
 
+    me.data.resetParsingFlags()
     me.w.globals.dataChanged = true
-
     me.series.getPreviousPaths()
 
     let newSeries = me.w.config.series.slice()
@@ -523,6 +543,16 @@ export default class ApexCharts {
 
   update(options) {
     return new Promise((resolve, reject) => {
+      if (
+        this.lastUpdateOptions &&
+        JSON.stringify(this.lastUpdateOptions) === JSON.stringify(options)
+      ) {
+        // Options are identical, skip the update
+        return resolve(this)
+      }
+
+      this.lastUpdateOptions = Utils.clone(options)
+
       new Destroy(this.ctx).clear({ isUpdating: true })
 
       const graphData = this.create(this.w.config.series, options)
@@ -626,6 +656,21 @@ export default class ApexCharts {
 
   static merge(target, source) {
     return Utils.extend(target, source)
+  }
+
+  static getThemePalettes() {
+    return {
+      palette1: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
+      palette2: ['#3F51B5', '#03A9F4', '#4CAF50', '#F9CE1D', '#FF9800'],
+      palette3: ['#33B2DF', '#546E7A', '#D4526E', '#13D8AA', '#A5978B'],
+      palette4: ['#4ECDC4', '#C7F464', '#81D4FA', '#FD6A6A', '#546E7A'],
+      palette5: ['#2B908F', '#F9A3A4', '#90EE7E', '#FA4443', '#69D2E7'],
+      palette6: ['#449DD1', '#F86624', '#EA3546', '#662E9B', '#C5D86D'],
+      palette7: ['#D7263D', '#1B998B', '#2E294E', '#F46036', '#E2C044'],
+      palette8: ['#662E9B', '#F86624', '#F9C80E', '#EA3546', '#43BCCD'],
+      palette9: ['#5C4742', '#A5978B', '#8D5B4C', '#5A2A27', '#C4BBAF'],
+      palette10: ['#A300D6', '#7D02EB', '#5653FE', '#2983FF', '#00B1F2'],
+    }
   }
 
   toggleSeries(seriesName) {
@@ -748,6 +793,10 @@ export default class ApexCharts {
   dataURI(options) {
     const exp = new Exports(this.ctx)
     return exp.dataURI(options)
+  }
+
+  getSvgString(scale) {
+    return new Exports(this.ctx).getSvgString(scale)
   }
 
   exportToCSV(options = {}) {

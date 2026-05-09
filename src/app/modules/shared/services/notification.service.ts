@@ -13,12 +13,28 @@ export interface ToastNotification {
   providedIn: 'root'
 })
 export class NotificationService {
+
   private notifications: ToastNotification[] = [];
   private notificationSubject = new BehaviorSubject<ToastNotification[]>([]);
 
   notifications$ = this.notificationSubject.asObservable();
 
-  show(message: string, title: string = 'Notification', type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 3000): void {
+  startPolling(userId: number): void {
+    console.log('Notification polling démarré pour user:', userId);
+
+    // Exemple futur :
+    // setInterval(() => {
+    //   this.info('Nouvelle notification reçue');
+    // }, 10000);
+  }
+
+  show(
+    message: string,
+    title: string = 'Notification',
+    type: 'success' | 'error' | 'warning' | 'info' = 'info',
+    duration: number = 3000
+  ): void {
+
     const notification: ToastNotification = {
       id: Date.now(),
       title,
@@ -26,7 +42,7 @@ export class NotificationService {
       type,
       duration
     };
-    
+
     this.notifications.push(notification);
     this.notificationSubject.next([...this.notifications]);
 
@@ -57,4 +73,5 @@ export class NotificationService {
     this.notifications = this.notifications.filter(n => n.id !== id);
     this.notificationSubject.next([...this.notifications]);
   }
+
 }
