@@ -29,7 +29,6 @@ import { EventGeneratorComponent } from './components/event-generator.component'
     EventGeneratorComponent
   ],
   exports: [
-    EventGeneratorComponent
   ]
 })
 export class AdminModule { }

@@ -1,17 +1,14 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-<<<<<<< HEAD
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-=======
-import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
->>>>>>> events
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-<<<<<<< HEAD
+// e-commerce modules
 import { ResourcesModule } from './modules/resources/resources.module';
 import { RequestsModule } from './modules/requests/requests.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
@@ -20,6 +17,18 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 
+// events modules
+import { AdminLayoutModule } from './layouts/admin-layout/admin-layout.module';
+import { PublicLayoutModule } from './layouts/public-layout/public-layout.module';
+import { EventsModule } from './modules/events/events.module';
+import { FormationsModule } from './modules/formations/formations.module';
+import { ReportingModule } from './modules/reporting/reporting.module';
+import { FrontOfficeModule } from './modules/frontoffice/frontoffice.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { FormateursModule } from './modules/formateurs/formateurs.module';
+import { SharedModule } from './modules/shared/shared.module';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -27,6 +36,7 @@ import { MarketplaceModule } from './modules/marketplace/marketplace.module';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     AppRoutingModule,
     AppComponent,
     ResourcesModule,
@@ -35,43 +45,21 @@ import { MarketplaceModule } from './modules/marketplace/marketplace.module';
     CartModule,
     OrdersModule,
     LoyaltyModule,
-    MarketplaceModule
+    MarketplaceModule,
+    AdminLayoutModule,
+    PublicLayoutModule,
+    EventsModule,
+    FormationsModule,
+    ReportingModule,
+    FrontOfficeModule,
+    AuthModule,
+    AdminModule,
+    FormateursModule,
+    SharedModule
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi())
+  ],
   bootstrap: [AppComponent]
 })
-=======
-// Layout Modules
-import { AdminLayoutModule } from './layouts/admin-layout/admin-layout.module';
-import { PublicLayoutModule } from './layouts/public-layout/public-layout.module';
-
-// Feature Modules
-import { EventsModule } from './modules/events/events.module';
-import { FormationsModule } from './modules/formations/formations.module';
-import { ReportingModule } from './modules/reporting/reporting.module';
-import { FrontOfficeModule } from './modules/frontoffice/frontoffice.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { AdminModule } from './modules/admin/admin.module';
-import { FormateursModule } from './modules/formateurs/formateurs.module';
-
-// Shared Module
-import { SharedModule } from './modules/shared/shared.module';
-
-@NgModule({ declarations: [
-        AppComponent
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        FormsModule,
-        AppRoutingModule,
-        AdminLayoutModule,
-        PublicLayoutModule,
-        EventsModule,
-        FormationsModule,
-        ReportingModule,
-        FrontOfficeModule,
-        AuthModule,
-        AdminModule,
-        FormateursModule,
-        SharedModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
->>>>>>> events
 export class AppModule { }

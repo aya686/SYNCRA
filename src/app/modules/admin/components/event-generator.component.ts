@@ -4,12 +4,15 @@ import { AiEventGeneratorService, GeneratedEvent, CategoryStats } from '../../..
 import { NotificationService } from '../../../modules/shared/services/notification.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
+import { CommonModule, DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 @Component({
-    selector: 'app-event-generator',
-    templateUrl: './event-generator.component.html',
-    styleUrls: ['./event-generator.component.scss'],
-    standalone: false
+  selector: 'app-event-generator',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe, DatePipe, TitleCasePipe],
+  templateUrl: './event-generator.component.html',
+  styleUrls: ['./event-generator.component.scss']
 })
 export class EventGeneratorComponent implements OnInit {
   categories = [

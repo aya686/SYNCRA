@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-// Formateur Components
 import { FormateurListComponent } from './formateur-list/formateur-list.component';
 import { FormateurFormComponent } from './formateur-form/formateur-form.component';
+import { SharedModule } from '../shared/shared.module';  // ← ajoute ça
 
 @NgModule({
   declarations: [
@@ -15,7 +15,11 @@ import { FormateurFormComponent } from './formateur-form/formateur-form.componen
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule
+    ReactiveFormsModule,
+    RouterModule,
+    DecimalPipe,
+        SharedModule   // ← ajoute ça
+
   ],
   exports: [
     FormateurListComponent,

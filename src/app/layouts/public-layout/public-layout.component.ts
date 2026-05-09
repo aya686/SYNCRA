@@ -1,28 +1,30 @@
-import { Component, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { SimpleAuthService } from '../../modules/auth/services/simple-auth.service';
 import { FavoritesService } from '../../modules/shared/services/favorites.service';
 
 @Component({
-    selector: 'app-public-layout',
-    templateUrl: './public-layout.component.html',
-    styleUrls: ['./public-layout.component.scss'],
-    standalone: false
+  selector: 'app-public-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './public-layout.component.html',
+  styleUrls: ['./public-layout.component.scss']
 })
-export class PublicLayoutComponent {
+export class PublicLayoutComponent implements OnInit {
   navScrolled = false;
   isSidebarCollapsed = false;
   mobileMenuOpen = false;
   submenuOpen = false;
   favoritesCount: number = 0;
 
-  constructor(public authService: SimpleAuthService,private favoritesService: FavoritesService) {}
-
-toggleSubmenu() {
-  this.submenuOpen = !this.submenuOpen;
-}
-
   @ViewChild('particleCanvas') particleCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('cursorGlow') cursorGlow!: ElementRef<HTMLDivElement>;
+
+  constructor(
+    public authService: SimpleAuthService,
+    private favoritesService: FavoritesService
+  ) {}
 
   ngOnInit() {
     this.initParticles();
@@ -32,14 +34,18 @@ toggleSubmenu() {
     });
   }
 
+  toggleSubmenu() {
+    this.submenuOpen = !this.submenuOpen;
+  }
+
   @HostListener('window:scroll')
   onScroll() {
     this.navScrolled = window.scrollY > 20;
   }
 
   logout() {
-  this.authService.logout();
-}
+    this.authService.logout();
+  }
 
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
