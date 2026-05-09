@@ -1,0 +1,441 @@
+<div class="profile-page">
+  <div class="profile-container">
+    
+    <!-- En-tête du profil -->
+    <div class="profile-header">
+      <button class="back-btn" (click)="goBack()">
+        <i class="ti ti-arrow-left"></i> Retour
+      </button>
+      
+      <button class="logout-btn" (click)="logout()">
+        <i class="ti ti-logout"></i> Déconnexion
+      </button>
+      
+      <div class="profile-avatar">
+        <div class="avatar-circle" *ngIf="!user?.photo">
+          {{ user?.prenom?.[0] }}{{ user?.nom?.[0] }}
+        </div>
+        <img *ngIf="user?.photo" [src]="user.photo" alt="Photo" class="avatar-img">
+      </div>
+      
+      <div class="profile-info">
+        <h1 class="profile-name">{{ user?.prenom }} {{ user?.nom }}</h1>
+        <p class="profile-email">{{ user?.email }}</p>
+        <p class="profile-date">
+          <i class="ti ti-calendar"></i> Membre depuis {{ user?.dateInscription | date:'MMMM yyyy' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Informations personnelles -->
+    <div class="card-section">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="ti ti-user-circle"></i>
+          <h3>Informations personnelles</h3>
+        </div>
+        <button *ngIf="!isEditingProfile" class="btn-edit" (click)="toggleEditProfile()">
+          <i class="ti ti-edit"></i> Modifier
+        </button>
+      </div>
+      
+      <div *ngIf="!isEditingProfile" class="info-grid">
+        <div class="info-item">
+          <label>Nom</label>
+          <p>{{ user?.nom || '-' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Prénom</label>
+          <p>{{ user?.prenom || '-' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <p>{{ user?.email || '-' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Téléphone</label>
+          <p>{{ user?.telephone || 'Non renseigné' }}</p>
+        </div>
+      </div>
+      
+      <form *ngIf="isEditingProfile" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="edit-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Nom *</label>
+            <input type="text" formControlName="nom">
+          </div>
+          <div class="form-field">
+            <label>Prénom *</label>
+            <input type="text" formControlName="prenom">
+          </div>
+          <div class="form-field">
+            <label>Email *</label>
+            <input type="email" formControlName="email">
+          </div>
+          <div class="form-field">
+            <label>Téléphone</label>
+            <input type="tel" formControlName="telephone">
+          </div>
+          <div class="form-field full-width">
+            <label>Photo de profil</label>
+            <div class="upload-area" (click)="photoInput.click()">
+              <input type="file" #photoInput (change)="onPhotoSelected($event)" accept="image/*" hidden>
+              <div class="upload-content" *ngIf="!photoPreview">
+                <i class="ti ti-cloud-upload"></i>
+                <span>Changer la photo</span>
+              </div>
+              <div class="photo-preview" *ngIf="photoPreview">
+                <img [src]="photoPreview" alt="Aperçu">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="toggleEditProfile()">Annuler</button>
+          <button type="submit" class="btn-primary" [disabled]="loading">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Rôles actifs -->
+    <div class="card-section">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="ti ti-rosette"></i>
+          <h3>Mes rôles</h3>
+        </div>
+      </div>
+      
+      <div class="roles-list">
+        <div *ngFor="let role of activeRoles" class="role-card">
+          <div class="role-icon" [ngStyle]="{'background': getRoleColor(role.roleLibelle || '') + '20'}">
+            <span style="font-size: 1.3rem;">
+              <ng-container [ngSwitch]="role.roleLibelle">
+                <span *ngSwitchCase="'FREELANCER'">💼</span>
+                <span *ngSwitchCase="'ETUDIANT'">🎓</span>
+                <span *ngSwitchCase="'CLIENT'">🏢</span>
+                <span *ngSwitchCase="'INVESTISSEUR'">📈</span>
+                <span *ngSwitchDefault>●</span>
+              </ng-container>
+            </span>
+          </div>
+          
+          <div class="role-content">
+            <div class="role-name">{{ role.roleLibelle }}</div>
+            <div class="role-desc">{{ role.roleDescription }}</div>
+            
+            <div class="role-status active">
+              <i class="ti ti-check-circle"></i>
+              <span>
+                <strong>{{ role.roleLibelle }}</strong> · Actif depuis le {{ formatDate(role.dateAttribution) }}
+                <span *ngIf="role.dateExpiration">
+                  · expire le {{ formatDate(role.dateExpiration) }}
+                  <span *ngIf="isExpiringSoon(role.dateExpiration)" class="expiry-warning">
+                    (Expire dans {{ getDaysUntilExpiration(role.dateExpiration) }} jours)
+                  </span>
+                </span>
+                <span *ngIf="!role.dateExpiration" class="role-permanent">
+                  · permanent
+                </span>
+              </span>
+            </div>
+          </div>
+          
+          <div class="role-actions">
+            <button class="btn-revoke" (click)="revokeRole(role.id!)">
+              <i class="ti ti-trash"></i> Retirer
+            </button>
+          </div>
+        </div>
+        
+        <div *ngIf="activeRoles.length === 0" class="empty-state">
+          <i class="ti ti-user-off"></i>
+          <p>Aucun rôle actif</p>
+        </div>
+      </div>
+      
+      <div class="add-role-area">
+        <button class="btn-add-role" (click)="openAddRoleModal()">
+          <i class="ti ti-plus"></i> Ajouter un rôle
+        </button>
+      </div>
+    </div>
+
+    <!-- Compétences -->
+    <div class="card-section" *ngIf="showSkillsAndPortfolio()">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="ti ti-brain"></i>
+          <h3>Mes compétences</h3>
+        </div>
+        <button class="btn-edit" (click)="openSkillForm()">
+          <i class="ti ti-plus"></i> Ajouter
+        </button>
+      </div>
+      
+      <div *ngIf="showSkillForm" class="inline-form">
+        <form [formGroup]="skillForm" (ngSubmit)="saveSkill()">
+          <div class="form-grid small">
+            <div class="form-field">
+              <label>Compétence *</label>
+              <input type="text" formControlName="libelle" placeholder="React, Angular...">
+            </div>
+            <div class="form-field">
+              <label>Niveau *</label>
+              <select formControlName="niveau">
+                <option value="DEBUTANT">Débutant</option>
+                <option value="INTERMEDIAIRE">Intermédiaire</option>
+                <option value="EXPERT">Expert</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Catégorie</label>
+              <input type="text" formControlName="categorie" placeholder="Développement...">
+            </div>
+          </div>
+          <div class="form-actions inline">
+            <button type="button" class="btn-secondary" (click)="showSkillForm = false">Annuler</button>
+            <button type="submit" class="btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="skills-list">
+        <div *ngFor="let skill of competences" class="skill-card">
+          <div class="skill-info">
+            <div class="skill-name">{{ skill.libelle }}</div>
+            <div class="skill-category" *ngIf="skill.categorie">{{ skill.categorie }}</div>
+            <span class="skill-level" [ngClass]="getNiveauClass(skill.niveau)">
+              {{ getNiveauLabel(skill.niveau) }}
+            </span>
+          </div>
+          <div class="skill-actions">
+            <button class="btn-icon" (click)="openSkillForm(skill)" title="Modifier">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-icon danger" (click)="deleteSkill(skill.id!)" title="Supprimer">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="competences.length === 0 && !showSkillForm" class="empty-state small">
+          <i class="ti ti-brain"></i>
+          <p>Aucune compétence. Ajoutez vos premières compétences !</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio -->
+    <div class="card-section" *ngIf="showSkillsAndPortfolio()">
+      <div class="section-header">
+        <div class="section-title">
+          <i class="ti ti-folder"></i>
+          <h3>Mon portfolio</h3>
+        </div>
+        <button class="btn-edit" (click)="openPortfolioForm()">
+          <i class="ti ti-plus"></i> Ajouter un projet
+        </button>
+      </div>
+      
+      <div *ngIf="showPortfolioForm" class="inline-form">
+        <form [formGroup]="portfolioForm" (ngSubmit)="savePortfolio()">
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Titre *</label>
+              <input type="text" formControlName="titre" placeholder="Nom du projet">
+            </div>
+            <div class="form-field full-width">
+              <label>Description</label>
+              <textarea formControlName="description" rows="2" placeholder="Description du projet..."></textarea>
+            </div>
+            <div class="form-field">
+              <label>Lien (URL)</label>
+              <input type="url" formControlName="lien" placeholder="https://...">
+            </div>
+            <div class="form-field">
+              <label>Fichier</label>
+              <input type="text" formControlName="fichier" placeholder="Nom du fichier">
+            </div>
+          </div>
+          <div class="form-actions inline">
+            <button type="button" class="btn-secondary" (click)="showPortfolioForm = false">Annuler</button>
+            <button type="submit" class="btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="portfolio-list">
+        <div *ngFor="let item of portfolios" class="portfolio-card">
+          <div class="portfolio-icon">
+            <i class="ti ti-file-description"></i>
+          </div>
+          <div class="portfolio-info">
+            <div class="portfolio-title">{{ item.titre }}</div>
+            <div class="portfolio-desc" *ngIf="item.description">{{ item.description }}</div>
+            <div class="portfolio-links">
+              <a *ngIf="item.lien" [href]="item.lien" target="_blank" class="portfolio-link">
+                <i class="ti ti-external-link"></i> Voir le projet
+              </a>
+            </div>
+          </div>
+          <div class="portfolio-actions">
+            <button class="btn-icon" (click)="openPortfolioForm(item)" title="Modifier">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn-icon danger" (click)="deletePortfolio(item.id!)" title="Supprimer">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="portfolios.length === 0 && !showPortfolioForm" class="empty-state small">
+          <i class="ti ti-folder-off"></i>
+          <p>Aucun projet. Ajoutez votre premier projet !</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal pour ajouter un rôle -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeAddRoleModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Ajouter un rôle</h3>
+      <button class="modal-close" (click)="closeAddRoleModal()">×</button>
+    </div>
+    <div class="modal-body">
+      
+      <div *ngIf="!selectedRole">
+        <p class="modal-hint">Sélectionnez le rôle que vous souhaitez ajouter :</p>
+        <div *ngFor="let role of availableRoles" class="role-option" (click)="selectRoleToAdd(role)">
+          <div class="role-option-icon" [ngClass]="{
+            'icon-freelancer': role.libelle === 'FREELANCER',
+            'icon-etudiant': role.libelle === 'ETUDIANT',
+            'icon-client': role.libelle === 'CLIENT',
+            'icon-investisseur': role.libelle === 'INVESTISSEUR'
+          }">
+            <span style="font-size: 1.2rem;">
+              <ng-container [ngSwitch]="role.libelle">
+                <span *ngSwitchCase="'FREELANCER'">💼</span>
+                <span *ngSwitchCase="'ETUDIANT'">🎓</span>
+                <span *ngSwitchCase="'CLIENT'">🏢</span>
+                <span *ngSwitchCase="'INVESTISSEUR'">📈</span>
+                <span *ngSwitchDefault>●</span>
+              </ng-container>
+            </span>
+          </div>
+          <div class="role-option-info">
+            <div class="role-option-name">{{ role.libelle }}</div>
+            <div class="role-option-desc">{{ role.description }}</div>
+          </div>
+          <button class="btn-select">Ajouter</button>
+        </div>
+        <div *ngIf="availableRoles.length === 0" class="empty-state small">
+          <i class="ti ti-check-circle"></i>
+          <p>Tous les rôles sont déjà actifs</p>
+        </div>
+      </div>
+      
+      <div *ngIf="selectedRole">
+        <div class="modal-back" (click)="selectedRole = null">
+          <i class="ti ti-arrow-left"></i> Retour à la liste
+        </div>
+        
+        <h4>Ajouter le rôle {{ selectedRole.libelle }}</h4>
+        
+        <!-- Formulaire Étudiant -->
+        <div *ngIf="selectedRole.libelle === 'ETUDIANT'" [formGroup]="tempEtudiantForm">
+          <div class="form-field">
+            <label>Université *</label>
+            <input type="text" formControlName="universite" placeholder="Université Paris-Saclay">
+            <small class="error" *ngIf="tempEtudiantForm.get('universite')?.invalid && tempEtudiantForm.get('universite')?.touched">Université requise</small>
+          </div>
+          <div class="form-field">
+            <label>Filière *</label>
+            <input type="text" formControlName="filiere" placeholder="Informatique">
+            <small class="error" *ngIf="tempEtudiantForm.get('filiere')?.invalid && tempEtudiantForm.get('filiere')?.touched">Filière requise</small>
+          </div>
+          <div class="form-field">
+            <label>Année d'étude *</label>
+            <input type="text" formControlName="anneeEtude" placeholder="1ère année">
+            <small class="error" *ngIf="tempEtudiantForm.get('anneeEtude')?.invalid && tempEtudiantForm.get('anneeEtude')?.touched">Année d'étude requise</small>
+          </div>
+          <div class="form-field">
+            <label>Email universitaire *</label>
+            <input type="email" formControlName="emailUniversitaire" placeholder="alice@univ-paris.fr">
+            <small class="error" *ngIf="tempEtudiantForm.get('emailUniversitaire')?.hasError('invalidDomain') && tempEtudiantForm.get('emailUniversitaire')?.touched">
+              ❌ Veuillez utiliser un email universitaire valide
+            </small>
+            <small class="error" *ngIf="tempEtudiantForm.get('emailUniversitaire')?.hasError('required') && tempEtudiantForm.get('emailUniversitaire')?.touched">Email universitaire requis</small>
+          </div>
+        </div>
+        
+        <!-- Formulaire Freelancer -->
+        <div *ngIf="selectedRole.libelle === 'FREELANCER'" [formGroup]="tempFreelancerForm">
+          <div class="form-field">
+            <label>Présentation</label>
+            <textarea formControlName="description" rows="4" placeholder="Décrivez vos compétences..."></textarea>
+          </div>
+          <div class="form-field">
+            <label>CV</label>
+            <input type="text" formControlName="cv" placeholder="Lien vers votre CV">
+          </div>
+        </div>
+        
+        <!-- Formulaire Client -->
+        <div *ngIf="selectedRole.libelle === 'CLIENT'" [formGroup]="tempClientForm">
+          <div class="form-field">
+            <label>Nom entreprise</label>
+            <input type="text" formControlName="nomEntreprise" placeholder="Ma Société">
+          </div>
+          <div class="form-field">
+            <label>Type *</label>
+            <select formControlName="type">
+              <option value="PARTICULIER">Particulier</option>
+              <option value="ENTREPRISE">Entreprise</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Secteur d'activité</label>
+            <input type="text" formControlName="secteurActivite" placeholder="Tech / Finance">
+          </div>
+          <div class="form-field">
+            <label>Site web</label>
+            <input type="url" formControlName="siteWeb" placeholder="https://...">
+          </div>
+          <div class="form-field full-width">
+            <label>Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Décrivez votre activité..."></textarea>
+          </div>
+        </div>
+        
+        <!-- Formulaire Investisseur -->
+        <div *ngIf="selectedRole.libelle === 'INVESTISSEUR'" [formGroup]="tempInvestisseurForm">
+          <div class="form-field">
+            <label>Budget min *</label>
+            <input type="number" formControlName="budgetMin" placeholder="0">
+          </div>
+          <div class="form-field">
+            <label>Budget max *</label>
+            <input type="number" formControlName="budgetMax" placeholder="100000">
+          </div>
+          <div class="form-field full-width">
+            <label>Domaines d'intérêt</label>
+            <textarea formControlName="domainesInteret" rows="3" placeholder="Tech, Immobilier..."></textarea>
+          </div>
+          <div class="form-field full-width">
+            <label>Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Présentez-vous..."></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="selectedRole = null">Retour</button>
+          <button class="btn-primary" (click)="submitAddRole()">Ajouter</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>

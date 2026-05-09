@@ -1,0 +1,91 @@
+<div class="login-page">
+  <div class="login-container">
+    
+    <div class="login-header">
+      <h1>Créer votre compte</h1>
+    </div>
+    
+    <!-- Formulaire de connexion -->
+    <form *ngIf="!show2FA" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label>Email</label>
+        <div class="input-group">
+          <i class="ti ti-mail"></i>
+          <input type="email" formControlName="email" placeholder="exemple@email.com">
+        </div>
+        <small class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          Email valide requis
+        </small>
+      </div>
+      
+      <div class="form-field">
+        <label>Mot de passe</label>
+        <div class="input-group">
+          <i class="ti ti-lock"></i>
+          <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="********">
+          <i class="ti ti-eye" [class.ti-eye-off]="!showPassword" (click)="togglePassword()"></i>
+        </div>
+        <small class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Mot de passe requis (min 6 caractères)
+        </small>
+      </div>
+      
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}">
+          <span>Se souvenir de moi</span>
+        </label>
+        <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+      </div>
+      
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="ti ti-alert-circle"></i> {{ errorMessage }}
+      </div>
+      
+      <button type="submit" class="btn-login" [disabled]="loading">
+        <span *ngIf="!loading">Se connecter</span>
+        <span *ngIf="loading"><i class="ti ti-loader ti-spin"></i> Connexion...</span>
+      </button>
+    </form>
+    
+    <!-- Formulaire 2FA avec QR code TOTP -->
+    <form *ngIf="show2FA" [formGroup]="twoFAForm" (ngSubmit)="verify2FA()">
+      
+      <!-- ✅ Affichage du QR code pour Google Authenticator -->
+      <div *ngIf="qrCodeImage" class="text-center mb-3">
+        <p class="mb-2">Scannez ce QR code avec <strong>Google Authenticator</strong> :</p>
+        <img [src]="qrCodeImage" alt="QR Code TOTP" style="width: 200px; height: 200px; margin: 10px auto; display: block;">
+        <p class="mt-2 text-muted small">Ou entrez le code à 6 chiffres ci-dessous</p>
+      </div>
+      
+      <div class="form-field">
+        <label>Code de vérification</label>
+        <div class="input-group">
+          <i class="ti ti-key"></i>
+          <input type="text" formControlName="code" placeholder="123456" maxlength="6">
+        </div>
+        <small class="error" *ngIf="twoFAForm.get('code')?.invalid && twoFAForm.get('code')?.touched">
+          Code à 6 chiffres requis
+        </small>
+      </div>
+      
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="ti ti-alert-circle"></i> {{ errorMessage }}
+      </div>
+      
+      <button type="submit" class="btn-login" [disabled]="loading">
+        <span *ngIf="!loading">Vérifier</span>
+        <span *ngIf="loading"><i class="ti ti-loader ti-spin"></i> Vérification...</span>
+      </button>
+      
+      <div class="text-center mt-3">
+        <a href="#" (click)="backToLogin(); $event.preventDefault()">Retour à la connexion</a>
+      </div>
+    </form>
+    
+    <div class="login-footer">
+      <a routerLink="/gesusers/register">Créer un compte</a>
+    </div>
+    
+  </div>
+</div>

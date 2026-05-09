@@ -1,0 +1,223 @@
+<div class="dashboard">
+
+  <!-- LOADING -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon icon-blue">
+        <i class="ti ti-login"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.connexionsToday }}</div>
+        <div class="stat-label">Connexions aujourd'hui</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-amber">
+        <i class="ti ti-key"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.twoFACount }}</div>
+        <div class="stat-label">2FA déclenchés</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-red">
+        <i class="ti ti-shield-off"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.blockedCount }}</div>
+        <div class="stat-label">Blocages</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-purple">
+        <i class="ti ti-chart-bar"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.avgMlScore }}%</div>
+        <div class="stat-label">Score ML moyen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTES -->
+  <div class="section" *ngIf="stats.suspendedCount > 0">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-alert-triangle"></i>
+        <h2>Alertes — comptes suspendus</h2>
+      </div>
+      <span class="badge badge-danger">{{ stats.suspendedCount }} en attente</span>
+    </div>
+
+    <div class="alerts-list">
+      <div *ngFor="let user of suspendedUsers" class="alert-card">
+        <div class="alert-left">
+          <div class="alert-avatar">{{ (user.prenom || 'U')[0] }}{{ (user.nom || '')[0] }}</div>
+          <div class="alert-info">
+            <div class="alert-email">{{ user.email }}</div>
+            <div class="alert-reason">
+              <i class="ti ti-alert-circle"></i>
+              {{ user.reason || 'Comportement suspect détecté' }}
+            </div>
+            <div class="alert-scores" *ngIf="user.riskScore">
+              <span class="score-pill iso">ISO {{ user.isolationScore || 0 }}%</span>
+              <span class="score-pill rf">RF {{ user.randomForestScore || 0 }}%</span>
+              <span class="score-pill hybrid">Score {{ user.riskScore || 0 }}%</span>
+              <span class="score-pill rule" *ngIf="user.ruleTriggered && user.ruleTriggered !== 'ml'">
+                {{ user.ruleTriggered }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="alert-actions">
+          <button class="btn-reactivate" (click)="reactivateUser(user.id)">
+            <i class="ti ti-refresh"></i> Réactiver
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DERNIÈRES CONNEXIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-history"></i>
+        <h2>Dernières connexions</h2>
+      </div>
+      <button class="btn-refresh" (click)="loadDashboard()">
+        <i class="ti ti-refresh"></i> Actualiser
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Heure</th>
+            <th>Pays</th>
+            <th>Appareil</th>
+            <th>ISO</th>
+            <th>RF</th>
+            <th>Score</th>
+            <th>Décision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let login of recentLogins" [class.row-blocked]="login.decision === 'BLOCKED'"
+              [class.row-2fa]="login.decision === '2FA_REQUIRED'">
+            <td>
+              <div class="user-cell">
+                <div class="mini-avatar">{{ (login.userEmail || 'U')[0].toUpperCase() }}</div>
+                <span>{{ login.userEmail }}</span>
+              </div>
+            </td>
+            <td class="muted">{{ login.loginTime | date:'HH:mm' }}</td>
+            <td>
+              <span class="country-tag">
+                <i class="ti ti-map-pin"></i>
+                {{ login.country || 'Unknown' }}
+              </span>
+            </td>
+            <td class="muted">{{ login.deviceType || '—' }}</td>
+            <td class="score-cell">
+              <span [style.color]="getScoreColor(login.isolationScore)">
+                {{ login.isolationScore || 0 }}%
+              </span>
+            </td>
+            <td class="score-cell">
+              <span [style.color]="getScoreColor(login.randomForestScore)">
+                {{ login.randomForestScore || 0 }}%
+              </span>
+            </td>
+            <td>
+              <div class="score-bar-cell">
+                <div class="score-bar-track">
+                  <div class="score-bar-fill"
+                       [style.width.%]="login.riskScore || 0"
+                       [style.background]="getScoreColor(login.riskScore)">
+                  </div>
+                </div>
+                <span class="score-num" [style.color]="getScoreColor(login.riskScore)">
+                  {{ login.riskScore || 0 }}%
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getDecisionClass(login.decision)">
+                <i class="ti" [ngClass]="{
+                  'ti-check': login.decision === 'NORMAL',
+                  'ti-key': login.decision === '2FA_REQUIRED',
+                  'ti-ban': login.decision === 'BLOCKED'
+                }"></i>
+                {{ login.decision === '2FA_REQUIRED' ? '2FA' : (login.decision || '—') }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="recentLogins.length === 0">
+            <td colspan="8" class="empty-row">
+              <i class="ti ti-database-off"></i>
+              Aucune connexion enregistrée
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DISTRIBUTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <i class="ti ti-pie-chart"></i>
+        <h2>Distribution des décisions · 7 derniers jours</h2>
+      </div>
+    </div>
+
+    <div class="distribution">
+      <div class="dist-item">
+        <div class="dist-label">
+          <span class="dist-dot dot-green"></span>
+          <span>Normal</span>
+          <span class="dist-pct">{{ distribution.normal }}%</span>
+        </div>
+        <div class="dist-track">
+          <div class="dist-fill fill-green" [style.width.%]="distribution.normal"></div>
+        </div>
+      </div>
+
+      <div class="dist-item">
+        <div class="dist-label">
+          <span class="dist-dot dot-amber"></span>
+          <span>2FA requis</span>
+          <span class="dist-pct">{{ distribution.twoFA }}%</span>
+        </div>
+        <div class="dist-track">
+          <div class="dist-fill fill-amber" [style.width.%]="distribution.twoFA"></div>
+        </div>
+      </div>
+
+      <div class="dist-item">
+        <div class="dist-label">
+          <span class="dist-dot dot-red"></span>
+          <span>Bloqué</span>
+          <span class="dist-pct">{{ distribution.blocked }}%</span>
+        </div>
+        <div class="dist-track">
+          <div class="dist-fill fill-red" [style.width.%]="distribution.blocked"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
