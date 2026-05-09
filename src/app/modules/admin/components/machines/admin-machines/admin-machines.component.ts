@@ -2,10 +2,14 @@
 // ✅ Ajout du tab AUTO_REJECTED pour les machines rejetées par le ML
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService, Machine } from '../../../../../services/admin.service';
 
 @Component({
   selector: 'admin-machines',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './admin-machines.component.html',
   styleUrls: ['./admin-machines.component.scss']
 })

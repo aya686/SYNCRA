@@ -1,12 +1,21 @@
 // src/app/modules/resources/components/machine-list/machine-list.component.ts
 // ✅ Ajout de isAutoRejected() + visibilité AUTO_REJECTED pour propriétaire
-
 import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { MachineService, Machine } from '../../../../services/machine.service';
 import { CartService } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-machine-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DecimalPipe
+  ],
   templateUrl: './machine-list.component.html',
   styleUrls: ['./machine-list.component.scss']
 })

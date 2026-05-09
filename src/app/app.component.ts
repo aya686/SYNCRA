@@ -2,12 +2,21 @@
 // ✅ Ajout du solde de points fidélité dans la navbar
 
 import { Component, OnInit, HostListener } from '@angular/core';
-import { CartService }         from './services/cart.service';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { CartService } from './services/cart.service';
 import { NotificationService } from './services/notification.service';
-import { LoyaltyService }      from './services/loyalty.service';
+import { LoyaltyService } from './services/loyalty.service';
+import { NotificationBellComponent } from './modules/cart/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    NotificationBellComponent
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

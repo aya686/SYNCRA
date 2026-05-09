@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NotificationService, AppNotification } from '../../../../services/notification.service';
- 
+
 @Component({
   selector: 'app-notification-bell',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './notification-bell.component.html',
   styleUrls: ['./notification-bell.component.scss']
 })

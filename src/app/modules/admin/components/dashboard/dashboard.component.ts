@@ -1,10 +1,14 @@
 // src/app/modules/admin/components/dashboard/dashboard.component.ts
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AdminService, DashboardStats } from '../../../../services/admin.service';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, DecimalPipe, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })

@@ -48,17 +48,23 @@
       <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="changeTab('all')">
         <i class="bi bi-grid-3x3-gap-fill"></i>
         <span>Toutes</span>
-        <span class="tab-count" *ngIf="getAllCount() > 0">{{ getAllCount() }}</span>
+        @if (getAllCount() > 0) {
+          <span class="tab-count">{{ getAllCount() }}</span>
+        }
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'sent'" (click)="changeTab('sent')">
         <i class="bi bi-send"></i>
         <span>Envoyées</span>
-        <span class="tab-count" *ngIf="getSentCount() > 0">{{ getSentCount() }}</span>
+        @if (getSentCount() > 0) {
+          <span class="tab-count">{{ getSentCount() }}</span>
+        }
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'received'" (click)="changeTab('received')">
         <i class="bi bi-inbox"></i>
         <span>Reçues</span>
-        <span class="tab-count" *ngIf="getReceivedCount() > 0">{{ getReceivedCount() }}</span>
+        @if (getReceivedCount() > 0) {
+          <span class="tab-count">{{ getReceivedCount() }}</span>
+        }
       </button>
     </div>
   </div>
@@ -70,10 +76,12 @@
         <i class="bi bi-funnel"></i>
         <span>Filtrer les demandes</span>
       </div>
-      <button class="btn-reset" (click)="resetFilters()" *ngIf="isFilterActive()">
-        <i class="bi bi-arrow-repeat"></i>
-        Réinitialiser
-      </button>
+      @if (isFilterActive()) {
+        <button class="btn-reset" (click)="resetFilters()">
+          <i class="bi bi-arrow-repeat"></i>
+          Réinitialiser
+        </button>
+      }
     </div>
 
     <div class="filters-grid">
@@ -83,165 +91,188 @@
           <i class="bi bi-search"></i>
           Recherche
         </label>
-        <input 
-          type="text" 
-          class="filter-input" 
+        <input
+          type="text"
+          class="filter-input"
           placeholder="Titre de la demande..."
           [(ngModel)]="filters.searchTerm"
           (input)="applyFilters()">
-      </div>
-
-      <!-- Statut -->
-      <div class="filter-group">
-        <label class="filter-label">
-          <i class="bi bi-circle"></i>
-          Statut
-        </label>
-        <select class="filter-select" [(ngModel)]="filters.status" (change)="applyFilters()">
-          <option value="">Tous les statuts</option>
-          <option *ngFor="let status of statuses" [value]="status">
-            {{ getStatusLabel(status) }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Type -->
-      <div class="filter-group">
-        <label class="filter-label">
-          <i class="bi bi-tags"></i>
-          Type de demande
-        </label>
-        <select class="filter-select" [(ngModel)]="filters.requestType" (change)="applyFilters()">
-          <option value="">Tous les types</option>
-          <option *ngFor="let type of requestTypes" [value]="type">
-            {{ getRequestTypeLabel(type) }}
-          </option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loader -->
-  <div *ngIf="loading" class="loader-wrapper">
-    <div class="loader-spinner"></div>
-    <p>Chargement des demandes...</p>
-  </div>
-
-  <!-- Liste des demandes -->
-  <div *ngIf="!loading && filteredRequests.length > 0" class="requests-grid">
-    <div class="stats-row reveal">
-      <div class="stat-badge">
-        <i class="bi bi-database"></i>
-        <span>{{ filteredRequests.length }} demande(s) trouvée(s)</span>
-      </div>
-    </div>
-
-    <div class="requests-list">
-      <div class="request-card" *ngFor="let request of paginatedRequests; let i = index" 
-           [style.animation-delay]="(i * 0.05) + 's'">
-        <div class="card-status" [class]="getStatusClass(request.status)">
-          <span class="status-dot"></span>
-          {{ getStatusLabel(request.status) }}
         </div>
-        
-        <div class="card-content">
-          <div class="card-header">
-            <div class="request-type">
-              <i class="bi" [class.bi-tools]="request.requestType === 'MACHINE_PURCHASE' || request.requestType === 'MACHINE_RENT'"
-                            [class.bi-briefcase]="request.requestType === 'SERVICE' || request.requestType === 'FABRICATION'"
-                            [class.bi-wrench]="request.requestType === 'REPARATION'"
-                            [class.bi-chat-dots]="request.requestType === 'CONSULTATION'"></i>
-              <span>{{ getRequestTypeLabel(request.requestType) }}</span>
-            </div>
-            <div class="request-direction" [class.sent]="isRequester(request)" [class.received]="!isRequester(request)">
-              <i class="bi" [class.bi-send]="isRequester(request)" [class.bi-inbox]="!isRequester(request)"></i>
-              <span>{{ isRequester(request) ? 'Envoyée' : 'Reçue' }}</span>
-            </div>
-          </div>
-          
-          <h3 class="request-title" (click)="viewRequestDetails(request.id)">
-            {{ request.title }}
-          </h3>
-          
-          <p class="request-description">
-            {{ request.description.length > 120 ? (request.description | slice:0:120) + '...' : request.description }}
-          </p>
-          
-          <div class="request-meta">
-            <div class="meta-item">
-              <i class="bi bi-person"></i>
-              <span>{{ getOtherPartyName(request) }}</span>
-            </div>
-            <div class="meta-item">
-              <i class="bi bi-calendar"></i>
-              <span>{{ formatDate(request.createdAt) }}</span>
-            </div>
-            <div class="meta-item">
-              <i class="bi bi-box-seam"></i>
-              <span>Qté: {{ request.quantity }}</span>
-            </div>
-            <div class="meta-item" *ngIf="request.deadline">
-              <i class="bi bi-clock"></i>
-              <span>Délai: {{ request.deadline | date:'dd/MM/yyyy' }}</span>
-            </div>
-          </div>
+
+        <!-- Statut -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="bi bi-circle"></i>
+            Statut
+          </label>
+          <select class="filter-select" [(ngModel)]="filters.status" (change)="applyFilters()">
+            <option value="">Tous les statuts</option>
+            @for (status of statuses; track status) {
+              <option [value]="status">
+                {{ getStatusLabel(status) }}
+              </option>
+            }
+          </select>
         </div>
-        
-        <div class="card-footer">
-          <button class="btn-details" (click)="viewRequestDetails(request.id)">
-            <span>Voir les détails</span>
-            <i class="bi bi-arrow-right"></i>
-          </button>
-          <button class="btn-action" *ngIf="request.status === 'PENDING'" 
-                  [class.btn-cancel]="isRequester(request)"
-                  [class.btn-respond]="!isRequester(request)"
-                  (click)="viewRequestDetails(request.id)">
-            <i class="bi" [class.bi-x-lg]="isRequester(request)" [class.bi-reply-all]="!isRequester(request)"></i>
-            <span>{{ isRequester(request) ? 'Annuler' : 'Répondre' }}</span>
-          </button>
-          <div class="action-status" *ngIf="request.status === 'ACCEPTED' && !isRequester(request)">
-            <i class="bi bi-check-circle"></i>
-            <span>Acceptée</span>
-          </div>
-          <div class="action-status completed" *ngIf="request.status === 'COMPLETED'">
-            <i class="bi bi-trophy"></i>
-            <span>Terminée</span>
-          </div>
+
+        <!-- Type -->
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="bi bi-tags"></i>
+            Type de demande
+          </label>
+          <select class="filter-select" [(ngModel)]="filters.requestType" (change)="applyFilters()">
+            <option value="">Tous les types</option>
+            @for (type of requestTypes; track type) {
+              <option [value]="type">
+                {{ getRequestTypeLabel(type) }}
+              </option>
+            }
+          </select>
         </div>
       </div>
     </div>
 
-    <!-- Pagination -->
-    <div *ngIf="totalItems > itemsPerPage" class="pagination-wrapper">
-      <div class="pagination">
-        <button class="page-btn" [class.disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <button class="page-btn" *ngFor="let page of getPageNumbers()" 
-                [class.active]="page === currentPage"
-                (click)="onPageChange(page)">
-          {{ page }}
-        </button>
-        <button class="page-btn" [class.disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
-          <i class="bi bi-chevron-right"></i>
+    <!-- Loader -->
+    @if (loading) {
+      <div class="loader-wrapper">
+        <div class="loader-spinner"></div>
+        <p>Chargement des demandes...</p>
+      </div>
+    }
+
+    <!-- Liste des demandes -->
+    @if (!loading && filteredRequests.length > 0) {
+      <div class="requests-grid">
+        <div class="stats-row reveal">
+          <div class="stat-badge">
+            <i class="bi bi-database"></i>
+            <span>{{ filteredRequests.length }} demande(s) trouvée(s)</span>
+          </div>
+        </div>
+        <div class="requests-list">
+          @for (request of paginatedRequests; track request; let i = $index) {
+            <div class="request-card"
+              [style.animation-delay]="(i * 0.05) + 's'">
+              <div class="card-status" [class]="getStatusClass(request.status)">
+                <span class="status-dot"></span>
+                {{ getStatusLabel(request.status) }}
+              </div>
+              <div class="card-content">
+                <div class="card-header">
+                  <div class="request-type">
+                    <i class="bi" [class.bi-tools]="request.requestType === 'MACHINE_PURCHASE' || request.requestType === 'MACHINE_RENT'"
+                      [class.bi-briefcase]="request.requestType === 'SERVICE' || request.requestType === 'FABRICATION'"
+                      [class.bi-wrench]="request.requestType === 'REPARATION'"
+                    [class.bi-chat-dots]="request.requestType === 'CONSULTATION'"></i>
+                    <span>{{ getRequestTypeLabel(request.requestType) }}</span>
+                  </div>
+                  <div class="request-direction" [class.sent]="isRequester(request)" [class.received]="!isRequester(request)">
+                    <i class="bi" [class.bi-send]="isRequester(request)" [class.bi-inbox]="!isRequester(request)"></i>
+                    <span>{{ isRequester(request) ? 'Envoyée' : 'Reçue' }}</span>
+                  </div>
+                </div>
+                <h3 class="request-title" (click)="viewRequestDetails(request.id)">
+                  {{ request.title }}
+                </h3>
+                <p class="request-description">
+                  {{ request.description.length > 120 ? (request.description | slice:0:120) + '...' : request.description }}
+                </p>
+                <div class="request-meta">
+                  <div class="meta-item">
+                    <i class="bi bi-person"></i>
+                    <span>{{ getOtherPartyName(request) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="bi bi-calendar"></i>
+                    <span>{{ formatDate(request.createdAt) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Qté: {{ request.quantity }}</span>
+                  </div>
+                  @if (request.deadline) {
+                    <div class="meta-item">
+                      <i class="bi bi-clock"></i>
+                      <span>Délai: {{ request.deadline | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn-details" (click)="viewRequestDetails(request.id)">
+                  <span>Voir les détails</span>
+                  <i class="bi bi-arrow-right"></i>
+                </button>
+                @if (request.status === 'PENDING') {
+                  <button class="btn-action"
+                    [class.btn-cancel]="isRequester(request)"
+                    [class.btn-respond]="!isRequester(request)"
+                    (click)="viewRequestDetails(request.id)">
+                    <i class="bi" [class.bi-x-lg]="isRequester(request)" [class.bi-reply-all]="!isRequester(request)"></i>
+                    <span>{{ isRequester(request) ? 'Annuler' : 'Répondre' }}</span>
+                  </button>
+                }
+                @if (request.status === 'ACCEPTED' && !isRequester(request)) {
+                  <div class="action-status">
+                    <i class="bi bi-check-circle"></i>
+                    <span>Acceptée</span>
+                  </div>
+                }
+                @if (request.status === 'COMPLETED') {
+                  <div class="action-status completed">
+                    <i class="bi bi-trophy"></i>
+                    <span>Terminée</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <!-- Pagination -->
+        @if (totalItems > itemsPerPage) {
+          <div class="pagination-wrapper">
+            <div class="pagination">
+              <button class="page-btn" [class.disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              @for (page of getPageNumbers(); track page) {
+                <button class="page-btn"
+                  [class.active]="page === currentPage"
+                  (click)="onPageChange(page)">
+                  {{ page }}
+                </button>
+              }
+              <button class="page-btn" [class.disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Aucun résultat -->
+    @if (!loading && filteredRequests.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="bi bi-inbox"></i>
+        </div>
+        <h3>Aucune demande trouvée</h3>
+        @if (activeTab === 'sent') {
+          <p>Vous n'avez pas encore envoyé de demande.</p>
+        }
+        @if (activeTab === 'received') {
+          <p>Vous n'avez pas encore reçu de demande.</p>
+        }
+        @if (activeTab === 'all') {
+          <p>Aucune demande pour le moment.</p>
+        }
+        <button class="btn-primary" routerLink="/requests/create">
+          <i class="bi bi-plus-circle"></i>
+          <span>Créer ma première demande</span>
+          <div class="btn-bg"></div>
         </button>
       </div>
-    </div>
+    }
   </div>
-
-  <!-- Aucun résultat -->
-  <div *ngIf="!loading && filteredRequests.length === 0" class="empty-state">
-    <div class="empty-icon">
-      <i class="bi bi-inbox"></i>
-    </div>
-    <h3>Aucune demande trouvée</h3>
-    <p *ngIf="activeTab === 'sent'">Vous n'avez pas encore envoyé de demande.</p>
-    <p *ngIf="activeTab === 'received'">Vous n'avez pas encore reçu de demande.</p>
-    <p *ngIf="activeTab === 'all'">Aucune demande pour le moment.</p>
-    <button class="btn-primary" routerLink="/requests/create">
-      <i class="bi bi-plus-circle"></i>
-      <span>Créer ma première demande</span>
-      <div class="btn-bg"></div>
-    </button>
-  </div>
-</div>

@@ -1,11 +1,14 @@
 // src/app/modules/orders/components/my-orders/my-orders.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { OrderService, Order } from '../../../../services/order.service';
 
 @Component({
   selector: 'app-my-orders',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './my-orders.component.html',
   styleUrls: ['./my-orders.component.scss']
 })

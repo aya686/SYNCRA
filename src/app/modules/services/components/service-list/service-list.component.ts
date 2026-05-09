@@ -2,11 +2,20 @@
 // ✅ Logique : APPROVED → visible par tous | PENDING/REJECTED → seulement propriétaire
 
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ServiceService, ServiceEntity } from '../../../../services/service.service';
 
 @Component({
   selector: 'app-service-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DecimalPipe
+  ],
   templateUrl: './service-list.component.html',
   styleUrls: ['./service-list.component.scss']
 })

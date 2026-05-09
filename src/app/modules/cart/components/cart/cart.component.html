@@ -18,344 +18,367 @@
   </div>
 
   <!-- Erreur -->
-  <div *ngIf="errorMessage" class="alert-card error reveal">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    <span>{{ errorMessage }}</span>
-    <button class="alert-close" (click)="errorMessage = ''">×</button>
-  </div>
+  @if (errorMessage) {
+    <div class="alert-card error reveal">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMessage }}</span>
+      <button class="alert-close" (click)="errorMessage = ''">×</button>
+    </div>
+  }
 
   <!-- Loader -->
-  <div *ngIf="loading" class="loader-wrapper">
-    <div class="loader-spinner"></div>
-    <p>Chargement de votre panier...</p>
-  </div>
+  @if (loading) {
+    <div class="loader-wrapper">
+      <div class="loader-spinner"></div>
+      <p>Chargement de votre panier...</p>
+    </div>
+  }
 
   <!-- Panier vide -->
-  <div *ngIf="!loading && (!cart || !cart.items || cart.items.length === 0)" class="empty-state">
-    <div class="empty-icon"><i class="bi bi-cart-x"></i></div>
-    <h3>Votre panier est vide</h3>
-    <p>Découvrez nos machines et services</p>
-    <button class="btn-primary" routerLink="/machines">
-      <i class="bi bi-shop"></i><span>Découvrir</span><div class="btn-bg"></div>
-    </button>
-  </div>
+  @if (!loading && (!cart || !cart.items || cart.items.length === 0)) {
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-cart-x"></i></div>
+      <h3>Votre panier est vide</h3>
+      <p>Découvrez nos machines et services</p>
+      <button class="btn-primary" routerLink="/machines">
+        <i class="bi bi-shop"></i><span>Découvrir</span><div class="btn-bg"></div>
+      </button>
+    </div>
+  }
 
   <!-- Panier avec articles -->
-  <div *ngIf="!loading && cart && cart.items && cart.items.length > 0" class="cart-content">
-    <div class="cart-grid">
-
-      <!-- ── Colonne gauche : Articles ── -->
-      <div class="cart-items-section">
-        <div class="section-header">
-          <div class="header-icon"><i class="bi bi-bag"></i></div>
-          <div class="header-text">
-            <h3>Articles</h3>
-            <p>{{ cart.items.length }} produit(s) dans votre panier</p>
-          </div>
-          <button class="btn-clear" (click)="clearCart()">
-            <i class="bi bi-trash"></i><span>Vider le panier</span>
-          </button>
-        </div>
-
-        <div class="cart-items-list">
-          <div class="cart-item" *ngFor="let item of cart.items; let i = index"
-               [style.animation-delay]="(i * 0.05) + 's'">
-            <div class="item-image">
-              <img [src]="item.itemImageUrl || 'assets/images/default-product.jpg'"
-                   [alt]="item.itemName" (error)="handleImageError($event)">
-            </div>
-            <div class="item-details">
-              <h4>{{ item.itemName }}</h4>
-              <div class="item-meta">
-                <span class="item-type">
-                  <i class="bi" [class.bi-tools]="item.itemType === 'MACHINE'"
-                                [class.bi-briefcase]="item.itemType === 'SERVICE'"></i>
-                  {{ getItemTypeLabel(item.itemType) }}
-                </span>
-                <span class="item-supplier">
-                  <i class="bi bi-building"></i>{{ item.supplierProviderName }}
-                </span>
-              </div>
-              <div class="item-price">
-                <span class="unit-price">{{ item.unitPrice | number }} TND</span>
-                <span class="price-unit">/ {{ item.priceUnit }}</span>
-              </div>
-            </div>
-            <div class="item-quantity">
-              <div class="quantity-control">
-                <button class="qty-btn" (click)="updateQuantity(item, item.quantity - 1)">
-                  <i class="bi bi-dash"></i>
-                </button>
-                <span class="qty-value">{{ item.quantity }}</span>
-                <button class="qty-btn" (click)="updateQuantity(item, item.quantity + 1)">
-                  <i class="bi bi-plus"></i>
-                </button>
-              </div>
-            </div>
-            <div class="item-total">
-              <div class="total-price">{{ item.totalPrice | number }} TND</div>
-              <button class="remove-btn" (click)="removeItem(item)" title="Supprimer">
-                <i class="bi bi-x-lg"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Colonne droite : Résumé + Livraison ── -->
-      <div class="cart-summary-section">
-
-        <!-- Résumé de la commande -->
-        <div class="summary-card">
-          <div class="card-header-custom">
-            <div class="header-icon"><i class="bi bi-receipt"></i></div>
+  @if (!loading && cart && cart.items && cart.items.length > 0) {
+    <div class="cart-content">
+      <div class="cart-grid">
+        <!-- ── Colonne gauche : Articles ── -->
+        <div class="cart-items-section">
+          <div class="section-header">
+            <div class="header-icon"><i class="bi bi-bag"></i></div>
             <div class="header-text">
-              <h3>Résumé</h3>
-              <p>Détails de votre commande</p>
+              <h3>Articles</h3>
+              <p>{{ cart.items.length }} produit(s) dans votre panier</p>
+            </div>
+            <button class="btn-clear" (click)="clearCart()">
+              <i class="bi bi-trash"></i><span>Vider le panier</span>
+            </button>
+          </div>
+          <div class="cart-items-list">
+            @for (item of cart.items; track item; let i = $index) {
+              <div class="cart-item"
+                [style.animation-delay]="(i * 0.05) + 's'">
+                <div class="item-image">
+                  <img [src]="item.itemImageUrl || 'assets/images/default-product.jpg'"
+                    [alt]="item.itemName" (error)="handleImageError($event)">
+                  </div>
+                  <div class="item-details">
+                    <h4>{{ item.itemName }}</h4>
+                    <div class="item-meta">
+                      <span class="item-type">
+                        <i class="bi" [class.bi-tools]="item.itemType === 'MACHINE'"
+                        [class.bi-briefcase]="item.itemType === 'SERVICE'"></i>
+                        {{ getItemTypeLabel(item.itemType) }}
+                      </span>
+                      <span class="item-supplier">
+                        <i class="bi bi-building"></i>{{ item.supplierProviderName }}
+                      </span>
+                    </div>
+                    <div class="item-price">
+                      <span class="unit-price">{{ item.unitPrice | number }} TND</span>
+                      <span class="price-unit">/ {{ item.priceUnit }}</span>
+                    </div>
+                  </div>
+                  <div class="item-quantity">
+                    <div class="quantity-control">
+                      <button class="qty-btn" (click)="updateQuantity(item, item.quantity - 1)">
+                        <i class="bi bi-dash"></i>
+                      </button>
+                      <span class="qty-value">{{ item.quantity }}</span>
+                      <button class="qty-btn" (click)="updateQuantity(item, item.quantity + 1)">
+                        <i class="bi bi-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="item-total">
+                    <div class="total-price">{{ item.totalPrice | number }} TND</div>
+                    <button class="remove-btn" (click)="removeItem(item)" title="Supprimer">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           </div>
-          <div class="card-body-custom">
-            <div class="summary-row">
-              <span>Sous-total</span>
-              <span>{{ calculateSubtotal() | number }} TND</span>
-            </div>
-
-            <!-- Réduction code promo -->
-            <div class="summary-row promo-discount" *ngIf="appliedPromo?.type === 'DISCOUNT'">
-              <span>
-                <i class="bi bi-tag-fill text-success me-1"></i>
-                Réduction ({{ appliedPromo?.discountPercent }}%)
-              </span>
-              <span class="text-success fw-bold">- {{ getDiscountAmount() | number }} TND</span>
-            </div>
-
-            <div class="summary-row">
-              <span>
-                Livraison
-                <span *ngIf="appliedPromo?.type === 'FREE_DELIVERY'" class="promo-tag">
-                  🚚 GRATUITE
-                </span>
-              </span>
-              <span>
-                <s *ngIf="appliedPromo?.type === 'FREE_DELIVERY'" style="color:#94a3b8; font-size:0.8em;">
-                  {{ (cart.deliveryCost || 0) | number }} TND
-                </s>
-                <span *ngIf="appliedPromo?.type === 'FREE_DELIVERY'" class="text-success fw-bold ms-1">0 TND</span>
-                <span *ngIf="appliedPromo?.type !== 'FREE_DELIVERY'">{{ (cart.deliveryCost || 0) | number }} TND</span>
-              </span>
-            </div>
-
-            <div class="summary-divider"></div>
-            <div class="summary-row total">
-              <span>Total</span>
-              <span class="total-amount">{{ calculateTotal() | number }} TND</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ✅ NOUVEAU : Section Code Promo -->
-        <div class="promo-card">
-          <div class="card-header-custom">
-            <div class="header-icon promo-icon">
-              <i class="bi bi-ticket-perforated-fill"></i>
-            </div>
-            <div class="header-text">
-              <h3>Code promo</h3>
-              <p>Utilisez vos récompenses fidélité</p>
-            </div>
-            <a routerLink="/loyalty" class="loyalty-link-small">
-              <i class="bi bi-star-fill"></i> Mes codes
-            </a>
-          </div>
-
-          <div class="card-body-custom">
-
-            <!-- Code déjà appliqué -->
-            <div class="promo-applied" *ngIf="appliedPromo?.valid">
-              <div class="applied-icon">✅</div>
-              <div class="applied-info">
-                <div class="applied-code">{{ promoCode }}</div>
-                <div class="applied-label">{{ promoTypeLabel }}</div>
+          <!-- ── Colonne droite : Résumé + Livraison ── -->
+          <div class="cart-summary-section">
+            <!-- Résumé de la commande -->
+            <div class="summary-card">
+              <div class="card-header-custom">
+                <div class="header-icon"><i class="bi bi-receipt"></i></div>
+                <div class="header-text">
+                  <h3>Résumé</h3>
+                  <p>Détails de votre commande</p>
+                </div>
               </div>
-              <button class="btn-remove-promo" (click)="removePromo()" title="Retirer">
-                <i class="bi bi-x-circle-fill"></i>
-              </button>
-            </div>
-
-            <!-- Saisie du code -->
-            <div class="promo-input-group" *ngIf="!appliedPromo?.valid">
-              <div class="promo-input-row">
-                <input
-                  type="text"
-                  class="promo-input"
-                  [(ngModel)]="promoCode"
-                  placeholder="Ex: LIVRAISON-A7B3"
-                  [class.is-valid]="promoValidation?.valid"
-                  [class.is-invalid]="promoValidation && !promoValidation.valid"
-                  (keyup.enter)="checkPromoCode()"
-                  style="text-transform: uppercase">
-                <button class="btn-apply-promo"
-                        (click)="checkPromoCode()"
-                        [disabled]="promoLoading || !promoCode.trim()">
-                  <span *ngIf="!promoLoading">Appliquer</span>
-                  <span *ngIf="promoLoading">
-                    <span class="spinner-border spinner-border-sm" role="status"></span>
+              <div class="card-body-custom">
+                <div class="summary-row">
+                  <span>Sous-total</span>
+                  <span>{{ calculateSubtotal() | number }} TND</span>
+                </div>
+                <!-- Réduction code promo -->
+                @if (appliedPromo?.type === 'DISCOUNT') {
+                  <div class="summary-row promo-discount">
+                    <span>
+                      <i class="bi bi-tag-fill text-success me-1"></i>
+                      Réduction ({{ appliedPromo?.discountPercent }}%)
+                    </span>
+                    <span class="text-success fw-bold">- {{ getDiscountAmount() | number }} TND</span>
+                  </div>
+                }
+                <div class="summary-row">
+                  <span>
+                    Livraison
+                    @if (appliedPromo?.type === 'FREE_DELIVERY') {
+                      <span class="promo-tag">
+                        🚚 GRATUITE
+                      </span>
+                    }
                   </span>
-                </button>
+                  <span>
+                    @if (appliedPromo?.type === 'FREE_DELIVERY') {
+                      <s style="color:#94a3b8; font-size:0.8em;">
+                        {{ (cart.deliveryCost || 0) | number }} TND
+                      </s>
+                    }
+                    @if (appliedPromo?.type === 'FREE_DELIVERY') {
+                      <span class="text-success fw-bold ms-1">0 TND</span>
+                    }
+                    @if (appliedPromo?.type !== 'FREE_DELIVERY') {
+                      <span>{{ (cart.deliveryCost || 0) | number }} TND</span>
+                    }
+                  </span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row total">
+                  <span>Total</span>
+                  <span class="total-amount">{{ calculateTotal() | number }} TND</span>
+                </div>
               </div>
-
-              <!-- Message de validation -->
-              <div class="promo-feedback valid"   *ngIf="promoValidation?.valid">
-                <i class="bi bi-check-circle-fill"></i>
-                {{ promoValidation?.message }}
+            </div>
+            <!-- ✅ NOUVEAU : Section Code Promo -->
+            <div class="promo-card">
+              <div class="card-header-custom">
+                <div class="header-icon promo-icon">
+                  <i class="bi bi-ticket-perforated-fill"></i>
+                </div>
+                <div class="header-text">
+                  <h3>Code promo</h3>
+                  <p>Utilisez vos récompenses fidélité</p>
+                </div>
+                <a routerLink="/loyalty" class="loyalty-link-small">
+                  <i class="bi bi-star-fill"></i> Mes codes
+                </a>
               </div>
-              <div class="promo-feedback invalid" *ngIf="promoValidation && !promoValidation.valid">
-                <i class="bi bi-x-circle-fill"></i>
-                {{ promoValidation.message }}
+              <div class="card-body-custom">
+                <!-- Code déjà appliqué -->
+                @if (appliedPromo?.valid) {
+                  <div class="promo-applied">
+                    <div class="applied-icon">✅</div>
+                    <div class="applied-info">
+                      <div class="applied-code">{{ promoCode }}</div>
+                      <div class="applied-label">{{ promoTypeLabel }}</div>
+                    </div>
+                    <button class="btn-remove-promo" (click)="removePromo()" title="Retirer">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                  </div>
+                }
+                <!-- Saisie du code -->
+                @if (!appliedPromo?.valid) {
+                  <div class="promo-input-group">
+                    <div class="promo-input-row">
+                      <input
+                        type="text"
+                        class="promo-input"
+                        [(ngModel)]="promoCode"
+                        placeholder="Ex: LIVRAISON-A7B3"
+                        [class.is-valid]="promoValidation?.valid"
+                        [class.is-invalid]="promoValidation && !promoValidation.valid"
+                        (keyup.enter)="checkPromoCode()"
+                        style="text-transform: uppercase">
+                        <button class="btn-apply-promo"
+                          (click)="checkPromoCode()"
+                          [disabled]="promoLoading || !promoCode.trim()">
+                          @if (!promoLoading) {
+                            <span>Appliquer</span>
+                          }
+                          @if (promoLoading) {
+                            <span>
+                              <span class="spinner-border spinner-border-sm" role="status"></span>
+                            </span>
+                          }
+                        </button>
+                      </div>
+                      <!-- Message de validation -->
+                      @if (promoValidation?.valid) {
+                        <div class="promo-feedback valid"  >
+                          <i class="bi bi-check-circle-fill"></i>
+                          {{ promoValidation?.message }}
+                        </div>
+                      }
+                      @if (promoValidation && !promoValidation.valid) {
+                        <div class="promo-feedback invalid">
+                          <i class="bi bi-x-circle-fill"></i>
+                          {{ promoValidation.message }}
+                        </div>
+                      }
+                      <!-- Lien vers les codes disponibles -->
+                      <div class="promo-hint">
+                        <i class="bi bi-info-circle"></i>
+                        Obtenez des codes en utilisant vos
+                        <a routerLink="/loyalty">points de fidélité</a>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
-
-              <!-- Lien vers les codes disponibles -->
-              <div class="promo-hint">
-                <i class="bi bi-info-circle"></i>
-                Obtenez des codes en utilisant vos
-                <a routerLink="/loyalty">points de fidélité</a>
+              <!-- Informations de livraison -->
+              <div class="delivery-card">
+                <div class="card-header-custom">
+                  <div class="header-icon"><i class="bi bi-truck"></i></div>
+                  <div class="header-text">
+                    <h3>Livraison</h3>
+                    <p>Où envoyer votre commande ?</p>
+                  </div>
+                </div>
+                <div class="card-body-custom">
+                  <div class="form-group">
+                    <label class="form-label">Adresse</label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-geo-alt"></i>
+                      <input type="text" [(ngModel)]="deliveryInfo.address" placeholder="Rue, numéro...">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Ville</label>
+                      <div class="input-wrapper">
+                        <i class="bi bi-building"></i>
+                        <input type="text" [(ngModel)]="deliveryInfo.city" placeholder="Tunis, Sfax...">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Code postal</label>
+                      <div class="input-wrapper">
+                        <i class="bi bi-mailbox"></i>
+                        <input type="text" [(ngModel)]="deliveryInfo.zipCode" placeholder="Code postal">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Téléphone</label>
+                    <div class="input-wrapper">
+                      <i class="bi bi-telephone"></i>
+                      <input type="tel" [(ngModel)]="deliveryInfo.phone" placeholder="Numéro de téléphone">
+                    </div>
+                  </div>
+                  <button class="btn-save" (click)="updateDeliveryInfo()">
+                    <i class="bi bi-save"></i><span>Enregistrer</span>
+                  </button>
+                </div>
               </div>
+              <!-- Bouton checkout -->
+              <button class="btn-checkout" (click)="proceedToCheckout()">
+                <i class="bi bi-credit-card"></i>
+                <span>Passer la commande</span>
+                <div class="btn-bg"></div>
+              </button>
             </div>
           </div>
         </div>
+      }
+    </div>
 
-        <!-- Informations de livraison -->
-        <div class="delivery-card">
-          <div class="card-header-custom">
-            <div class="header-icon"><i class="bi bi-truck"></i></div>
-            <div class="header-text">
-              <h3>Livraison</h3>
-              <p>Où envoyer votre commande ?</p>
+    <!-- ── Modal Confirmation Commande ── -->
+    @if (showCheckoutModal) {
+      <div class="modal-custom" [class.show]="showCheckoutModal">
+        <div class="modal-overlay" (click)="showCheckoutModal = false"></div>
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3>Confirmer la commande</h3>
+            <button class="modal-close" (click)="showCheckoutModal = false">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="checkout-summary">
+              <div class="summary-item">
+                <span>Articles</span>
+                <strong>{{ cart?.items?.length }} produit(s)</strong>
+              </div>
+              <div class="summary-item">
+                <span>Sous-total</span>
+                <strong>{{ calculateSubtotal() | number }} TND</strong>
+              </div>
+              <!-- Code promo dans le modal -->
+              @if (appliedPromo?.valid) {
+                <div class="summary-item promo-line">
+                  <span>
+                    <i class="bi bi-ticket-perforated-fill text-success me-1"></i>
+                    Code promo
+                    <span class="badge bg-success ms-1" style="font-size:0.7rem;">{{ promoCode }}</span>
+                  </span>
+                  <strong class="text-success">{{ promoTypeLabel }}</strong>
+                </div>
+              }
+              @if (appliedPromo?.type === 'DISCOUNT') {
+                <div class="summary-item">
+                  <span>Réduction ({{ appliedPromo?.discountPercent }}%)</span>
+                  <strong class="text-success">- {{ getDiscountAmount() | number }} TND</strong>
+                </div>
+              }
+              <div class="summary-item">
+                <span>Livraison</span>
+                <strong>
+                  @if (appliedPromo?.type === 'FREE_DELIVERY') {
+                    <s class="text-muted me-1">
+                      {{ (cart?.deliveryCost || 0) | number }} TND
+                    </s>
+                  }
+                  @if (appliedPromo?.type === 'FREE_DELIVERY') {
+                    <span class="text-success">GRATUITE</span>
+                  }
+                  @if (appliedPromo?.type !== 'FREE_DELIVERY') {
+                    <span>{{ (cart?.deliveryCost || 0) | number }} TND</span>
+                  }
+                </strong>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-item total">
+                <span>Total</span>
+                <strong class="total-price">{{ calculateTotal() | number }} TND</strong>
+              </div>
+            </div>
+            <div class="delivery-address">
+              <i class="bi bi-geo-alt"></i>
+              <div>
+                <strong>Adresse de livraison</strong>
+                <p>
+                  {{ deliveryInfo.address }}<br>
+                  {{ deliveryInfo.city }} - {{ deliveryInfo.zipCode }}<br>
+                  Tél: {{ deliveryInfo.phone }}
+                </p>
+              </div>
+            </div>
+            <div class="warning-message">
+              <i class="bi bi-info-circle"></i>
+              <span>Une fois confirmée, la commande ne pourra plus être modifiée.</span>
             </div>
           </div>
-          <div class="card-body-custom">
-            <div class="form-group">
-              <label class="form-label">Adresse</label>
-              <div class="input-wrapper">
-                <i class="bi bi-geo-alt"></i>
-                <input type="text" [(ngModel)]="deliveryInfo.address" placeholder="Rue, numéro...">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Ville</label>
-                <div class="input-wrapper">
-                  <i class="bi bi-building"></i>
-                  <input type="text" [(ngModel)]="deliveryInfo.city" placeholder="Tunis, Sfax...">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Code postal</label>
-                <div class="input-wrapper">
-                  <i class="bi bi-mailbox"></i>
-                  <input type="text" [(ngModel)]="deliveryInfo.zipCode" placeholder="Code postal">
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Téléphone</label>
-              <div class="input-wrapper">
-                <i class="bi bi-telephone"></i>
-                <input type="tel" [(ngModel)]="deliveryInfo.phone" placeholder="Numéro de téléphone">
-              </div>
-            </div>
-            <button class="btn-save" (click)="updateDeliveryInfo()">
-              <i class="bi bi-save"></i><span>Enregistrer</span>
+          <div class="modal-footer">
+            <button class="btn-secondary" (click)="showCheckoutModal = false">Annuler</button>
+            <button class="btn-primary" (click)="confirmCheckout()" [disabled]="checkoutLoading">
+              <span>{{ checkoutLoading ? 'Traitement...' : 'Confirmer la commande' }}</span>
+              <div class="btn-bg"></div>
             </button>
           </div>
         </div>
-
-        <!-- Bouton checkout -->
-        <button class="btn-checkout" (click)="proceedToCheckout()">
-          <i class="bi bi-credit-card"></i>
-          <span>Passer la commande</span>
-          <div class="btn-bg"></div>
-        </button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Modal Confirmation Commande ── -->
-<div class="modal-custom" [class.show]="showCheckoutModal" *ngIf="showCheckoutModal">
-  <div class="modal-overlay" (click)="showCheckoutModal = false"></div>
-  <div class="modal-container">
-    <div class="modal-header">
-      <h3>Confirmer la commande</h3>
-      <button class="modal-close" (click)="showCheckoutModal = false">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="checkout-summary">
-        <div class="summary-item">
-          <span>Articles</span>
-          <strong>{{ cart?.items?.length }} produit(s)</strong>
-        </div>
-        <div class="summary-item">
-          <span>Sous-total</span>
-          <strong>{{ calculateSubtotal() | number }} TND</strong>
-        </div>
-
-        <!-- Code promo dans le modal -->
-        <div class="summary-item promo-line" *ngIf="appliedPromo?.valid">
-          <span>
-            <i class="bi bi-ticket-perforated-fill text-success me-1"></i>
-            Code promo
-            <span class="badge bg-success ms-1" style="font-size:0.7rem;">{{ promoCode }}</span>
-          </span>
-          <strong class="text-success">{{ promoTypeLabel }}</strong>
-        </div>
-
-        <div class="summary-item" *ngIf="appliedPromo?.type === 'DISCOUNT'">
-          <span>Réduction ({{ appliedPromo?.discountPercent }}%)</span>
-          <strong class="text-success">- {{ getDiscountAmount() | number }} TND</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Livraison</span>
-          <strong>
-            <s *ngIf="appliedPromo?.type === 'FREE_DELIVERY'" class="text-muted me-1">
-              {{ (cart?.deliveryCost || 0) | number }} TND
-            </s>
-            <span *ngIf="appliedPromo?.type === 'FREE_DELIVERY'" class="text-success">GRATUITE</span>
-            <span *ngIf="appliedPromo?.type !== 'FREE_DELIVERY'">{{ (cart?.deliveryCost || 0) | number }} TND</span>
-          </strong>
-        </div>
-
-        <div class="summary-divider"></div>
-        <div class="summary-item total">
-          <span>Total</span>
-          <strong class="total-price">{{ calculateTotal() | number }} TND</strong>
-        </div>
-      </div>
-
-      <div class="delivery-address">
-        <i class="bi bi-geo-alt"></i>
-        <div>
-          <strong>Adresse de livraison</strong>
-          <p>
-            {{ deliveryInfo.address }}<br>
-            {{ deliveryInfo.city }} - {{ deliveryInfo.zipCode }}<br>
-            Tél: {{ deliveryInfo.phone }}
-          </p>
-        </div>
-      </div>
-
-      <div class="warning-message">
-        <i class="bi bi-info-circle"></i>
-        <span>Une fois confirmée, la commande ne pourra plus être modifiée.</span>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="showCheckoutModal = false">Annuler</button>
-      <button class="btn-primary" (click)="confirmCheckout()" [disabled]="checkoutLoading">
-        <span>{{ checkoutLoading ? 'Traitement...' : 'Confirmer la commande' }}</span>
-        <div class="btn-bg"></div>
-      </button>
-    </div>
-  </div>
-</div>
+    }

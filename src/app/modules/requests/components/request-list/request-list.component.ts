@@ -1,12 +1,22 @@
 // src/app/modules/requests/components/request-list/request-list.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule, DatePipe, SlicePipe } from '@angular/common';
 import { ServiceRequestService } from '../../../../services/service-request.service';
 import { ServiceRequest, RequestStatus, RequestType } from '../../../../models/service-request.model';
 
 @Component({
   selector: 'app-request-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DatePipe,
+    SlicePipe
+  ],
   templateUrl: './request-list.component.html',
   styleUrls: ['./request-list.component.scss']
 })

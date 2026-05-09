@@ -13,78 +13,94 @@
       Donner mon avis
     </button>
   </div>
-  
+
   <!-- Note moyenne -->
-  <div class="average-rating-card bg-light rounded p-4 mb-4 text-center" *ngIf="averageRating > 0">
-    <div class="display-1 fw-bold text-primary">{{averageRating | number:'1.1-1'}}</div>
-    <div class="rating-stars mb-2">
-      <span *ngFor="let star of getStars(averageRating)" class="fs-3 me-1">
-        <i [class]="star" style="color: #ffc107;"></i>
-      </span>
-    </div>
-    <div class="text-muted">Note moyenne sur {{reviews.length}} avis</div>
-  </div>
-  
-  <!-- Formulaire d'ajout d'avis -->
-  <div class="review-form-container mb-4" *ngIf="showReviewForm">
-    <app-review-form 
-      [machineId]="machineId"
-      [serviceId]="serviceId"
-      [entityName]="entityName"
-      (reviewSubmitted)="onReviewAdded()"
-      (cancel)="showReviewForm = false">
-    </app-review-form>
-  </div>
-  
-  <!-- Loader -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
-    </div>
-    <p class="mt-2 text-muted">Chargement des avis...</p>
-  </div>
-  
-  <!-- Liste des avis -->
-  <div *ngIf="!loading && reviews.length === 0" class="text-center py-5 bg-light rounded">
-    <i class="bi bi-chat-dots display-1 text-muted mb-3 d-block"></i>
-    <p class="text-muted">Aucun avis pour le moment</p>
-    <p class="small text-muted">Soyez le premier à donner votre avis !</p>
-  </div>
-  
-  <div class="reviews-list" *ngIf="!loading && reviews.length > 0">
-    <div class="review-card card mb-3 shadow-sm" *ngFor="let review of reviews">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <div class="d-flex align-items-center">
-            <div class="review-avatar me-3">
-              <img 
-                [src]="review.userAvatarUrl || 'assets/images/default-avatar.png'" 
-                class="rounded-circle" 
-                style="width: 50px; height: 50px; object-fit: cover;"
-                (error)="handleImageError($event)">
-            </div>
-            <div>
-              <h6 class="mb-0">{{review.userName}}</h6>
-              <small class="text-muted">{{formatDate(review.createdAt)}}</small>
-            </div>
-          </div>
-          <div class="rating">
-            <span *ngFor="let star of getStars(review.rating)" class="me-1">
-              <i [class]="star" style="color: #ffc107;"></i>
-            </span>
-          </div>
-        </div>
-        
-        <div class="review-content mt-3">
-          <p class="mb-0">{{review.comment}}</p>
-        </div>
-        
-        <div class="review-footer mt-2" *ngIf="review.userId === getCurrentUserId()">
-          <button class="btn btn-sm btn-outline-danger" (click)="deleteReview(review.id)">
-            <i class="bi bi-trash me-1"></i> Supprimer
-          </button>
-        </div>
+  @if (averageRating > 0) {
+    <div class="average-rating-card bg-light rounded p-4 mb-4 text-center">
+      <div class="display-1 fw-bold text-primary">{{averageRating | number:'1.1-1'}}</div>
+      <div class="rating-stars mb-2">
+        @for (star of getStars(averageRating); track star) {
+          <span class="fs-3 me-1">
+            <i [class]="star" style="color: #ffc107;"></i>
+          </span>
+        }
       </div>
+      <div class="text-muted">Note moyenne sur {{reviews.length}} avis</div>
     </div>
+  }
+
+  <!-- Formulaire d'ajout d'avis -->
+  @if (showReviewForm) {
+    <div class="review-form-container mb-4">
+      <app-review-form
+        [machineId]="machineId"
+        [serviceId]="serviceId"
+        [entityName]="entityName"
+        (reviewSubmitted)="onReviewAdded()"
+        (cancel)="showReviewForm = false">
+      </app-review-form>
+    </div>
+  }
+
+  <!-- Loader -->
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p class="mt-2 text-muted">Chargement des avis...</p>
+    </div>
+  }
+
+  <!-- Liste des avis -->
+  @if (!loading && reviews.length === 0) {
+    <div class="text-center py-5 bg-light rounded">
+      <i class="bi bi-chat-dots display-1 text-muted mb-3 d-block"></i>
+      <p class="text-muted">Aucun avis pour le moment</p>
+      <p class="small text-muted">Soyez le premier à donner votre avis !</p>
+    </div>
+  }
+
+  @if (!loading && reviews.length > 0) {
+    <div class="reviews-list">
+      @for (review of reviews; track review) {
+        <div class="review-card card mb-3 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="d-flex align-items-center">
+                <div class="review-avatar me-3">
+                  <img
+                    [src]="review.userAvatarUrl || 'assets/images/default-avatar.png'"
+                    class="rounded-circle"
+                    style="width: 50px; height: 50px; object-fit: cover;"
+                    (error)="handleImageError($event)">
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{review.userName}}</h6>
+                    <small class="text-muted">{{formatDate(review.createdAt)}}</small>
+                  </div>
+                </div>
+                <div class="rating">
+                  @for (star of getStars(review.rating); track star) {
+                    <span class="me-1">
+                      <i [class]="star" style="color: #ffc107;"></i>
+                    </span>
+                  }
+                </div>
+              </div>
+              <div class="review-content mt-3">
+                <p class="mb-0">{{review.comment}}</p>
+              </div>
+              @if (review.userId === getCurrentUserId()) {
+                <div class="review-footer mt-2">
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteReview(review.id)">
+                    <i class="bi bi-trash me-1"></i> Supprimer
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
   </div>
-</div>

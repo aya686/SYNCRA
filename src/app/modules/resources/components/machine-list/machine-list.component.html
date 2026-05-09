@@ -34,254 +34,270 @@
   <div class="filters-section reveal">
     <div class="filters-header">
       <div class="filters-title"><i class="bi bi-funnel"></i><span>Filtrer les machines</span></div>
-      <button class="btn-reset" (click)="resetFilters()" *ngIf="isFilterActive()">
-        <i class="bi bi-arrow-repeat"></i> Réinitialiser
-      </button>
+      @if (isFilterActive()) {
+        <button class="btn-reset" (click)="resetFilters()">
+          <i class="bi bi-arrow-repeat"></i> Réinitialiser
+        </button>
+      }
     </div>
     <div class="filters-grid">
       <div class="filter-group">
         <label class="filter-label"><i class="bi bi-search"></i> Recherche</label>
         <input type="text" class="filter-input" placeholder="Nom de la machine..."
-               [(ngModel)]="filters.searchTerm" (input)="applyFilters()">
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-tags"></i> Catégorie</label>
-        <select class="filter-select" [(ngModel)]="filters.category" (change)="applyFilters()">
-          <option value="">Toutes les catégories</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-gear"></i> Type</label>
-        <select class="filter-select" [(ngModel)]="filters.type" (change)="applyFilters()">
-          <option value="">Tous les types</option>
-          <option *ngFor="let type of machineTypes" [value]="type">{{type}}</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-currency-exchange"></i> Transaction</label>
-        <select class="filter-select" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
-          <option value="">Tous</option>
-          <option value="SALE">💰 À vendre</option>
-          <option value="RENT">🔑 À louer</option>
-          <option value="BOTH">🔄 Les deux</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-geo-alt"></i> Localisation</label>
-        <input type="text" class="filter-input" placeholder="Tunis, Sfax..."
-               [(ngModel)]="filters.location" (input)="applyFilters()">
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-arrow-up"></i> Prix min (TND)</label>
-        <input type="number" class="filter-input" placeholder="0"
-               [(ngModel)]="filters.minPrice" (input)="applyFilters()">
-      </div>
-      <div class="filter-group">
-        <label class="filter-label"><i class="bi bi-arrow-down"></i> Prix max (TND)</label>
-        <input type="number" class="filter-input" placeholder="Illimité"
-               [(ngModel)]="filters.maxPrice" (input)="applyFilters()">
-      </div>
-    </div>
-  </div>
-
-  <!-- Erreur -->
-  <div *ngIf="errorMessage" class="alert-card error reveal">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    <span>{{ errorMessage }}</span>
-    <button class="alert-close" (click)="errorMessage = ''">×</button>
-  </div>
-
-  <!-- Loader -->
-  <div *ngIf="loading" class="loader-wrapper">
-    <div class="loader-spinner"></div>
-    <p>Chargement des machines...</p>
-  </div>
-
-  <!-- Liste machines -->
-  <div *ngIf="!loading && allMachines.length > 0" class="machines-grid">
-    <div class="stats-row reveal">
-      <div class="stat-badge">
-        <i class="bi bi-database"></i>
-        <span>{{ filteredMachines.length }} machine(s) trouvée(s)</span>
-      </div>
-    </div>
-
-    <div class="grid-layout">
-      <div class="machine-card"
-           *ngFor="let machine of filteredMachines; let i = index"
-           [class.card-rejected]="isRejected(machine)"
-           [class.card-auto-rejected]="isAutoRejected(machine)"
-           [class.card-pending]="isPending(machine)"
-           [style.animation-delay]="(i * 0.05) + 's'">
-
-        <!-- Image -->
-        <div class="card-image-wrapper">
-          <img
-            [src]="machine.imageUrls && machine.imageUrls.length > 0 ? machine.imageUrls[0] : 'assets/images/default-machine.jpg'"
-            [alt]="machine.name"
-            [class.img-greyed]="isRejected(machine) || isAutoRejected(machine)"
-            (error)="handleImageError($event)">
-
-          <!-- Badge dispo (seulement si approuvé) -->
-          <div class="availability-badge" [class]="getAvailabilityClass(machine.availability)"
-               *ngIf="isApproved(machine)">
-            <span class="badge-dot"></span>
-            {{ getAvailabilityText(machine.availability) }}
-          </div>
-
-          <!-- ✅ Badge AUTO_REJECTED (IA) — propriétaire seulement -->
-          <div class="status-overlay-badge badge-ai-rejected"
-               *ngIf="isAutoRejected(machine) && isOwner(machine)">
-            <i class="bi bi-robot"></i>
-            <span>REJETÉ PAR IA</span>
-          </div>
-
-          <!-- Badge REJECTED (admin) -->
-          <div class="status-overlay-badge badge-rejected"
-               *ngIf="isRejected(machine) && isOwner(machine)">
-            <i class="bi bi-ban-fill"></i>
-            <span>REJETÉE</span>
-          </div>
-
-          <!-- Badge EN ATTENTE -->
-          <div class="status-overlay-badge badge-pending"
-               *ngIf="isPending(machine) && isOwner(machine)">
-            <i class="bi bi-clock-fill"></i>
-            <span>EN ATTENTE</span>
-          </div>
-
-          <div class="card-overlay" *ngIf="isApproved(machine)">
-            <button class="btn-quick-view" [routerLink]="['/machines', machine.id]">
-              <i class="bi bi-eye"></i>
-            </button>
-          </div>
+          [(ngModel)]="filters.searchTerm" (input)="applyFilters()">
         </div>
-
-        <!-- ✅ BANNIÈRE REJET PAR IA (propriétaire seulement) — avec message ML -->
-        <div class="auto-reject-banner" *ngIf="isAutoRejected(machine) && isOwner(machine)">
-          
-          <div class="auto-reject-content">
-            <strong>🤖Rejeté automatiquement par notre IA de modération</strong>
-            <p>{{ machine.rejectionReason || 'Votre machine contient un contenu qui ne respecte pas nos règles.' }}</p>
-            <span class="auto-reject-hint">Modifiez votre description et re-soumettez.</span>
-          </div>
+        <div class="filter-group">
+          <label class="filter-label"><i class="bi bi-tags"></i> Catégorie</label>
+          <select class="filter-select" [(ngModel)]="filters.category" (change)="applyFilters()">
+            <option value="">Toutes les catégories</option>
+            @for (cat of categories; track cat) {
+              <option [value]="cat">{{cat}}</option>
+            }
+          </select>
         </div>
-
-        <!-- Bannière rejet admin -->
-        <div class="reject-banner" *ngIf="isRejected(machine) && isOwner(machine)">
-          <i class="bi bi-info-circle-fill"></i>
-          <div>
-            <strong>Rejeté par l'administrateur</strong>
-            <span> — {{ getRejectReason(machine) }}</span>
-          </div>
+        <div class="filter-group">
+          <label class="filter-label"><i class="bi bi-gear"></i> Type</label>
+          <select class="filter-select" [(ngModel)]="filters.type" (change)="applyFilters()">
+            <option value="">Tous les types</option>
+            @for (type of machineTypes; track type) {
+              <option [value]="type">{{type}}</option>
+            }
+          </select>
         </div>
-
-        <!-- Bannière en attente -->
-        <div class="pending-banner" *ngIf="isPending(machine) && isOwner(machine)">
-          <i class="bi bi-clock-history"></i>
-          <div>
-            <strong>En attente de validation</strong>
-            <span> — Visible après approbation de l'administrateur.</span>
-          </div>
+        <div class="filter-group">
+          <label class="filter-label"><i class="bi bi-currency-exchange"></i> Transaction</label>
+          <select class="filter-select" [(ngModel)]="filters.transactionType" (change)="applyFilters()">
+            <option value="">Tous</option>
+            <option value="SALE">💰 À vendre</option>
+            <option value="RENT">🔑 À louer</option>
+            <option value="BOTH">🔄 Les deux</option>
+          </select>
         </div>
-
-        <!-- Corps -->
-        <div class="card-body" [class.greyed-out]="isRejected(machine) || isAutoRejected(machine)">
-          <h5 class="machine-name">{{ machine.name }}</h5>
-          <p class="machine-location">
-            <i class="bi bi-geo-alt"></i> {{ machine.location }}
-          </p>
-
-          <div class="rating mb-2" *ngIf="isApproved(machine)">
-            <span *ngFor="let star of getStars(machine.rating)">
-              <i [class]="'bi ' + star" style="color: #ffc107;"></i>
-            </span>
-            <span class="ms-1 text-muted small">({{ machine.reviewCount || 0 }} avis)</span>
+        <div class="filter-group">
+          <label class="filter-label"><i class="bi bi-geo-alt"></i> Localisation</label>
+          <input type="text" class="filter-input" placeholder="Tunis, Sfax..."
+            [(ngModel)]="filters.location" (input)="applyFilters()">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label"><i class="bi bi-arrow-up"></i> Prix min (TND)</label>
+            <input type="number" class="filter-input" placeholder="0"
+              [(ngModel)]="filters.minPrice" (input)="applyFilters()">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-arrow-down"></i> Prix max (TND)</label>
+              <input type="number" class="filter-input" placeholder="Illimité"
+                [(ngModel)]="filters.maxPrice" (input)="applyFilters()">
+              </div>
+            </div>
           </div>
 
-          <div class="price-row">
-            <span class="price-value">{{ machine.price | number }} TND</span>
-            <small class="text-muted">/{{ machine.priceUnit || 'unité' }}</small>
+          <!-- Erreur -->
+          @if (errorMessage) {
+            <div class="alert-card error reveal">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>{{ errorMessage }}</span>
+              <button class="alert-close" (click)="errorMessage = ''">×</button>
+            </div>
+          }
+
+          <!-- Loader -->
+          @if (loading) {
+            <div class="loader-wrapper">
+              <div class="loader-spinner"></div>
+              <p>Chargement des machines...</p>
+            </div>
+          }
+
+          <!-- Liste machines -->
+          @if (!loading && allMachines.length > 0) {
+            <div class="machines-grid">
+              <div class="stats-row reveal">
+                <div class="stat-badge">
+                  <i class="bi bi-database"></i>
+                  <span>{{ filteredMachines.length }} machine(s) trouvée(s)</span>
+                </div>
+              </div>
+              <div class="grid-layout">
+                @for (machine of filteredMachines; track machine; let i = $index) {
+                  <div class="machine-card"
+                    [class.card-rejected]="isRejected(machine)"
+                    [class.card-auto-rejected]="isAutoRejected(machine)"
+                    [class.card-pending]="isPending(machine)"
+                    [style.animation-delay]="(i * 0.05) + 's'">
+                    <!-- Image -->
+                    <div class="card-image-wrapper">
+                      <img
+                        [src]="machine.imageUrls && machine.imageUrls.length > 0 ? machine.imageUrls[0] : 'assets/images/default-machine.jpg'"
+                        [alt]="machine.name"
+                        [class.img-greyed]="isRejected(machine) || isAutoRejected(machine)"
+                        (error)="handleImageError($event)">
+                        <!-- Badge dispo (seulement si approuvé) -->
+                        @if (isApproved(machine)) {
+                          <div class="availability-badge" [class]="getAvailabilityClass(machine.availability)"
+                            >
+                            <span class="badge-dot"></span>
+                            {{ getAvailabilityText(machine.availability) }}
+                          </div>
+                        }
+                        <!-- ✅ Badge AUTO_REJECTED (IA) — propriétaire seulement -->
+                        @if (isAutoRejected(machine) && isOwner(machine)) {
+                          <div class="status-overlay-badge badge-ai-rejected"
+                            >
+                            <i class="bi bi-robot"></i>
+                            <span>REJETÉ PAR IA</span>
+                          </div>
+                        }
+                        <!-- Badge REJECTED (admin) -->
+                        @if (isRejected(machine) && isOwner(machine)) {
+                          <div class="status-overlay-badge badge-rejected"
+                            >
+                            <i class="bi bi-ban-fill"></i>
+                            <span>REJETÉE</span>
+                          </div>
+                        }
+                        <!-- Badge EN ATTENTE -->
+                        @if (isPending(machine) && isOwner(machine)) {
+                          <div class="status-overlay-badge badge-pending"
+                            >
+                            <i class="bi bi-clock-fill"></i>
+                            <span>EN ATTENTE</span>
+                          </div>
+                        }
+                        @if (isApproved(machine)) {
+                          <div class="card-overlay">
+                            <button class="btn-quick-view" [routerLink]="['/machines', machine.id]">
+                              <i class="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        }
+                      </div>
+                      <!-- ✅ BANNIÈRE REJET PAR IA (propriétaire seulement) — avec message ML -->
+                      @if (isAutoRejected(machine) && isOwner(machine)) {
+                        <div class="auto-reject-banner">
+                          <div class="auto-reject-content">
+                            <strong>🤖Rejeté automatiquement par notre IA de modération</strong>
+                            <p>{{ machine.rejectionReason || 'Votre machine contient un contenu qui ne respecte pas nos règles.' }}</p>
+                            <span class="auto-reject-hint">Modifiez votre description et re-soumettez.</span>
+                          </div>
+                        </div>
+                      }
+                      <!-- Bannière rejet admin -->
+                      @if (isRejected(machine) && isOwner(machine)) {
+                        <div class="reject-banner">
+                          <i class="bi bi-info-circle-fill"></i>
+                          <div>
+                            <strong>Rejeté par l'administrateur</strong>
+                            <span> — {{ getRejectReason(machine) }}</span>
+                          </div>
+                        </div>
+                      }
+                      <!-- Bannière en attente -->
+                      @if (isPending(machine) && isOwner(machine)) {
+                        <div class="pending-banner">
+                          <i class="bi bi-clock-history"></i>
+                          <div>
+                            <strong>En attente de validation</strong>
+                            <span> — Visible après approbation de l'administrateur.</span>
+                          </div>
+                        </div>
+                      }
+                      <!-- Corps -->
+                      <div class="card-body" [class.greyed-out]="isRejected(machine) || isAutoRejected(machine)">
+                        <h5 class="machine-name">{{ machine.name }}</h5>
+                        <p class="machine-location">
+                          <i class="bi bi-geo-alt"></i> {{ machine.location }}
+                        </p>
+                        @if (isApproved(machine)) {
+                          <div class="rating mb-2">
+                            @for (star of getStars(machine.rating); track star) {
+                              <span>
+                                <i [class]="'bi ' + star" style="color: #ffc107;"></i>
+                              </span>
+                            }
+                            <span class="ms-1 text-muted small">({{ machine.reviewCount || 0 }} avis)</span>
+                          </div>
+                        }
+                        <div class="price-row">
+                          <span class="price-value">{{ machine.price | number }} TND</span>
+                          <small class="text-muted">/{{ machine.priceUnit || 'unité' }}</small>
+                        </div>
+                        <div class="badges-row">
+                          <span class="badge-type">
+                            {{ machine.transactionType === 'SALE' ? 'À vendre' : machine.transactionType === 'RENT' ? 'À louer' : 'Vente/Location' }}
+                          </span>
+                          <span class="badge-category">{{ machine.category }}</span>
+                        </div>
+                      </div>
+                      <!-- Footer actions -->
+                      <div class="card-footer">
+                        <!-- Approuvée → voir détails + modifier/supprimer (page "mes machines") -->
+                        @if (isApproved(machine)) {
+                          <button class="btn-details" [routerLink]="['/machines', machine.id]">
+                            <span>Détails</span><i class="bi bi-arrow-right"></i>
+                          </button>
+                          <button class="btn-edit" [routerLink]="['/machines/edit', machine.id]">
+                            <i class="bi bi-pencil"></i> Modifier
+                          </button>
+                          <button class="btn-delete" (click)="deleteMachine(machine)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                        <!-- En attente → modifier/supprimer -->
+                        @if (isPending(machine) && isOwner(machine)) {
+                          <button class="btn-edit" [routerLink]="['/machines/edit', machine.id]">
+                            <i class="bi bi-pencil"></i> Modifier
+                          </button>
+                          <button class="btn-delete" (click)="deleteMachine(machine)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                        <!-- ✅ AUTO_REJECTED → corriger et re-soumettre -->
+                        @if (isAutoRejected(machine) && isOwner(machine)) {
+                          <button class="btn-edit btn-edit-ai" [routerLink]="['/machines/edit', machine.id]">
+                            <i class="bi bi-pencil-square"></i> Corriger le contenu
+                          </button>
+                          <button class="btn-delete" (click)="deleteMachine(machine)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                        <!-- Rejeté admin → corriger et re-soumettre -->
+                        @if (isRejected(machine) && isOwner(machine)) {
+                          <button class="btn-edit btn-edit-rejected" [routerLink]="['/machines/edit', machine.id]">
+                            <i class="bi bi-arrow-repeat"></i> Corriger &amp; re-soumettre
+                          </button>
+                          <button class="btn-delete" (click)="deleteMachine(machine)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Vide -->
+            @if (!loading && allMachines.length === 0 && !errorMessage) {
+              <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                <h3>Aucune machine trouvée</h3>
+                <p>La base de données ne contient pas encore de machines.</p>
+                <button class="btn-primary" routerLink="/machines/create">
+                  <i class="bi bi-plus-circle"></i><span>Ajouter votre première machine</span>
+                </button>
+              </div>
+            }
+
+            <!-- Aucun résultat après filtre -->
+            @if (!loading && allMachines.length > 0 && filteredMachines.length === 0 && !errorMessage) {
+              <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-funnel"></i></div>
+                <h3>Aucun résultat</h3>
+                <p>Aucune machine ne correspond à vos critères.</p>
+                <button class="btn-primary" (click)="resetFilters()">
+                  <i class="bi bi-arrow-repeat"></i><span>Réinitialiser les filtres</span>
+                </button>
+              </div>
+            }
+
           </div>
-
-          <div class="badges-row">
-            <span class="badge-type">
-              {{ machine.transactionType === 'SALE' ? 'À vendre' : machine.transactionType === 'RENT' ? 'À louer' : 'Vente/Location' }}
-            </span>
-            <span class="badge-category">{{ machine.category }}</span>
-          </div>
-        </div>
-
-        <!-- Footer actions -->
-        <div class="card-footer">
-
-          <!-- Approuvée → voir détails + modifier/supprimer (page "mes machines") -->
-          <ng-container *ngIf="isApproved(machine)">
-            <button class="btn-details" [routerLink]="['/machines', machine.id]">
-              <span>Détails</span><i class="bi bi-arrow-right"></i>
-            </button>
-            <button class="btn-edit" [routerLink]="['/machines/edit', machine.id]">
-              <i class="bi bi-pencil"></i> Modifier
-            </button>
-            <button class="btn-delete" (click)="deleteMachine(machine)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </ng-container>
-
-          <!-- En attente → modifier/supprimer -->
-          <ng-container *ngIf="isPending(machine) && isOwner(machine)">
-            <button class="btn-edit" [routerLink]="['/machines/edit', machine.id]">
-              <i class="bi bi-pencil"></i> Modifier
-            </button>
-            <button class="btn-delete" (click)="deleteMachine(machine)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </ng-container>
-
-          <!-- ✅ AUTO_REJECTED → corriger et re-soumettre -->
-          <ng-container *ngIf="isAutoRejected(machine) && isOwner(machine)">
-            <button class="btn-edit btn-edit-ai" [routerLink]="['/machines/edit', machine.id]">
-              <i class="bi bi-pencil-square"></i> Corriger le contenu
-            </button>
-            <button class="btn-delete" (click)="deleteMachine(machine)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </ng-container>
-
-          <!-- Rejeté admin → corriger et re-soumettre -->
-          <ng-container *ngIf="isRejected(machine) && isOwner(machine)">
-            <button class="btn-edit btn-edit-rejected" [routerLink]="['/machines/edit', machine.id]">
-              <i class="bi bi-arrow-repeat"></i> Corriger &amp; re-soumettre
-            </button>
-            <button class="btn-delete" (click)="deleteMachine(machine)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </ng-container>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Vide -->
-  <div *ngIf="!loading && allMachines.length === 0 && !errorMessage" class="empty-state">
-    <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-    <h3>Aucune machine trouvée</h3>
-    <p>La base de données ne contient pas encore de machines.</p>
-    <button class="btn-primary" routerLink="/machines/create">
-      <i class="bi bi-plus-circle"></i><span>Ajouter votre première machine</span>
-    </button>
-  </div>
-
-  <!-- Aucun résultat après filtre -->
-  <div *ngIf="!loading && allMachines.length > 0 && filteredMachines.length === 0 && !errorMessage" class="empty-state">
-    <div class="empty-icon"><i class="bi bi-funnel"></i></div>
-    <h3>Aucun résultat</h3>
-    <p>Aucune machine ne correspond à vos critères.</p>
-    <button class="btn-primary" (click)="resetFilters()">
-      <i class="bi bi-arrow-repeat"></i><span>Réinitialiser les filtres</span>
-    </button>
-  </div>
-
-</div>

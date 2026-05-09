@@ -2,10 +2,14 @@
 // Page résultat d'une catégorie avec filtres spécifiques
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MachineService, Machine } from '../../../../services/machine.service';
 import { ServiceService, ServiceEntity } from '../../../../services/service.service';
 import { CartService } from '../../../../services/cart.service';
+
+
 
 export type ItemType = 'machine' | 'service';
 
@@ -39,6 +43,8 @@ export interface SpecificFilter {
 
 @Component({
   selector: 'app-category-page',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './category-page.component.html',
   styleUrls: ['./category-page.component.scss']
 })

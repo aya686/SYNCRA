@@ -1,11 +1,15 @@
 // src/app/modules/loyalty/components/loyalty-dashboard/loyalty-dashboard.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { LoyaltyService, LoyaltyAccount, TopItem } from '../../../../services/loyalty.service';
 
 @Component({
   selector: 'app-loyalty-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe, DatePipe],
   templateUrl: './loyalty-dashboard.component.html',
   styleUrls: ['./loyalty-dashboard.component.scss']
 })

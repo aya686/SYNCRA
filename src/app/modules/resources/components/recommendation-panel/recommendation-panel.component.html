@@ -3,7 +3,7 @@
 <div class="rec-wrapper">
 
   <!-- ══════════════════════════════════════════════════════════
-       EN-TÊTE
+  EN-TÊTE
   ══════════════════════════════════════════════════════════ -->
   <div class="rec-header">
     <div class="header-icon-ring">
@@ -19,7 +19,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       FORMULAIRE DE CRITÈRES
+  FORMULAIRE DE CRITÈRES
   ══════════════════════════════════════════════════════════ -->
   <div class="criteria-card">
 
@@ -33,12 +33,14 @@
       <div class="field-group full-width">
         <label class="field-label">Type de ressource</label>
         <div class="radio-tabs">
-          <button *ngFor="let rt of resourceTypes"
-                  class="radio-tab"
-                  [class.active]="criteria.resourceType === rt.value"
-                  (click)="criteria.resourceType = rt.value">
-            {{ rt.label }}
-          </button>
+          @for (rt of resourceTypes; track rt) {
+            <button
+              class="radio-tab"
+              [class.active]="criteria.resourceType === rt.value"
+              (click)="criteria.resourceType = rt.value">
+              {{ rt.label }}
+            </button>
+          }
         </div>
       </div>
 
@@ -46,381 +48,432 @@
       <div class="field-group">
         <label class="field-label"><i class="bi bi-tags"></i> Catégorie</label>
         <select class="field-select" [(ngModel)]="criteria.category"
-                (change)="criteria.subCategory = ''">
+          (change)="criteria.subCategory = ''">
           <option value="">Toutes les catégories</option>
-          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          @for (c of categories; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
         </select>
       </div>
 
       <!-- Sous-catégorie (dynamique selon catégorie) -->
-      <div class="field-group" *ngIf="currentSubCategories.length > 0">
-        <label class="field-label"><i class="bi bi-diagram-3"></i> Sous-catégorie</label>
-        <select class="field-select" [(ngModel)]="criteria.subCategory">
-          <option value="">Toutes les sous-catégories</option>
-          <option *ngFor="let sub of currentSubCategories" [value]="sub.key">
-            {{ sub.label }}
-          </option>
-        </select>
-      </div>
+      @if (currentSubCategories.length > 0) {
+        <div class="field-group">
+          <label class="field-label"><i class="bi bi-diagram-3"></i> Sous-catégorie</label>
+          <select class="field-select" [(ngModel)]="criteria.subCategory">
+            <option value="">Toutes les sous-catégories</option>
+            @for (sub of currentSubCategories; track sub) {
+              <option [value]="sub.key">
+                {{ sub.label }}
+              </option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Type d'entreprise -->
       <div class="field-group">
         <label class="field-label"><i class="bi bi-building"></i> Type d'entreprise</label>
         <select class="field-select" [(ngModel)]="criteria.businessType">
           <option value="">Tous les types</option>
-          <option *ngFor="let bt of businessTypeOptions" [value]="bt.value">
-            {{ bt.label }}
-          </option>
+          @for (bt of businessTypeOptions; track bt) {
+            <option [value]="bt.value">
+              {{ bt.label }}
+            </option>
+          }
         </select>
       </div>
 
       <!-- Type machine (conditionnel) -->
-      <div class="field-group" *ngIf="criteria.resourceType !== 'SERVICE'">
-        <label class="field-label"><i class="bi bi-gear"></i> Type de machine</label>
-        <select class="field-select" [(ngModel)]="criteria.machineType">
-          <option value="">Tous les types</option>
-          <option *ngFor="let mt of machineTypes" [value]="mt">{{ mt }}</option>
-        </select>
-      </div>
+      @if (criteria.resourceType !== 'SERVICE') {
+        <div class="field-group">
+          <label class="field-label"><i class="bi bi-gear"></i> Type de machine</label>
+          <select class="field-select" [(ngModel)]="criteria.machineType">
+            <option value="">Tous les types</option>
+            @for (mt of machineTypes; track mt) {
+              <option [value]="mt">{{ mt }}</option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Type service (conditionnel) -->
-      <div class="field-group" *ngIf="criteria.resourceType !== 'MACHINE'">
-        <label class="field-label"><i class="bi bi-briefcase"></i> Type de service</label>
-        <select class="field-select" [(ngModel)]="criteria.serviceType">
-          <option value="">Tous les types</option>
-          <option *ngFor="let st of serviceTypes" [value]="st">{{ st }}</option>
-        </select>
-      </div>
+      @if (criteria.resourceType !== 'MACHINE') {
+        <div class="field-group">
+          <label class="field-label"><i class="bi bi-briefcase"></i> Type de service</label>
+          <select class="field-select" [(ngModel)]="criteria.serviceType">
+            <option value="">Tous les types</option>
+            @for (st of serviceTypes; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Transaction (machines) -->
-      <div class="field-group" *ngIf="criteria.resourceType !== 'SERVICE'">
-        <label class="field-label"><i class="bi bi-currency-exchange"></i> Mode de transaction</label>
-        <select class="field-select" [(ngModel)]="criteria.transactionType">
-          <option value="">Vente ou Location</option>
-          <option value="SALE">💰 Achat uniquement</option>
-          <option value="RENT">🔑 Location uniquement</option>
-          <option value="BOTH">🔄 Vente & Location</option>
-        </select>
-      </div>
+      @if (criteria.resourceType !== 'SERVICE') {
+        <div class="field-group">
+          <label class="field-label"><i class="bi bi-currency-exchange"></i> Mode de transaction</label>
+          <select class="field-select" [(ngModel)]="criteria.transactionType">
+            <option value="">Vente ou Location</option>
+            <option value="SALE">💰 Achat uniquement</option>
+            <option value="RENT">🔑 Location uniquement</option>
+            <option value="BOTH">🔄 Vente & Location</option>
+          </select>
+        </div>
+      }
 
       <!-- Budget min -->
       <div class="field-group">
         <label class="field-label"><i class="bi bi-arrow-down-circle"></i> Budget min (TND)</label>
         <input class="field-input" type="number" min="0"
-               [(ngModel)]="criteria.minBudget" placeholder="0">
-      </div>
+          [(ngModel)]="criteria.minBudget" placeholder="0">
+        </div>
 
-      <!-- Budget max -->
-      <div class="field-group">
-        <label class="field-label"><i class="bi bi-arrow-up-circle"></i> Budget max (TND)</label>
-        <input class="field-input" type="number" min="0"
-               [(ngModel)]="criteria.maxBudget" placeholder="Illimité">
-      </div>
-
-      <!-- Localisation -->
-      <div class="field-group">
-        <label class="field-label"><i class="bi bi-geo-alt"></i> Localisation préférée</label>
-        <select class="field-select" [(ngModel)]="criteria.preferredLocation">
-          <option value="">Toute la Tunisie</option>
-          <option *ngFor="let city of tunisianCities" [value]="city">{{ city }}</option>
-        </select>
-      </div>
-
-      <!-- Rating minimum -->
-      <div class="field-group">
-        <label class="field-label"><i class="bi bi-star"></i> Note minimale</label>
-        <select class="field-select" [(ngModel)]="criteria.minRating">
-          <option *ngFor="let r of ratingOptions" [value]="r.value">{{ r.label }}</option>
-        </select>
-      </div>
-
-      <!-- Quantité requise -->
-      <div class="field-group">
-        <label class="field-label"><i class="bi bi-boxes"></i> Quantité souhaitée</label>
-        <input class="field-input" type="number" min="1"
-               [(ngModel)]="criteria.requiredQuantity" placeholder="Ex: 2">
-      </div>
-
-      <!-- Disponibilité requise -->
-      <div class="field-group availability-toggle">
-        <label class="field-label"><i class="bi bi-lightning-charge"></i> Disponibilité immédiate requise</label>
-        <label class="toggle-switch">
-          <input type="checkbox" [(ngModel)]="criteria.requiresAvailability">
-          <span class="toggle-track">
-            <span class="toggle-thumb"></span>
-          </span>
-          <span class="toggle-label">{{ criteria.requiresAvailability ? 'Oui, obligatoire' : 'Non, flexible' }}</span>
-        </label>
-      </div>
-
-    </div>
-
-    <!-- ── Poids avancés ─────────────────────────────────── -->
-    <div class="weights-section">
-      <button class="weights-toggle" (click)="showWeights = !showWeights">
-        <i class="bi" [class.bi-chevron-down]="!showWeights" [class.bi-chevron-up]="showWeights"></i>
-        ⚙️ Personnaliser les poids du scoring
-        <span class="weights-hint">(Total : {{ weightsTotal }}/100)</span>
-      </button>
-
-      <div class="weights-grid" *ngIf="showWeights">
-        <div class="weight-item" *ngFor="let w of [
-          {key:'type',         label:'🏷️ Type/Catégorie',    model: weights.type,         max: 50},
-          {key:'budget',       label:'💰 Budget',             model: weights.budget,       max: 50},
-          {key:'location',     label:'📍 Localisation',       model: weights.location,     max: 40},
-          {key:'rating',       label:'⭐ Rating',             model: weights.rating,       max: 30},
-          {key:'availability', label:'✅ Disponibilité',      model: weights.availability, max: 30}
-        ]">
-          <label class="weight-label">{{ w.label }}</label>
-          <div class="weight-controls">
-            <input type="range" min="0" [max]="w.max" step="1"
-                   [ngModel]="weights[w.key]"
-                   (ngModelChange)="weights[w.key] = $event">
-            <span class="weight-value">{{ weights[w.key] }}</span>
+        <!-- Budget max -->
+        <div class="field-group">
+          <label class="field-label"><i class="bi bi-arrow-up-circle"></i> Budget max (TND)</label>
+          <input class="field-input" type="number" min="0"
+            [(ngModel)]="criteria.maxBudget" placeholder="Illimité">
           </div>
-        </div>
-        <p class="weights-note" [class.over]="weightsTotal > 105">
-          Total : <strong>{{ weightsTotal }}</strong>/100
-          <span *ngIf="weightsTotal > 105"> ⚠️ Dépasse 100, les scores seront normalisés</span>
-        </p>
-      </div>
-    </div>
 
-    <!-- ── Boutons ─────────────────────────────────────────── -->
-    <div class="criteria-actions">
-      <button class="btn-reset" (click)="reset()" *ngIf="searched">
-        <i class="bi bi-arrow-repeat"></i> Réinitialiser
-      </button>
-      <button class="btn-search" (click)="search()" [disabled]="loading">
-        <span *ngIf="!loading"><i class="bi bi-cpu"></i> Calculer les recommandations</span>
-        <span *ngIf="loading">
-          <span class="spinner-tiny"></span> Calcul en cours...
-        </span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════
-       ERREUR
-  ══════════════════════════════════════════════════════════ -->
-  <div class="error-banner" *ngIf="errorMessage">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    {{ errorMessage }}
-    <button (click)="errorMessage = ''">×</button>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════
-       RÉSULTATS
-  ══════════════════════════════════════════════════════════ -->
-  <div class="results-section" *ngIf="searched && !loading">
-
-    <!-- Aucun résultat -->
-    <div class="no-results" *ngIf="results.length === 0">
-      <i class="bi bi-search"></i>
-      <h3>Aucun fournisseur trouvé</h3>
-      <p>Essayez d'élargir vos critères (budget, localisation, disponibilité).</p>
-    </div>
-
-    <!-- Stats + tri -->
-    <div class="results-header" *ngIf="results.length > 0">
-      <div class="results-meta">
-        <span class="results-count">{{ results.length }} résultat(s)</span>
-        <div class="level-chips">
-          <span class="level-chip all" [class.active]="filterLevel === ''"
-                (click)="filterLevel = ''">Tous</span>
-          <span class="level-chip top"  [class.active]="filterLevel === 'TOP'"
-                (click)="filterLevel = 'TOP'" *ngIf="countByLevel('TOP') > 0">
-            🏆 Top ({{ countByLevel('TOP') }})
-          </span>
-          <span class="level-chip good" [class.active]="filterLevel === 'GOOD'"
-                (click)="filterLevel = 'GOOD'" *ngIf="countByLevel('GOOD') > 0">
-            ✅ Bien ({{ countByLevel('GOOD') }})
-          </span>
-          <span class="level-chip avg"  [class.active]="filterLevel === 'AVERAGE'"
-                (click)="filterLevel = 'AVERAGE'" *ngIf="countByLevel('AVERAGE') > 0">
-            💡 Correct ({{ countByLevel('AVERAGE') }})
-          </span>
-        </div>
-      </div>
-      <div class="sort-select-wrap">
-        <label>Trier par :</label>
-        <select class="sort-select" [(ngModel)]="sortBy">
-          <option value="score">Score de correspondance</option>
-          <option value="price_asc">Prix croissant</option>
-          <option value="price_desc">Prix décroissant</option>
-          <option value="rating">Meilleure note</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Grille de résultats -->
-    <div class="results-grid" *ngIf="results.length > 0">
-      <div class="result-card"
-           *ngFor="let result of displayedResults; let i = index"
-           [class.card-top]="result.recommendationLevel === 'TOP'"
-           [class.card-good]="result.recommendationLevel === 'GOOD'"
-           [style.animation-delay]="(i * 0.07) + 's'">
-
-        <!-- Badge -->
-        <div class="result-badge" *ngIf="result.badge">{{ result.badge }}</div>
-
-        <!-- Image + niveau -->
-        <div class="card-visual">
-          <img [src]="getImage(result)" [alt]="result.name"
-               (error)="handleImageError($event)">
-          <div class="resource-type-tag">
-            <i class="bi" [class.bi-tools]="result.resourceType === 'MACHINE'"
-                          [class.bi-briefcase]="result.resourceType === 'SERVICE'"></i>
-            {{ result.resourceType === 'MACHINE' ? 'Machine' : 'Service' }}
+          <!-- Localisation -->
+          <div class="field-group">
+            <label class="field-label"><i class="bi bi-geo-alt"></i> Localisation préférée</label>
+            <select class="field-select" [(ngModel)]="criteria.preferredLocation">
+              <option value="">Toute la Tunisie</option>
+              @for (city of tunisianCities; track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
           </div>
-        </div>
 
-        <!-- ── SCORE DONUT ─────────────────────────────── -->
-        <div class="score-section">
-          <div class="score-circle" [style.--score-color]="getLevelColor(result.recommendationLevel)">
-            <svg viewBox="0 0 44 44" class="score-svg">
-              <circle cx="22" cy="22" r="18" fill="none" stroke="#f0f0f0" stroke-width="4"/>
-              <circle cx="22" cy="22" r="18" fill="none"
-                      [attr.stroke]="getLevelColor(result.recommendationLevel)"
-                      stroke-width="4"
-                      stroke-dasharray="113"
-                      [attr.stroke-dashoffset]="113 - (113 * result.totalScore / 100)"
-                      stroke-linecap="round"
-                      transform="rotate(-90 22 22)"/>
-            </svg>
-            <div class="score-text">
-              <span class="score-number">{{ result.totalScore | number:'1.0-0' }}</span>
-              <span class="score-max">/100</span>
+          <!-- Rating minimum -->
+          <div class="field-group">
+            <label class="field-label"><i class="bi bi-star"></i> Note minimale</label>
+            <select class="field-select" [(ngModel)]="criteria.minRating">
+              @for (r of ratingOptions; track r) {
+                <option [value]="r.value">{{ r.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Quantité requise -->
+          <div class="field-group">
+            <label class="field-label"><i class="bi bi-boxes"></i> Quantité souhaitée</label>
+            <input class="field-input" type="number" min="1"
+              [(ngModel)]="criteria.requiredQuantity" placeholder="Ex: 2">
+            </div>
+
+            <!-- Disponibilité requise -->
+            <div class="field-group availability-toggle">
+              <label class="field-label"><i class="bi bi-lightning-charge"></i> Disponibilité immédiate requise</label>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="criteria.requiresAvailability">
+                <span class="toggle-track">
+                  <span class="toggle-thumb"></span>
+                </span>
+                <span class="toggle-label">{{ criteria.requiresAvailability ? 'Oui, obligatoire' : 'Non, flexible' }}</span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- ── Poids avancés ─────────────────────────────────── -->
+          <div class="weights-section">
+            <button class="weights-toggle" (click)="showWeights = !showWeights">
+              <i class="bi" [class.bi-chevron-down]="!showWeights" [class.bi-chevron-up]="showWeights"></i>
+              ⚙️ Personnaliser les poids du scoring
+              <span class="weights-hint">(Total : {{ weightsTotal }}/100)</span>
+            </button>
+
+            @if (showWeights) {
+              <div class="weights-grid">
+                @for (w of [
+                  {key:'type',         label:'🏷️ Type/Catégorie',    model: weights.type,         max: 50},
+                  {key:'budget',       label:'💰 Budget',             model: weights.budget,       max: 50},
+                  {key:'location',     label:'📍 Localisation',       model: weights.location,     max: 40},
+                  {key:'rating',       label:'⭐ Rating',             model: weights.rating,       max: 30},
+                  {key:'availability', label:'✅ Disponibilité',      model: weights.availability, max: 30}
+                  ]; track w) {
+                  <div class="weight-item">
+                    <label class="weight-label">{{ w.label }}</label>
+                    <div class="weight-controls">
+                      <input type="range" min="0" [max]="w.max" step="1"
+                        [ngModel]="weights[w.key]"
+                        (ngModelChange)="weights[w.key] = $event">
+                        <span class="weight-value">{{ weights[w.key] }}</span>
+                      </div>
+                    </div>
+                  }
+                  <p class="weights-note" [class.over]="weightsTotal > 105">
+                    Total : <strong>{{ weightsTotal }}</strong>/100
+                    @if (weightsTotal > 105) {
+                      <span> ⚠️ Dépasse 100, les scores seront normalisés</span>
+                    }
+                  </p>
+                </div>
+              }
+            </div>
+
+            <!-- ── Boutons ─────────────────────────────────────────── -->
+            <div class="criteria-actions">
+              @if (searched) {
+                <button class="btn-reset" (click)="reset()">
+                  <i class="bi bi-arrow-repeat"></i> Réinitialiser
+                </button>
+              }
+              <button class="btn-search" (click)="search()" [disabled]="loading">
+                @if (!loading) {
+                  <span><i class="bi bi-cpu"></i> Calculer les recommandations</span>
+                }
+                @if (loading) {
+                  <span>
+                    <span class="spinner-tiny"></span> Calcul en cours...
+                  </span>
+                }
+              </button>
             </div>
           </div>
 
-          <!-- Barres de détail du score -->
-          <div class="score-bars">
-            <div class="score-bar-row" title="Type/Catégorie">
-              <span class="bar-label">🏷️</span>
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width]="(result.scoreType / 30 * 100) + '%'"
-                     [style.background]="getLevelColor(result.recommendationLevel)"></div>
-              </div>
+          <!-- ══════════════════════════════════════════════════════════
+          ERREUR
+          ══════════════════════════════════════════════════════════ -->
+          @if (errorMessage) {
+            <div class="error-banner">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              {{ errorMessage }}
+              <button (click)="errorMessage = ''">×</button>
             </div>
-            <div class="score-bar-row" title="Budget">
-              <span class="bar-label">💰</span>
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width]="(result.scoreBudget / 25 * 100) + '%'"
-                     [style.background]="getLevelColor(result.recommendationLevel)"></div>
-              </div>
+          }
+
+          <!-- ══════════════════════════════════════════════════════════
+          RÉSULTATS
+          ══════════════════════════════════════════════════════════ -->
+          @if (searched && !loading) {
+            <div class="results-section">
+              <!-- Aucun résultat -->
+              @if (results.length === 0) {
+                <div class="no-results">
+                  <i class="bi bi-search"></i>
+                  <h3>Aucun fournisseur trouvé</h3>
+                  <p>Essayez d'élargir vos critères (budget, localisation, disponibilité).</p>
+                </div>
+              }
+              <!-- Stats + tri -->
+              @if (results.length > 0) {
+                <div class="results-header">
+                  <div class="results-meta">
+                    <span class="results-count">{{ results.length }} résultat(s)</span>
+                    <div class="level-chips">
+                      <span class="level-chip all" [class.active]="filterLevel === ''"
+                      (click)="filterLevel = ''">Tous</span>
+                      @if (countByLevel('TOP') > 0) {
+                        <span class="level-chip top"  [class.active]="filterLevel === 'TOP'"
+                          (click)="filterLevel = 'TOP'">
+                          🏆 Top ({{ countByLevel('TOP') }})
+                        </span>
+                      }
+                      @if (countByLevel('GOOD') > 0) {
+                        <span class="level-chip good" [class.active]="filterLevel === 'GOOD'"
+                          (click)="filterLevel = 'GOOD'">
+                          ✅ Bien ({{ countByLevel('GOOD') }})
+                        </span>
+                      }
+                      @if (countByLevel('AVERAGE') > 0) {
+                        <span class="level-chip avg"  [class.active]="filterLevel === 'AVERAGE'"
+                          (click)="filterLevel = 'AVERAGE'">
+                          💡 Correct ({{ countByLevel('AVERAGE') }})
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <div class="sort-select-wrap">
+                    <label>Trier par :</label>
+                    <select class="sort-select" [(ngModel)]="sortBy">
+                      <option value="score">Score de correspondance</option>
+                      <option value="price_asc">Prix croissant</option>
+                      <option value="price_desc">Prix décroissant</option>
+                      <option value="rating">Meilleure note</option>
+                    </select>
+                  </div>
+                </div>
+              }
+              <!-- Grille de résultats -->
+              @if (results.length > 0) {
+                <div class="results-grid">
+                  @for (result of displayedResults; track result; let i = $index) {
+                    <div class="result-card"
+                      [class.card-top]="result.recommendationLevel === 'TOP'"
+                      [class.card-good]="result.recommendationLevel === 'GOOD'"
+                      [style.animation-delay]="(i * 0.07) + 's'">
+                      <!-- Badge -->
+                      @if (result.badge) {
+                        <div class="result-badge">{{ result.badge }}</div>
+                      }
+                      <!-- Image + niveau -->
+                      <div class="card-visual">
+                        <img [src]="getImage(result)" [alt]="result.name"
+                          (error)="handleImageError($event)">
+                          <div class="resource-type-tag">
+                            <i class="bi" [class.bi-tools]="result.resourceType === 'MACHINE'"
+                            [class.bi-briefcase]="result.resourceType === 'SERVICE'"></i>
+                            {{ result.resourceType === 'MACHINE' ? 'Machine' : 'Service' }}
+                          </div>
+                        </div>
+                        <!-- ── SCORE DONUT ─────────────────────────────── -->
+                        <div class="score-section">
+                          <div class="score-circle" [style.--score-color]="getLevelColor(result.recommendationLevel)">
+                            <svg viewBox="0 0 44 44" class="score-svg">
+                              <circle cx="22" cy="22" r="18" fill="none" stroke="#f0f0f0" stroke-width="4"/>
+                              <circle cx="22" cy="22" r="18" fill="none"
+                                [attr.stroke]="getLevelColor(result.recommendationLevel)"
+                                stroke-width="4"
+                                stroke-dasharray="113"
+                                [attr.stroke-dashoffset]="113 - (113 * result.totalScore / 100)"
+                                stroke-linecap="round"
+                                transform="rotate(-90 22 22)"/>
+                              </svg>
+                              <div class="score-text">
+                                <span class="score-number">{{ result.totalScore | number:'1.0-0' }}</span>
+                                <span class="score-max">/100</span>
+                              </div>
+                            </div>
+                            <!-- Barres de détail du score -->
+                            <div class="score-bars">
+                              <div class="score-bar-row" title="Type/Catégorie">
+                                <span class="bar-label">🏷️</span>
+                                <div class="bar-track">
+                                  <div class="bar-fill"
+                                    [style.width]="(result.scoreType / 30 * 100) + '%'"
+                                  [style.background]="getLevelColor(result.recommendationLevel)"></div>
+                                </div>
+                              </div>
+                              <div class="score-bar-row" title="Budget">
+                                <span class="bar-label">💰</span>
+                                <div class="bar-track">
+                                  <div class="bar-fill"
+                                    [style.width]="(result.scoreBudget / 25 * 100) + '%'"
+                                  [style.background]="getLevelColor(result.recommendationLevel)"></div>
+                                </div>
+                              </div>
+                              <div class="score-bar-row" title="Localisation">
+                                <span class="bar-label">📍</span>
+                                <div class="bar-track">
+                                  <div class="bar-fill"
+                                    [style.width]="(result.scoreLocation / 20 * 100) + '%'"
+                                  [style.background]="getLevelColor(result.recommendationLevel)"></div>
+                                </div>
+                              </div>
+                              <div class="score-bar-row" title="Rating">
+                                <span class="bar-label">⭐</span>
+                                <div class="bar-track">
+                                  <div class="bar-fill"
+                                    [style.width]="(result.scoreRating / 15 * 100) + '%'"
+                                  [style.background]="getLevelColor(result.recommendationLevel)"></div>
+                                </div>
+                              </div>
+                              <div class="score-bar-row" title="Disponibilité">
+                                <span class="bar-label">✅</span>
+                                <div class="bar-track">
+                                  <div class="bar-fill"
+                                    [style.width]="(result.scoreAvailability / 10 * 100) + '%'"
+                                  [style.background]="getLevelColor(result.recommendationLevel)"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- ── INFOS FOURNISSEUR ────────────────────────── -->
+                          <div class="card-info">
+                            <div class="provider-name">{{ result.supplierName }}</div>
+                            <h3 class="result-name">{{ result.name }}</h3>
+                            <div class="meta-row">
+                              <span class="meta-item">
+                                <i class="bi bi-geo-alt"></i> {{ result.location || '—' }}
+                              </span>
+                              <span class="meta-item">
+                                @if (result.resourceType === 'MACHINE') {
+                                  <i class="bi bi-box-seam"></i>
+                                }
+                                @if (result.stockQuantity != null && result.resourceType === 'MACHINE') {
+                                  <span>
+                                    Stock : {{ result.stockQuantity }}
+                                  </span>
+                                }
+                              </span>
+                            </div>
+                            <!-- Rating -->
+                            <div class="rating-row">
+                              <div class="stars">
+                                @for (s of getStars(result.rating); track s) {
+                                  <i class="bi"
+                                    [class.bi-star-fill]="s === 'full'"
+                                    [class.bi-star-half]="s === 'half'"
+                                  [class.bi-star]="s === 'empty'"></i>
+                                }
+                              </div>
+                              <span class="rating-val">{{ result.rating | number:'1.1-1' }}</span>
+                              <span class="rating-count">({{ result.reviewCount }})</span>
+                            </div>
+                            <div class="price-avail-row">
+                              <div class="price-wrap">
+                                <span class="price-val">{{ formatPrice(result.price) }} TND</span>
+                                <span class="price-unit">/{{ result.priceUnit }}</span>
+                              </div>
+                              <span class="avail-tag"
+                                [class.avail-ok]="result.availability === 'AVAILABLE'"
+                                [class.avail-reserved]="result.availability === 'RESERVED'"
+                                [class.avail-no]="result.availability === 'UNAVAILABLE'">
+                                {{ getAvailabilityText(result.availability) }}
+                              </span>
+                            </div>
+                          </div>
+                          <!-- ── RAISONS ─────────────────────────────────── -->
+                          <div class="reasons-section">
+                            <div class="reasons-title">Pourquoi ce fournisseur ?</div>
+                            <ul class="reasons-list">
+                              @for (reason of result.reasons.slice(0, 4); track reason) {
+                                <li>{{ reason }}</li>
+                              }
+                            </ul>
+                          </div>
+                          <!-- ── ACTIONS ─────────────────────────────────── -->
+                          <div class="card-actions">
+                            <button class="btn-details" (click)="viewDetails(result)">
+                              <i class="bi bi-eye"></i> Voir profil
+                            </button>
+                            @if (result.resourceType === 'MACHINE') {
+                              <button class="btn-cart"
+                                [disabled]="result.availability !== 'AVAILABLE'"
+                                (click)="addToCart(result)"
+                                title="Ajouter au panier">
+                                <i class="bi bi-cart-plus"></i>
+                              </button>
+                            }
+                            @if (result.resourceType === 'SERVICE' || true) {
+                              <button class="btn-request"
+                                (click)="makeRequest(result)"
+                                title="Faire une demande">
+                                <i class="bi bi-envelope"></i>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Loader -->
+              @if (loading) {
+                <div class="loading-state">
+                  <div class="loader-ring"></div>
+                  <div class="loader-text">
+                    <p>Analyse de <strong>{{ criteria.resourceType || 'toutes les ressources' }}</strong>...</p>
+                    <p class="loader-sub">Calcul du score multi-critères en cours</p>
+                  </div>
+                </div>
+              }
+
             </div>
-            <div class="score-bar-row" title="Localisation">
-              <span class="bar-label">📍</span>
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width]="(result.scoreLocation / 20 * 100) + '%'"
-                     [style.background]="getLevelColor(result.recommendationLevel)"></div>
-              </div>
-            </div>
-            <div class="score-bar-row" title="Rating">
-              <span class="bar-label">⭐</span>
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width]="(result.scoreRating / 15 * 100) + '%'"
-                     [style.background]="getLevelColor(result.recommendationLevel)"></div>
-              </div>
-            </div>
-            <div class="score-bar-row" title="Disponibilité">
-              <span class="bar-label">✅</span>
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [style.width]="(result.scoreAvailability / 10 * 100) + '%'"
-                     [style.background]="getLevelColor(result.recommendationLevel)"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── INFOS FOURNISSEUR ────────────────────────── -->
-        <div class="card-info">
-          <div class="provider-name">{{ result.supplierName }}</div>
-          <h3 class="result-name">{{ result.name }}</h3>
-
-          <div class="meta-row">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt"></i> {{ result.location || '—' }}
-            </span>
-            <span class="meta-item">
-              <i class="bi bi-box-seam" *ngIf="result.resourceType === 'MACHINE'"></i>
-              <span *ngIf="result.stockQuantity != null && result.resourceType === 'MACHINE'">
-                Stock : {{ result.stockQuantity }}
-              </span>
-            </span>
-          </div>
-
-          <!-- Rating -->
-          <div class="rating-row">
-            <div class="stars">
-              <i *ngFor="let s of getStars(result.rating)" class="bi"
-                 [class.bi-star-fill]="s === 'full'"
-                 [class.bi-star-half]="s === 'half'"
-                 [class.bi-star]="s === 'empty'"></i>
-            </div>
-            <span class="rating-val">{{ result.rating | number:'1.1-1' }}</span>
-            <span class="rating-count">({{ result.reviewCount }})</span>
-          </div>
-
-          <div class="price-avail-row">
-            <div class="price-wrap">
-              <span class="price-val">{{ formatPrice(result.price) }} TND</span>
-              <span class="price-unit">/{{ result.priceUnit }}</span>
-            </div>
-            <span class="avail-tag"
-                  [class.avail-ok]="result.availability === 'AVAILABLE'"
-                  [class.avail-reserved]="result.availability === 'RESERVED'"
-                  [class.avail-no]="result.availability === 'UNAVAILABLE'">
-              {{ getAvailabilityText(result.availability) }}
-            </span>
-          </div>
-        </div>
-
-        <!-- ── RAISONS ─────────────────────────────────── -->
-        <div class="reasons-section">
-          <div class="reasons-title">Pourquoi ce fournisseur ?</div>
-          <ul class="reasons-list">
-            <li *ngFor="let reason of result.reasons.slice(0, 4)">{{ reason }}</li>
-          </ul>
-        </div>
-
-        <!-- ── ACTIONS ─────────────────────────────────── -->
-        <div class="card-actions">
-          <button class="btn-details" (click)="viewDetails(result)">
-            <i class="bi bi-eye"></i> Voir profil
-          </button>
-          <button class="btn-cart"
-                  *ngIf="result.resourceType === 'MACHINE'"
-                  [disabled]="result.availability !== 'AVAILABLE'"
-                  (click)="addToCart(result)"
-                  title="Ajouter au panier">
-            <i class="bi bi-cart-plus"></i>
-          </button>
-          <button class="btn-request"
-                  *ngIf="result.resourceType === 'SERVICE' || true"
-                  (click)="makeRequest(result)"
-                  title="Faire une demande">
-            <i class="bi bi-envelope"></i>
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Loader -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="loader-ring"></div>
-    <div class="loader-text">
-      <p>Analyse de <strong>{{ criteria.resourceType || 'toutes les ressources' }}</strong>...</p>
-      <p class="loader-sub">Calcul du score multi-critères en cours</p>
-    </div>
-  </div>
-
-</div>

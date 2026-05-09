@@ -3,11 +3,13 @@
 <div class="admin-services">
 
   <!-- Toast -->
-  <div class="toast-notification" [class]="'toast-' + toastType" *ngIf="showToastFlag">
-    <i class="ti" [class.ti-check]="toastType==='success'" [class.ti-x]="toastType==='error'"
-       [class.ti-alert-triangle]="toastType==='warning'" [class.ti-info-circle]="toastType==='info'"></i>
-    {{ toastMessage }}
-  </div>
+  @if (showToastFlag) {
+    <div class="toast-notification" [class]="'toast-' + toastType">
+      <i class="ti" [class.ti-check]="toastType==='success'" [class.ti-x]="toastType==='error'"
+      [class.ti-alert-triangle]="toastType==='warning'" [class.ti-info-circle]="toastType==='info'"></i>
+      {{ toastMessage }}
+    </div>
+  }
 
   <!-- En-tête -->
   <div class="row mb-4">
@@ -39,7 +41,7 @@
   <div class="row mb-4 g-3">
     <div class="col-xl col-md-4 col-6">
       <div class="card stat-card border-0 shadow-sm cursor-pointer"
-           [class.active-tab-card]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+        [class.active-tab-card]="activeTab === 'pending'" (click)="activeTab = 'pending'">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -56,7 +58,7 @@
 
     <div class="col-xl col-md-4 col-6">
       <div class="card stat-card border-0 shadow-sm cursor-pointer"
-           [class.active-tab-card]="activeTab === 'approved'" (click)="activeTab = 'approved'">
+        [class.active-tab-card]="activeTab === 'approved'" (click)="activeTab = 'approved'">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -73,7 +75,7 @@
 
     <div class="col-xl col-md-4 col-6">
       <div class="card stat-card border-0 shadow-sm cursor-pointer"
-           [class.active-tab-card]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
+        [class.active-tab-card]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -91,8 +93,8 @@
     <!-- ✅ NOUVEAU — rejetés par IA -->
     <div class="col-xl col-md-4 col-6">
       <div class="card stat-card border-0 shadow-sm cursor-pointer"
-           [class.active-tab-card]="activeTab === 'auto_rejected'"
-           (click)="activeTab = 'auto_rejected'">
+        [class.active-tab-card]="activeTab === 'auto_rejected'"
+        (click)="activeTab = 'auto_rejected'">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -112,7 +114,7 @@
 
     <div class="col-xl col-md-4 col-6">
       <div class="card stat-card border-0 shadow-sm cursor-pointer"
-           [class.active-tab-card]="activeTab === 'all'" (click)="activeTab = 'all'">
+        [class.active-tab-card]="activeTab === 'all'" (click)="activeTab = 'all'">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -138,34 +140,38 @@
           <ul class="nav nav-tabs border-0 flex-wrap">
             <li class="nav-item">
               <a class="nav-link fw-semibold" [class.active]="activeTab === 'pending'"
-                 (click)="activeTab = 'pending'" href="javascript:void(0)">
+                (click)="activeTab = 'pending'" href="javascript:void(0)">
                 <i class="ti ti-clock me-1"></i> En attente
-                <span class="badge bg-warning ms-1 rounded-pill" *ngIf="stats.pending > 0">{{ stats.pending }}</span>
+                @if (stats.pending > 0) {
+                  <span class="badge bg-warning ms-1 rounded-pill">{{ stats.pending }}</span>
+                }
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link fw-semibold" [class.active]="activeTab === 'approved'"
-                 (click)="activeTab = 'approved'" href="javascript:void(0)">
+                (click)="activeTab = 'approved'" href="javascript:void(0)">
                 <i class="ti ti-check me-1"></i> Approuvés
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link fw-semibold" [class.active]="activeTab === 'rejected'"
-                 (click)="activeTab = 'rejected'" href="javascript:void(0)">
+                (click)="activeTab = 'rejected'" href="javascript:void(0)">
                 <i class="ti ti-ban me-1"></i> Rejetés
               </a>
             </li>
             <!-- ✅ NOUVEL ONGLET -->
             <li class="nav-item">
               <a class="nav-link fw-semibold" [class.active]="activeTab === 'auto_rejected'"
-                 (click)="activeTab = 'auto_rejected'" href="javascript:void(0)">
+                (click)="activeTab = 'auto_rejected'" href="javascript:void(0)">
                 🤖 IA Rejetés
-                <span class="badge bg-dark ms-1 rounded-pill" *ngIf="stats.autoRejected > 0">{{ stats.autoRejected }}</span>
+                @if (stats.autoRejected > 0) {
+                  <span class="badge bg-dark ms-1 rounded-pill">{{ stats.autoRejected }}</span>
+                }
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link fw-semibold" [class.active]="activeTab === 'all'"
-                 (click)="activeTab = 'all'" href="javascript:void(0)">
+                (click)="activeTab = 'all'" href="javascript:void(0)">
                 <i class="ti ti-list me-1"></i> Tout
               </a>
             </li>
@@ -177,208 +183,224 @@
               <i class="ti ti-search text-muted"></i>
             </span>
             <input type="text" class="form-control border-start-0 bg-light"
-                   placeholder="Rechercher service, prestataire..."
-                   [(ngModel)]="searchTerm">
+              placeholder="Rechercher service, prestataire..."
+              [(ngModel)]="searchTerm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Explication IA -->
+        @if (activeTab === 'auto_rejected') {
+          <div class="alert alert-dark d-flex align-items-start gap-2 py-2 mb-3"
+            >
+            <i class="ti ti-robot fs-5 mt-1"></i>
+            <div>
+              <strong>🤖 Rejet automatique par intelligence artificielle</strong>
+              <p class="mb-0 small">Ces services ont été détectés comme contenant du contenu offensant ou haineux
+              par notre modèle ML. L'admin peut forcer l'approbation si le rejet est erroné.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Loader -->
+        @if (loading) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" style="width:2.5rem;height:2.5rem;"></div>
+            <p class="text-muted mt-2">Chargement des services...</p>
+          </div>
+        }
+
+        <!-- Table -->
+        @if (!loading) {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">Service</th>
+                  <th>Prestataire</th>
+                  <th>Type</th>
+                  <th>Prix</th>
+                  <th>Zone</th>
+                  <th>Dispo</th>
+                  <th>Statut</th>
+                  @if (activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all') {
+                    <th>Motif</th>
+                  }
+                  <th class="text-end pe-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (service of getDisplayedServices(); track service) {
+                  <tr
+                    [class.table-warning-subtle]="service.validationStatus === 'PENDING'"
+                    [class.table-danger-subtle]="service.validationStatus === 'REJECTED'"
+                    [class.table-dark-subtle]="service.validationStatus === 'AUTO_REJECTED'">
+                    <!-- Service -->
+                    <td class="ps-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <img [src]="getServiceImage(service)"
+                          style="width:42px;height:42px;object-fit:cover;border-radius:8px;" alt="">
+                          <div>
+                            <div class="fw-semibold">{{ service.name }}</div>
+                            <small class="text-muted">{{ service.category }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="fw-medium">{{ service.providerName || '—' }}</div>
+                       @if (service.providerName) {
+  <small class="text-muted">{{ service.providerName }}</small>
+                        }
+                      </td>
+                      <td><span class="badge bg-light text-dark">{{ getServiceTypeLabel(service.serviceType) }}</span></td>
+                      <td>
+                        <span class="fw-bold text-primary">{{ formatPrice(service.basePrice) }} TND</span>
+                        <div><small class="text-muted">/{{ service.priceUnit || 'h' }}</small></div>
+                      </td>
+                      <td><i class="ti ti-map-pin text-muted me-1"></i>{{ service.location }}</td>
+                      <td>
+                        <span class="badge rounded-pill"
+                          [class.bg-success-subtle]="service.availability === 'AVAILABLE'"
+                          [class.text-success]="service.availability === 'AVAILABLE'"
+                          [class.bg-danger-subtle]="service.availability === 'UNAVAILABLE'"
+                          [class.text-danger]="service.availability === 'UNAVAILABLE'"
+                          [class.bg-warning-subtle]="service.availability === 'RESERVED'"
+                          [class.text-warning]="service.availability === 'RESERVED'">
+                          {{ getAvailabilityText(service.availability) }}
+                        </span>
+                      </td>
+                      <!-- Statut -->
+                      <td>
+                        <span class="badge rounded-pill px-2 py-1"
+                          [class.bg-warning-subtle]="service.validationStatus === 'PENDING'"
+                          [class.text-warning]="service.validationStatus === 'PENDING'"
+                          [class.bg-success-subtle]="service.validationStatus === 'APPROVED'"
+                          [class.text-success]="service.validationStatus === 'APPROVED'"
+                          [class.bg-danger-subtle]="service.validationStatus === 'REJECTED'"
+                          [class.text-danger]="service.validationStatus === 'REJECTED'"
+                          [class.bg-dark-subtle]="service.validationStatus === 'AUTO_REJECTED'"
+                          [class.text-dark]="service.validationStatus === 'AUTO_REJECTED'">
+                          {{ getStatusText(service.validationStatus) }}
+                        </span>
+                      </td>
+                      <!-- Motif rejet -->
+                      @if (activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all') {
+                        <td>
+                          @if (service.validationStatus === 'REJECTED' || service.validationStatus === 'AUTO_REJECTED') {
+                            @if (service.validationStatus === 'AUTO_REJECTED') {
+                              <div class="mb-1">
+                                <span class="badge bg-dark small">🤖 Détecté par IA</span>
+                              </div>
+                            }
+                            <span class="text-danger small" style="font-size:0.78rem; max-width:180px; display:block;">
+                              {{ service.rejectionReason || '—' }}
+                            </span>
+                            @if (service.rejectedAt) {
+                              <div>
+                                <small class="text-muted">{{ service.rejectedAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                              </div>
+                            }
+                          }
+                          @if (service.validationStatus !== 'REJECTED' && service.validationStatus !== 'AUTO_REJECTED') {
+                            <span
+                            class="text-muted">—</span>
+                          }
+                        </td>
+                      }
+                      <!-- Actions -->
+                      <td class="text-end pe-3">
+                        <div class="d-flex gap-1 justify-content-end">
+                          @if (service.validationStatus === 'PENDING') {
+                            <button class="btn btn-sm btn-success" (click)="approveService(service)" title="Approuver">
+                              <i class="ti ti-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" (click)="openRejectModal(service)" title="Rejeter">
+                              <i class="ti ti-x"></i>
+                            </button>
+                          }
+                          <!-- ✅ Override ML : forcer approbation -->
+                          @if (service.validationStatus === 'AUTO_REJECTED') {
+                            <button
+                              class="btn btn-sm btn-outline-success"
+                              (click)="forceApprove(service)"
+                              title="Forcer l'approbation (override IA)">
+                              <i class="ti ti-shield-check"></i>
+                            </button>
+                          }
+                          @if (service.validationStatus === 'REJECTED') {
+                            <button
+                              class="btn btn-sm btn-outline-success"
+                              (click)="approveService(service)" title="Ré-approuver">
+                              <i class="ti ti-refresh"></i>
+                            </button>
+                          }
+                          @if (service.validationStatus === 'APPROVED') {
+                            <button
+                              class="btn btn-sm btn-outline-warning"
+                              (click)="openRejectModal(service)" title="Rejeter">
+                              <i class="ti ti-ban"></i>
+                            </button>
+                          }
+                          <button class="btn btn-sm btn-outline-primary"
+                            (click)="editService(service)" title="Modifier">
+                            <i class="ti ti-edit"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-danger"
+                            (click)="deleteService(service)" title="Supprimer">
+                            <i class="ti ti-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  @if (getDisplayedServices().length === 0) {
+                    <tr>
+                      <td [attr.colspan]="10" class="text-center py-5">
+                        <i class="ti ti-inbox" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+                        <p class="text-muted mb-0">Aucun service pour cet onglet</p>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal rejet manuel -->
+    @if (showRejectModal) {
+      <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 bg-danger-subtle">
+              <h5 class="modal-title text-danger fw-bold">
+                <i class="ti ti-ban me-2"></i>Rejeter le service
+              </h5>
+              <button type="button" class="btn-close" (click)="showRejectModal = false"></button>
+            </div>
+            <div class="modal-body pt-3">
+              @if (selectedService) {
+                <div class="alert alert-warning py-2 small">
+                  <i class="ti ti-info-circle me-1"></i>
+                  <strong>"{{ selectedService.name }}"</strong> sera grisé chez le prestataire.
+                </div>
+              }
+              <label class="form-label fw-semibold">Motif du rejet <span class="text-danger">*</span></label>
+              <textarea class="form-control" rows="3" [(ngModel)]="rejectReason"
+              placeholder="Ex: Informations insuffisantes, tarif incorrect..."></textarea>
+              <small class="text-muted mt-1 d-block">
+                <i class="ti ti-eye me-1"></i>Ce motif est visible par le prestataire.
+              </small>
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-light" (click)="showRejectModal = false">Annuler</button>
+              <button class="btn btn-danger" (click)="confirmReject()" [disabled]="!rejectReason.trim()">
+                <i class="ti ti-ban me-1"></i>Confirmer
+              </button>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- Explication IA -->
-      <div class="alert alert-dark d-flex align-items-start gap-2 py-2 mb-3"
-           *ngIf="activeTab === 'auto_rejected'">
-        <i class="ti ti-robot fs-5 mt-1"></i>
-        <div>
-          <strong>🤖 Rejet automatique par intelligence artificielle</strong>
-          <p class="mb-0 small">Ces services ont été détectés comme contenant du contenu offensant ou haineux
-            par notre modèle ML. L'admin peut forcer l'approbation si le rejet est erroné.</p>
-        </div>
-      </div>
-
-      <!-- Loader -->
-      <div *ngIf="loading" class="text-center py-5">
-        <div class="spinner-border text-primary" style="width:2.5rem;height:2.5rem;"></div>
-        <p class="text-muted mt-2">Chargement des services...</p>
-      </div>
-
-      <!-- Table -->
-      <div class="table-responsive" *ngIf="!loading">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="ps-3">Service</th>
-              <th>Prestataire</th>
-              <th>Type</th>
-              <th>Prix</th>
-              <th>Zone</th>
-              <th>Dispo</th>
-              <th>Statut</th>
-              <th *ngIf="activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all'">Motif</th>
-              <th class="text-end pe-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let service of getDisplayedServices()"
-                [class.table-warning-subtle]="service.validationStatus === 'PENDING'"
-                [class.table-danger-subtle]="service.validationStatus === 'REJECTED'"
-                [class.table-dark-subtle]="service.validationStatus === 'AUTO_REJECTED'">
-
-              <!-- Service -->
-              <td class="ps-3">
-                <div class="d-flex align-items-center gap-2">
-                  <img [src]="getServiceImage(service)"
-                       style="width:42px;height:42px;object-fit:cover;border-radius:8px;" alt="">
-                  <div>
-                    <div class="fw-semibold">{{ service.name }}</div>
-                    <small class="text-muted">{{ service.category }}</small>
-                  </div>
-                </div>
-              </td>
-
-              <td>
-                <div class="fw-medium">{{ service.providerName || '—' }}</div>
-                <small class="text-muted" *ngIf="service.providerCompanyName">{{ service.providerCompanyName }}</small>
-              </td>
-
-              <td><span class="badge bg-light text-dark">{{ getServiceTypeLabel(service.serviceType) }}</span></td>
-
-              <td>
-                <span class="fw-bold text-primary">{{ formatPrice(service.basePrice) }} TND</span>
-                <div><small class="text-muted">/{{ service.priceUnit || 'h' }}</small></div>
-              </td>
-
-              <td><i class="ti ti-map-pin text-muted me-1"></i>{{ service.location }}</td>
-
-              <td>
-                <span class="badge rounded-pill"
-                      [class.bg-success-subtle]="service.availability === 'AVAILABLE'"
-                      [class.text-success]="service.availability === 'AVAILABLE'"
-                      [class.bg-danger-subtle]="service.availability === 'UNAVAILABLE'"
-                      [class.text-danger]="service.availability === 'UNAVAILABLE'"
-                      [class.bg-warning-subtle]="service.availability === 'RESERVED'"
-                      [class.text-warning]="service.availability === 'RESERVED'">
-                  {{ getAvailabilityText(service.availability) }}
-                </span>
-              </td>
-
-              <!-- Statut -->
-              <td>
-                <span class="badge rounded-pill px-2 py-1"
-                      [class.bg-warning-subtle]="service.validationStatus === 'PENDING'"
-                      [class.text-warning]="service.validationStatus === 'PENDING'"
-                      [class.bg-success-subtle]="service.validationStatus === 'APPROVED'"
-                      [class.text-success]="service.validationStatus === 'APPROVED'"
-                      [class.bg-danger-subtle]="service.validationStatus === 'REJECTED'"
-                      [class.text-danger]="service.validationStatus === 'REJECTED'"
-                      [class.bg-dark-subtle]="service.validationStatus === 'AUTO_REJECTED'"
-                      [class.text-dark]="service.validationStatus === 'AUTO_REJECTED'">
-                  {{ getStatusText(service.validationStatus) }}
-                </span>
-              </td>
-
-              <!-- Motif rejet -->
-              <td *ngIf="activeTab === 'rejected' || activeTab === 'auto_rejected' || activeTab === 'all'">
-                <ng-container *ngIf="service.validationStatus === 'REJECTED' || service.validationStatus === 'AUTO_REJECTED'">
-                  <div *ngIf="service.validationStatus === 'AUTO_REJECTED'" class="mb-1">
-                    <span class="badge bg-dark small">🤖 Détecté par IA</span>
-                  </div>
-                  <span class="text-danger small" style="font-size:0.78rem; max-width:180px; display:block;">
-                    {{ service.rejectionReason || '—' }}
-                  </span>
-                  <div *ngIf="service.rejectedAt">
-                    <small class="text-muted">{{ service.rejectedAt | date:'dd/MM/yyyy HH:mm' }}</small>
-                  </div>
-                </ng-container>
-                <span *ngIf="service.validationStatus !== 'REJECTED' && service.validationStatus !== 'AUTO_REJECTED'"
-                      class="text-muted">—</span>
-              </td>
-
-              <!-- Actions -->
-              <td class="text-end pe-3">
-                <div class="d-flex gap-1 justify-content-end">
-
-                  <ng-container *ngIf="service.validationStatus === 'PENDING'">
-                    <button class="btn btn-sm btn-success" (click)="approveService(service)" title="Approuver">
-                      <i class="ti ti-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-warning" (click)="openRejectModal(service)" title="Rejeter">
-                      <i class="ti ti-x"></i>
-                    </button>
-                  </ng-container>
-
-                  <!-- ✅ Override ML : forcer approbation -->
-                  <button *ngIf="service.validationStatus === 'AUTO_REJECTED'"
-                          class="btn btn-sm btn-outline-success"
-                          (click)="forceApprove(service)"
-                          title="Forcer l'approbation (override IA)">
-                    <i class="ti ti-shield-check"></i>
-                  </button>
-
-                  <button *ngIf="service.validationStatus === 'REJECTED'"
-                          class="btn btn-sm btn-outline-success"
-                          (click)="approveService(service)" title="Ré-approuver">
-                    <i class="ti ti-refresh"></i>
-                  </button>
-
-                  <button *ngIf="service.validationStatus === 'APPROVED'"
-                          class="btn btn-sm btn-outline-warning"
-                          (click)="openRejectModal(service)" title="Rejeter">
-                    <i class="ti ti-ban"></i>
-                  </button>
-
-                  <button class="btn btn-sm btn-outline-primary"
-                          (click)="editService(service)" title="Modifier">
-                    <i class="ti ti-edit"></i>
-                  </button>
-
-                  <button class="btn btn-sm btn-outline-danger"
-                          (click)="deleteService(service)" title="Supprimer">
-                    <i class="ti ti-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <tr *ngIf="getDisplayedServices().length === 0">
-              <td [attr.colspan]="10" class="text-center py-5">
-                <i class="ti ti-inbox" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
-                <p class="text-muted mb-0">Aucun service pour cet onglet</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal rejet manuel -->
-<div class="modal fade show d-block" tabindex="-1" *ngIf="showRejectModal" style="background:rgba(0,0,0,0.5);">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg">
-      <div class="modal-header border-0 bg-danger-subtle">
-        <h5 class="modal-title text-danger fw-bold">
-          <i class="ti ti-ban me-2"></i>Rejeter le service
-        </h5>
-        <button type="button" class="btn-close" (click)="showRejectModal = false"></button>
-      </div>
-      <div class="modal-body pt-3">
-        <div class="alert alert-warning py-2 small" *ngIf="selectedService">
-          <i class="ti ti-info-circle me-1"></i>
-          <strong>"{{ selectedService.name }}"</strong> sera grisé chez le prestataire.
-        </div>
-        <label class="form-label fw-semibold">Motif du rejet <span class="text-danger">*</span></label>
-        <textarea class="form-control" rows="3" [(ngModel)]="rejectReason"
-                  placeholder="Ex: Informations insuffisantes, tarif incorrect..."></textarea>
-        <small class="text-muted mt-1 d-block">
-          <i class="ti ti-eye me-1"></i>Ce motif est visible par le prestataire.
-        </small>
-      </div>
-      <div class="modal-footer border-0">
-        <button class="btn btn-light" (click)="showRejectModal = false">Annuler</button>
-        <button class="btn btn-danger" (click)="confirmReject()" [disabled]="!rejectReason.trim()">
-          <i class="ti ti-ban me-1"></i>Confirmer
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    }

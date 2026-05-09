@@ -3,14 +3,15 @@
 // ✅ NOUVEAU : champ code promo avec validation avant checkout
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import {
-  CartService, Cart, CartItem, DeliveryInfo,
-  PromoValidation, CheckoutResult
-} from '../../../../services/cart.service';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CartService, Cart, CartItem, DeliveryInfo, PromoValidation, CheckoutResult } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-cart',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })

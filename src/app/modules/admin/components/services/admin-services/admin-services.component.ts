@@ -2,11 +2,16 @@
 // ✅ Ajout du tab AUTO_REJECTED pour les services rejetés par le ML
 
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AdminService, ServiceEntity } from '../../../../../services/admin.service';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { AdminService } from '../../../../../services/admin.service';
+import { ServiceEntity } from '../../../../../services/service.service';
 
 @Component({
   selector: 'app-admin-services',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DatePipe, RouterModule],
   templateUrl: './admin-services.component.html',
   styleUrls: ['./admin-services.component.scss']
 })

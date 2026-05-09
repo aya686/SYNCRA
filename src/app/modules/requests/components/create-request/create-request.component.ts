@@ -1,8 +1,7 @@
-// src/app/modules/requests/components/create-request/create-request.component.ts
-
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { ServiceRequestService } from '../../../../services/service-request.service';
 import { RequestType, CreateServiceRequest, Provider } from '../../../../models/service-request.model';
 import { MachineService } from '../../../../services/machine.service';
@@ -12,6 +11,13 @@ import { ServiceEntity } from '../../../../models/service.model';
 
 @Component({
   selector: 'app-create-request',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule
+  ],
   templateUrl: './create-request.component.html',
   styleUrls: ['./create-request.component.scss']
 })

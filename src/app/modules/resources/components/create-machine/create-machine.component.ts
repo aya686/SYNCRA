@@ -1,13 +1,20 @@
 // src/app/modules/resources/components/create-machine/create-machine.component.ts
 // ✅ Affiche le résultat de modération IA immédiatement après la soumission
-
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MachineService, Machine } from '../../../../services/machine.service';
 
 @Component({
   selector: 'app-create-machine',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule
+  ],
   templateUrl: './create-machine.component.html',
   styleUrls: ['./create-machine.component.scss']
 })

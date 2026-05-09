@@ -1,10 +1,18 @@
 // src/app/modules/reviews/components/review-list/review-list.component.ts
 
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { ReviewService, Review } from '../../../../services/review.service';
+import { ReviewFormComponent } from '../review-form/review-form.component';
 
 @Component({
   selector: 'app-review-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    ReviewFormComponent
+  ],
   templateUrl: './review-list.component.html',
   styleUrls: ['./review-list.component.css']
 })

@@ -1,10 +1,14 @@
 // src/app/modules/admin/components/requests/admin-requests.component.ts
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService, ServiceRequest } from '../../../../../services/admin.service';
 
 @Component({
   selector: 'app-admin-requests',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DecimalPipe],
   templateUrl: './admin-requests.component.html',
   styleUrls: ['./admin-requests.component.scss']
 })

@@ -136,46 +136,54 @@
             <a routerLink="/admin/machines" class="btn btn-sm btn-outline-primary">Tout voir</a>
           </div>
 
-          <div *ngIf="loading" class="text-center py-4">
-            <div class="spinner-border spinner-border-sm text-primary"></div>
-          </div>
+          @if (loading) {
+            <div class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary"></div>
+            </div>
+          }
 
-          <div class="table-responsive" *ngIf="!loading">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Machine</th>
-                  <th>Fournisseur</th>
-                  <th>Prix</th>
-                  <th>Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let m of recentMachines">
-                  <td>
-                    <div class="fw-semibold">{{ m.name }}</div>
-                    <small class="text-muted">{{ m.category }}</small>
-                  </td>
-                  <td class="text-muted small">{{ m.supplierName || '—' }}</td>
-                  <td class="fw-bold text-primary">{{ m.price | number }} TND</td>
-                  <td>
-                    <span class="badge rounded-pill"
+          @if (!loading) {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Machine</th>
+                    <th>Fournisseur</th>
+                    <th>Prix</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (m of recentMachines; track m) {
+                    <tr>
+                      <td>
+                        <div class="fw-semibold">{{ m.name }}</div>
+                        <small class="text-muted">{{ m.category }}</small>
+                      </td>
+                      <td class="text-muted small">{{ m.supplierName || '—' }}</td>
+                      <td class="fw-bold text-primary">{{ m.price | number }} TND</td>
+                      <td>
+                        <span class="badge rounded-pill"
                           [class.bg-warning-subtle]="m.validationStatus === 'PENDING'"
                           [class.text-warning]="m.validationStatus === 'PENDING'"
                           [class.bg-success-subtle]="m.validationStatus === 'APPROVED'"
                           [class.text-success]="m.validationStatus === 'APPROVED'"
                           [class.bg-danger-subtle]="m.validationStatus === 'REJECTED'"
                           [class.text-danger]="m.validationStatus === 'REJECTED'">
-                      {{ getStatusText(m.validationStatus) }}
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="recentMachines.length === 0">
-                  <td colspan="4" class="text-center text-muted py-4">Aucune machine</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                          {{ getStatusText(m.validationStatus) }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                  @if (recentMachines.length === 0) {
+                    <tr>
+                      <td colspan="4" class="text-center text-muted py-4">Aucune machine</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
       </div>
     </div>

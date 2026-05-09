@@ -1,13 +1,21 @@
-// src/app/modules/requests/components/request-detail/request-detail.component.ts
-
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { ServiceRequestService } from '../../../../services/service-request.service';
 import { ServiceRequest, RequestStatus, RequestType } from '../../../../models/service-request.model';
-import { ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+
 @Component({
   selector: 'app-request-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    DatePipe,
+    DecimalPipe
+  ],
   templateUrl: './request-detail.component.html',
   styleUrls: ['./request-detail.component.scss']
 })

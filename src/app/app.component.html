@@ -28,7 +28,9 @@
       </a>
       <a routerLink="/cart" routerLinkActive="active" class="nav-link cart-link">
         <i class="bi bi-cart"></i><span>Panier</span>
-        <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        @if (cartItemCount > 0) {
+          <span class="cart-badge">{{ cartItemCount }}</span>
+        }
       </a>
       <a routerLink="/orders" routerLinkActive="active" class="nav-link">
         <i class="bi bi-bag"></i><span>Commandes</span>
@@ -36,7 +38,9 @@
       <a routerLink="/loyalty" routerLinkActive="active" class="nav-link loyalty-link">
         <i class="bi bi-star-fill"></i>
         <span>Fidélité</span>
-        <span class="loyalty-badge" *ngIf="loyaltyPoints > 0">{{ loyaltyPoints }}</span>
+        @if (loyaltyPoints > 0) {
+          <span class="loyalty-badge">{{ loyaltyPoints }}</span>
+        }
       </a>
       <a routerLink="/machines/recommendation" routerLinkActive="active" class="nav-link">
         <i class="bi bi-cpu"></i><span>Recommandation</span>
@@ -49,7 +53,7 @@
     <!-- Section droite avec notification et CTA -->
     <div class="nav-right">
       <app-notification-bell></app-notification-bell>
-      
+
     </div>
 
     <button class="nav-mobile-toggle">

@@ -1,7 +1,9 @@
 // src/app/modules/resources/components/recommendation-panel/recommendation-panel.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   RecommendationService,
   RecommendationCriteria,
@@ -11,6 +13,13 @@ import { CartService } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-recommendation-panel',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DecimalPipe
+  ],
   templateUrl: './recommendation-panel.component.html',
   styleUrls: ['./recommendation-panel.component.scss']
 })

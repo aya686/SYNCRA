@@ -1,13 +1,14 @@
 // src/app/modules/marketplace/components/marketplace/marketplace.component.ts
 // Page marketplace style Europages : Hero photo + Catégories grille + Tendances
 
-import {
-  Component, OnInit, AfterViewInit, OnDestroy,
-  ElementRef, ViewChild
-} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MachineService, Machine } from '../../../../services/machine.service';
 import { ServiceService, ServiceEntity } from '../../../../services/service.service';
+
+
 
 export interface CategoryData {
   key: string;
@@ -26,12 +27,14 @@ export interface SubFilter {
   key: string;
   count?: number;
 }
-
 @Component({
   selector: 'app-marketplace',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './marketplace.component.html',
   styleUrls: ['./marketplace.component.scss']
 })
+
 export class MarketplaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('heroCanvas') heroCanvas!: ElementRef<HTMLCanvasElement>;

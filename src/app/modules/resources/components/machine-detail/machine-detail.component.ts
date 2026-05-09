@@ -2,13 +2,22 @@
 // ✅ NOUVEAU : produits similaires + produits du même fournisseur
 
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MachineService, Machine } from '../../../../services/machine.service';
 import { CartService } from '../../../../services/cart.service';
 import { ReviewService, Review, CreateReviewRequest } from '../../../../services/review.service';
 
 @Component({
   selector: 'app-machine-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DecimalPipe
+  ],
   templateUrl: './machine-detail.component.html',
   styleUrls: ['./machine-detail.component.scss']
 })

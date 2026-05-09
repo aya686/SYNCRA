@@ -2,11 +2,22 @@
 // ✅ NOUVEAU : services similaires + services du même prestataire
 
 import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ServiceService, ServiceEntity } from '../../../../services/service.service';
+import { ReviewListComponent } from '../../../reviews/components/review-list/review-list.component';
 
 @Component({
   selector: 'app-service-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    DecimalPipe,
+    ReviewListComponent
+  ],
   templateUrl: './service-detail.component.html',
   styleUrls: ['./service-detail.component.scss']
 })

@@ -2,11 +2,15 @@
 // ✅ CORRIGÉ : utilise AdminService.getAllOrders() qui appelle le bon endpoint
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../../../services/admin.service';
 import { Order } from '../../../../../services/order.service';
 
 @Component({
   selector: 'app-admin-orders',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-orders.component.html',
   styleUrls: ['./admin-orders.component.scss']
 })

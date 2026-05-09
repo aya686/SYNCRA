@@ -24,263 +24,284 @@
           (keyup.enter)="applyAll()"
           (input)="applyAll()"
           [placeholder]="'Rechercher dans ' + categoryLabel + '...'">
-        <button class="cp-search-clear" *ngIf="searchQuery" (click)="searchQuery = ''; applyAll()">
-          <i class="bi bi-x"></i>
+          @if (searchQuery) {
+            <button class="cp-search-clear" (click)="searchQuery = ''; applyAll()">
+              <i class="bi bi-x"></i>
+            </button>
+          }
+        </div>
+        <button class="cp-search-btn" (click)="applyAll()">
+          <i class="bi bi-search"></i> Rechercher
         </button>
       </div>
-      <button class="cp-search-btn" (click)="applyAll()">
-        <i class="bi bi-search"></i> Rechercher
-      </button>
+
+      <h1 class="cp-title">
+        {{ categoryLabel }}
+        <span class="cp-total-badge">{{ filteredItems.length }} offre(s)</span>
+      </h1>
     </div>
-
-    <h1 class="cp-title">
-      {{ categoryLabel }}
-      <span class="cp-total-badge">{{ filteredItems.length }} offre(s)</span>
-    </h1>
   </div>
-</div>
 
-<!-- ── Layout principal ── -->
-<div class="cp-layout">
-  <div class="cp-inner">
+  <!-- ── Layout principal ── -->
+  <div class="cp-layout">
+    <div class="cp-inner">
 
-    <!-- ══ SIDEBAR FILTRES GAUCHE ══ -->
-    <aside class="cp-sidebar">
+      <!-- ══ SIDEBAR FILTRES GAUCHE ══ -->
+      <aside class="cp-sidebar">
 
-      <!-- Onglets Tout / Machines / Services -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Type d'offre</div>
-        <div class="type-tabs">
-          <button class="type-tab" [class.active]="activeTab === 'all'" (click)="onTabChange('all')">
-            <i class="bi bi-grid"></i> Tout
-            <span class="type-count">{{ filteredItems.length }}</span>
-          </button>
-          <button class="type-tab" [class.active]="activeTab === 'machines'" (click)="onTabChange('machines')">
-            <i class="bi bi-tools"></i> Machines
-            <span class="type-count">{{ machineCount }}</span>
-          </button>
-          <button class="type-tab" [class.active]="activeTab === 'services'" (click)="onTabChange('services')">
-            <i class="bi bi-briefcase"></i> Services
-            <span class="type-count">{{ serviceCount }}</span>
-          </button>
+        <!-- Onglets Tout / Machines / Services -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Type d'offre</div>
+          <div class="type-tabs">
+            <button class="type-tab" [class.active]="activeTab === 'all'" (click)="onTabChange('all')">
+              <i class="bi bi-grid"></i> Tout
+              <span class="type-count">{{ filteredItems.length }}</span>
+            </button>
+            <button class="type-tab" [class.active]="activeTab === 'machines'" (click)="onTabChange('machines')">
+              <i class="bi bi-tools"></i> Machines
+              <span class="type-count">{{ machineCount }}</span>
+            </button>
+            <button class="type-tab" [class.active]="activeTab === 'services'" (click)="onTabChange('services')">
+              <i class="bi bi-briefcase"></i> Services
+              <span class="type-count">{{ serviceCount }}</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- ✅ FILTRES SPÉCIFIQUES À LA CATÉGORIE -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">
-          <i class="bi bi-funnel"></i>
-          Filtrer par sous-catégorie
+        <!-- ✅ FILTRES SPÉCIFIQUES À LA CATÉGORIE -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            <i class="bi bi-funnel"></i>
+            Filtrer par sous-catégorie
+          </div>
+          <div class="specific-filters">
+            @for (f of specificFilters; track f) {
+              <label class="sf-item"
+                [class.active]="f.active"
+                (click)="toggleSpecificFilter(f)">
+                <input type="checkbox" [checked]="f.active" (change)="toggleSpecificFilter(f)">
+                <span class="sf-label">{{ f.label }}</span>
+                <span class="sf-count">({{ f.count }})</span>
+              </label>
+            }
+          </div>
         </div>
-        <div class="specific-filters">
-          <label class="sf-item"
-                 *ngFor="let f of specificFilters"
-                 [class.active]="f.active"
-                 (click)="toggleSpecificFilter(f)">
-            <input type="checkbox" [checked]="f.active" (change)="toggleSpecificFilter(f)">
-            <span class="sf-label">{{ f.label }}</span>
-            <span class="sf-count">({{ f.count }})</span>
-          </label>
+
+        <!-- Type d'entreprise -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title"><i class="bi bi-building"></i> Type d'entreprise</div>
+          <div class="type-tabs" style="flex-direction:column; gap:6px;">
+            @for (bt of businessTypeOptions; track bt) {
+              <label class="sf-item"
+                [class.active]="filters.businessType === bt.value"
+                (click)="filters.businessType = (filters.businessType === bt.value ? '' : bt.value); applyAll()"
+                style="cursor:pointer;">
+                <input type="radio" [checked]="filters.businessType === bt.value" (change)="$event.stopPropagation()">
+                <span class="sf-label">{{ bt.label }}</span>
+              </label>
+            }
+          </div>
         </div>
-      </div>
 
-      <!-- Type d'entreprise -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title"><i class="bi bi-building"></i> Type d'entreprise</div>
-        <div class="type-tabs" style="flex-direction:column; gap:6px;">
-          <label class="sf-item"
-                 *ngFor="let bt of businessTypeOptions"
-                 [class.active]="filters.businessType === bt.value"
-                 (click)="filters.businessType = (filters.businessType === bt.value ? '' : bt.value); applyAll()"
-                 style="cursor:pointer;">
-            <input type="radio" [checked]="filters.businessType === bt.value" (change)="$event.stopPropagation()">
-            <span class="sf-label">{{ bt.label }}</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Localisation -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title"><i class="bi bi-geo-alt"></i> Localisation</div>
-        <input class="sidebar-input" type="text" [(ngModel)]="filters.location"
-               (input)="applyAll()" placeholder="Tunis, Sfax, Sousse...">
-      </div>
-
-      <!-- Prix -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title"><i class="bi bi-cash"></i> Fourchette de prix (TND)</div>
-        <div class="price-range">
-          <input class="sidebar-input" type="number" [(ngModel)]="filters.minPrice"
-                 (input)="applyAll()" placeholder="Min">
-          <span class="price-sep">—</span>
-          <input class="sidebar-input" type="number" [(ngModel)]="filters.maxPrice"
-                 (input)="applyAll()" placeholder="Max">
-        </div>
-      </div>
-
-      <!-- Disponibilité -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-title"><i class="bi bi-check-circle"></i> Disponibilité</div>
-        <select class="sidebar-select" [(ngModel)]="filters.availability" (change)="applyAll()">
-          <option value="">Toutes</option>
-          <option value="AVAILABLE">Disponible</option>
-          <option value="RESERVED">Réservé</option>
-          <option value="UNAVAILABLE">Indisponible</option>
-        </select>
-      </div>
-
-      <!-- Type transaction (pour machines) -->
-      <div class="sidebar-section" *ngIf="activeTab !== 'services'">
-        <div class="sidebar-section-title"><i class="bi bi-currency-exchange"></i> Transaction</div>
-        <select class="sidebar-select" [(ngModel)]="filters.transactionType" (change)="applyAll()">
-          <option value="">Tous</option>
-          <option value="SALE">💰 À vendre</option>
-          <option value="RENT">🔑 À louer</option>
-          <option value="BOTH">🔄 Les deux</option>
-        </select>
-      </div>
-
-      <!-- Type service -->
-      <div class="sidebar-section" *ngIf="activeTab !== 'machines'">
-        <div class="sidebar-section-title"><i class="bi bi-briefcase"></i> Type de service</div>
-        <select class="sidebar-select" [(ngModel)]="filters.serviceType" (change)="applyAll()">
-          <option value="">Tous</option>
-          <option value="FABRICATION">🔧 Fabrication</option>
-          <option value="REPARATION">🛠️ Réparation</option>
-          <option value="CONSULTATION">💡 Consultation</option>
-          <option value="LIVRAISON">🚚 Livraison</option>
-          <option value="AUTRE">📋 Autre</option>
-        </select>
-      </div>
-
-      <!-- Réinitialiser filtres -->
-      <button class="btn-reset-all" (click)="resetFilters()" *ngIf="isFilterActive()">
-        <i class="bi bi-x-circle"></i> Réinitialiser tous les filtres
-      </button>
-
-    </aside>
-
-    <!-- ══ CONTENU PRINCIPAL ══ -->
-    <main class="cp-main">
-
-      <!-- Barre résultats + tri -->
-      <div class="cp-results-bar">
-        <div class="results-text">
-          <strong>{{ filteredItems.length }}</strong> résultat(s)
-          <span *ngIf="searchQuery"> pour "<em>{{ searchQuery }}</em>"</span>
-        </div>
-        <div class="results-sort">
-          <label>Trier par :</label>
-          <select [(ngModel)]="sortBy" (change)="onSortChange()">
-            <option value="rating">Meilleure note</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="name">Nom A-Z</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Loader -->
-      <div class="cp-loader" *ngIf="loading">
-        <div class="cp-spinner"></div>
-        <p>Chargement...</p>
-      </div>
-
-      <!-- Vide -->
-      <div class="cp-empty" *ngIf="!loading && filteredItems.length === 0">
-        <i class="bi bi-search"></i>
-        <h3>Aucun résultat</h3>
-        <p>Essayez de modifier vos critères de recherche ou vos filtres.</p>
-        <button (click)="resetFilters()">Réinitialiser les filtres</button>
-      </div>
-
-      <!-- Grille résultats -->
-      <div class="cp-grid" *ngIf="!loading && filteredItems.length > 0">
-        <div class="cp-card"
-             *ngFor="let item of paginatedItems; let i = index"
-             (click)="goToItem(item)">
-
-          <!-- Type badge -->
-          <div class="cp-card-type" [class.machine]="item.type === 'machine'" [class.service]="item.type === 'service'">
-            <i class="bi" [class.bi-tools]="item.type === 'machine'" [class.bi-briefcase]="item.type === 'service'"></i>
-            {{ item.type === 'machine' ? 'Machine' : 'Service' }}
+        <!-- Localisation -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title"><i class="bi bi-geo-alt"></i> Localisation</div>
+          <input class="sidebar-input" type="text" [(ngModel)]="filters.location"
+            (input)="applyAll()" placeholder="Tunis, Sfax, Sousse...">
           </div>
 
-          <!-- Image -->
-          <div class="cp-card-img">
-            <img [src]="item.imageUrl || 'assets/images/default-machine.jpg'"
-                 [alt]="item.name" (error)="handleImgErr($event)">
-            <div class="cp-card-overlay">
-              <span><i class="bi bi-eye"></i> Voir détail</span>
-            </div>
-            <!-- Disponibilité -->
-            <div class="cp-avail" [class.ok]="item.availability === 'AVAILABLE'" [class.no]="item.availability !== 'AVAILABLE'">
-              <span class="avail-dot"></span>
-              {{ item.availability === 'AVAILABLE' ? 'Disponible' : 'Indisponible' }}
-            </div>
-          </div>
+          <!-- Prix -->
+          <div class="sidebar-section">
+            <div class="sidebar-section-title"><i class="bi bi-cash"></i> Fourchette de prix (TND)</div>
+            <div class="price-range">
+              <input class="sidebar-input" type="number" [(ngModel)]="filters.minPrice"
+                (input)="applyAll()" placeholder="Min">
+                <span class="price-sep">—</span>
+                <input class="sidebar-input" type="number" [(ngModel)]="filters.maxPrice"
+                  (input)="applyAll()" placeholder="Max">
+                </div>
+              </div>
 
-          <!-- Corps -->
-          <div class="cp-card-body">
-            <div class="cp-card-cat">{{ item.category }}</div>
-            <h4 class="cp-card-name">{{ item.name }}</h4>
-            <div class="cp-card-provider">
-              <i class="bi bi-building"></i>{{ item.providerName }}
-            </div>
-            <div class="cp-card-location">
-              <i class="bi bi-geo-alt"></i>{{ item.location }}
-            </div>
-            <!-- Stars -->
-            <div class="cp-card-stars">
-              <i *ngFor="let s of getStars(item.rating)" class="bi"
-                 [class.bi-star-fill]="s==='full'"
-                 [class.bi-star-half]="s==='half'"
-                 [class.bi-star]="s==='empty'"></i>
-              <span>({{ item.reviewCount }})</span>
-            </div>
-          </div>
+              <!-- Disponibilité -->
+              <div class="sidebar-section">
+                <div class="sidebar-section-title"><i class="bi bi-check-circle"></i> Disponibilité</div>
+                <select class="sidebar-select" [(ngModel)]="filters.availability" (change)="applyAll()">
+                  <option value="">Toutes</option>
+                  <option value="AVAILABLE">Disponible</option>
+                  <option value="RESERVED">Réservé</option>
+                  <option value="UNAVAILABLE">Indisponible</option>
+                </select>
+              </div>
 
-          <!-- Footer prix + CTA -->
-          <div class="cp-card-footer">
-            <div class="cp-card-price">
-              <span class="cp-price-val">{{ item.price | number }} TND</span>
-              <span class="cp-price-unit">/ {{ item.priceUnit }}</span>
+              <!-- Type transaction (pour machines) -->
+              @if (activeTab !== 'services') {
+                <div class="sidebar-section">
+                  <div class="sidebar-section-title"><i class="bi bi-currency-exchange"></i> Transaction</div>
+                  <select class="sidebar-select" [(ngModel)]="filters.transactionType" (change)="applyAll()">
+                    <option value="">Tous</option>
+                    <option value="SALE">💰 À vendre</option>
+                    <option value="RENT">🔑 À louer</option>
+                    <option value="BOTH">🔄 Les deux</option>
+                  </select>
+                </div>
+              }
+
+              <!-- Type service -->
+              @if (activeTab !== 'machines') {
+                <div class="sidebar-section">
+                  <div class="sidebar-section-title"><i class="bi bi-briefcase"></i> Type de service</div>
+                  <select class="sidebar-select" [(ngModel)]="filters.serviceType" (change)="applyAll()">
+                    <option value="">Tous</option>
+                    <option value="FABRICATION">🔧 Fabrication</option>
+                    <option value="REPARATION">🛠️ Réparation</option>
+                    <option value="CONSULTATION">💡 Consultation</option>
+                    <option value="LIVRAISON">🚚 Livraison</option>
+                    <option value="AUTRE">📋 Autre</option>
+                  </select>
+                </div>
+              }
+
+              <!-- Réinitialiser filtres -->
+              @if (isFilterActive()) {
+                <button class="btn-reset-all" (click)="resetFilters()">
+                  <i class="bi bi-x-circle"></i> Réinitialiser tous les filtres
+                </button>
+              }
+
+            </aside>
+
+            <!-- ══ CONTENU PRINCIPAL ══ -->
+            <main class="cp-main">
+
+              <!-- Barre résultats + tri -->
+              <div class="cp-results-bar">
+                <div class="results-text">
+                  <strong>{{ filteredItems.length }}</strong> résultat(s)
+                  @if (searchQuery) {
+                    <span> pour "<em>{{ searchQuery }}</em>"</span>
+                  }
+                </div>
+                <div class="results-sort">
+                  <label>Trier par :</label>
+                  <select [(ngModel)]="sortBy" (change)="onSortChange()">
+                    <option value="rating">Meilleure note</option>
+                    <option value="price_asc">Prix croissant</option>
+                    <option value="price_desc">Prix décroissant</option>
+                    <option value="name">Nom A-Z</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Loader -->
+              @if (loading) {
+                <div class="cp-loader">
+                  <div class="cp-spinner"></div>
+                  <p>Chargement...</p>
+                </div>
+              }
+
+              <!-- Vide -->
+              @if (!loading && filteredItems.length === 0) {
+                <div class="cp-empty">
+                  <i class="bi bi-search"></i>
+                  <h3>Aucun résultat</h3>
+                  <p>Essayez de modifier vos critères de recherche ou vos filtres.</p>
+                  <button (click)="resetFilters()">Réinitialiser les filtres</button>
+                </div>
+              }
+
+              <!-- Grille résultats -->
+              @if (!loading && filteredItems.length > 0) {
+                <div class="cp-grid">
+                  @for (item of paginatedItems; track item; let i = $index) {
+                    <div class="cp-card"
+                      (click)="goToItem(item)">
+                      <!-- Type badge -->
+                      <div class="cp-card-type" [class.machine]="item.type === 'machine'" [class.service]="item.type === 'service'">
+                        <i class="bi" [class.bi-tools]="item.type === 'machine'" [class.bi-briefcase]="item.type === 'service'"></i>
+                        {{ item.type === 'machine' ? 'Machine' : 'Service' }}
+                      </div>
+                      <!-- Image -->
+                      <div class="cp-card-img">
+                        <img [src]="item.imageUrl || 'assets/images/default-machine.jpg'"
+                          [alt]="item.name" (error)="handleImgErr($event)">
+                          <div class="cp-card-overlay">
+                            <span><i class="bi bi-eye"></i> Voir détail</span>
+                          </div>
+                          <!-- Disponibilité -->
+                          <div class="cp-avail" [class.ok]="item.availability === 'AVAILABLE'" [class.no]="item.availability !== 'AVAILABLE'">
+                            <span class="avail-dot"></span>
+                            {{ item.availability === 'AVAILABLE' ? 'Disponible' : 'Indisponible' }}
+                          </div>
+                        </div>
+                        <!-- Corps -->
+                        <div class="cp-card-body">
+                          <div class="cp-card-cat">{{ item.category }}</div>
+                          <h4 class="cp-card-name">{{ item.name }}</h4>
+                          <div class="cp-card-provider">
+                            <i class="bi bi-building"></i>{{ item.providerName }}
+                          </div>
+                          <div class="cp-card-location">
+                            <i class="bi bi-geo-alt"></i>{{ item.location }}
+                          </div>
+                          <!-- Stars -->
+                          <div class="cp-card-stars">
+                            @for (s of getStars(item.rating); track s) {
+                              <i class="bi"
+                                [class.bi-star-fill]="s==='full'"
+                                [class.bi-star-half]="s==='half'"
+                              [class.bi-star]="s==='empty'"></i>
+                            }
+                            <span>({{ item.reviewCount }})</span>
+                          </div>
+                        </div>
+                        <!-- Footer prix + CTA -->
+                        <div class="cp-card-footer">
+                          <div class="cp-card-price">
+                            <span class="cp-price-val">{{ item.price | number }} TND</span>
+                            <span class="cp-price-unit">/ {{ item.priceUnit }}</span>
+                          </div>
+                          <div class="cp-card-actions">
+                            <button class="btn-cp-detail">
+                              Voir <i class="bi bi-arrow-right"></i>
+                            </button>
+                            @if (item.type === 'service') {
+                              <button class="btn-cp-contact" (click)="$event.stopPropagation()"
+                                [routerLink]="['/requests/create']"
+                                [queryParams]="{serviceId: item.id}">
+                                <i class="bi bi-envelope"></i>
+                              </button>
+                            }
+                            @if (item.type === 'machine') {
+                              <button class="btn-cp-contact" (click)="$event.stopPropagation(); addToCart(item)"
+                                [disabled]="item.availability !== 'AVAILABLE'">
+                                <i class="bi bi-cart4"></i>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  }<!-- /cp-grid -->
+
+                  <!-- Pagination -->
+                  @if (totalPages > 1) {
+                    <div class="cp-pagination">
+                      <button class="page-btn" [disabled]="currentPage === 1" (click)="onPage(currentPage - 1)">
+                        <i class="bi bi-chevron-left"></i>
+                      </button>
+                      @for (p of getPageNumbers(); track p) {
+                        <button class="page-btn"
+                          [class.active]="p === currentPage"
+                        (click)="onPage(p)">{{ p }}</button>
+                      }
+                      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="onPage(currentPage + 1)">
+                        <i class="bi bi-chevron-right"></i>
+                      </button>
+                    </div>
+                  }
+
+                </main>
+              </div><!-- /cp-inner -->
             </div>
-            <div class="cp-card-actions">
-              <button class="btn-cp-detail">
-                Voir <i class="bi bi-arrow-right"></i>
-              </button>
-              <button class="btn-cp-contact" (click)="$event.stopPropagation()"
-                      *ngIf="item.type === 'service'"
-                      [routerLink]="['/requests/create']"
-                      [queryParams]="{serviceId: item.id}">
-                <i class="bi bi-envelope"></i>
-              </button>
-              <button class="btn-cp-contact" (click)="$event.stopPropagation(); addToCart(item)"
-                      *ngIf="item.type === 'machine'"
-                      [disabled]="item.availability !== 'AVAILABLE'">
-                <i class="bi bi-cart4"></i>
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div><!-- /cp-grid -->
-
-      <!-- Pagination -->
-      <div class="cp-pagination" *ngIf="totalPages > 1">
-        <button class="page-btn" [disabled]="currentPage === 1" (click)="onPage(currentPage - 1)">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <button class="page-btn"
-                *ngFor="let p of getPageNumbers()"
-                [class.active]="p === currentPage"
-                (click)="onPage(p)">{{ p }}</button>
-        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="onPage(currentPage + 1)">
-          <i class="bi bi-chevron-right"></i>
-        </button>
-      </div>
-
-    </main>
-  </div><!-- /cp-inner -->
-</div>

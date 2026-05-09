@@ -1,12 +1,20 @@
 // src/app/modules/resources/components/create-service/create-service.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { ServiceService, CreateServiceRequest, ServiceEntity } from '../../../../services/service.service';
 
 @Component({
   selector: 'app-create-service',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule
+  ],
   templateUrl: './create-service.component.html',
   styleUrls: ['./create-service.component.scss']
 })
