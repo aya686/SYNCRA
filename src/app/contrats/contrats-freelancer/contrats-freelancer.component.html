@@ -1,0 +1,166 @@
+<div class="contrats-freelancer-container">
+  <div class="page-header">
+    <h1>Mes Contrats Freelancer</h1>
+    <p class="subtitle">Consultez et signez vos contrats en tant que prestataire</p>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total Contrats</div>
+      </div>
+    </div>
+    <div class="stat-card stat-a-signer">
+      <div class="stat-icon">✍️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.aSigner }}</div>
+        <div class="stat-label">À signer</div>
+      </div>
+    </div>
+    <div class="stat-card stat-en-cours">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.enCours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+    </div>
+    <div class="stat-card stat-termines">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.termines }}</div>
+        <div class="stat-label">Terminés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Rechercher par titre..."
+      [(ngModel)]="searchTitre"
+      (input)="onFilterChange()"
+    >
+    
+    <select class="filter-select" [(ngModel)]="filterStatut" (change)="onFilterChange()">
+      <option [value]="null">Tous les statuts</option>
+      <option value="BROUILLON">Brouillon</option>
+      <option value="EN_ATTENTE">En attente</option>
+      <option value="ACTIF">Actif</option>
+      <option value="TERMINE">Terminé</option>
+      <option value="RESILIE">Résilié</option>
+      <option value="LITIGE">Litige</option>
+    </select>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des contrats...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Contracts Cards -->
+  <div class="contracts-grid" *ngIf="!loading && !error">
+    <div class="contract-card" *ngFor="let contrat of filteredContrats">
+      <div class="contract-header">
+        <h3>{{ contrat.titre }}</h3>
+        <span class="badge {{ getStatutBadgeClass(contrat.statut) }}">
+          {{ getStatutLabel(contrat.statut) }}
+        </span>
+      </div>
+      
+      <div class="contract-body">
+        <div class="contract-info">
+          <div class="info-row">
+            <span class="info-label">Client:</span>
+            <span class="info-value">{{ getClientName(contrat) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Montant:</span>
+            <span class="info-value">{{ contrat.montant }} TND</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Date début:</span>
+            <span class="info-value">{{ formatDate(contrat.dateDebut) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Date fin:</span>
+            <span class="info-value">{{ formatDate(contrat.dateFin) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Modalité:</span>
+            <span class="info-value">{{ contrat.modalitePaiement || 'Non spécifié' }}</span>
+          </div>
+        </div>
+
+        <div class="contract-description" *ngIf="contrat.description">
+          <p>{{ contrat.description }}</p>
+        </div>
+      </div>
+
+      <div class="contract-actions">
+        <button 
+          class="btn btn-view"
+          (click)="openSignatureModal(contrat)"
+          title="Signer le contrat"
+        >
+          ✍️ Signer
+        </button>
+        
+        <button 
+          class="btn btn-download"
+          (click)="telechargerPDF(contrat)"
+          title="Télécharger PDF"
+        >
+          📥 Télécharger
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredContrats.length === 0">
+      <div class="empty-icon">📄</div>
+      <h3>Aucun contrat trouvé</h3>
+      <p>Vous n'avez pas encore de contrats en tant que prestataire ou aucun contrat ne correspond à vos filtres.</p>
+    </div>
+  </div>
+
+  <!-- Signature Modal -->
+  <div class="signature-modal" *ngIf="showSignatureModal">
+    <div class="modal-overlay" (click)="closeSignatureModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Signature Électronique</h3>
+        <button class="close-btn" (click)="closeSignatureModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Signez dans la zone blanche ci-dessous avec votre souris ou votre doigt :</p>
+        <canvas 
+          #signatureCanvas 
+          class="signature-canvas"
+          (mousedown)="startDrawing($event)"
+          (mousemove)="draw($event)"
+          (mouseup)="stopDrawing()"
+          (mouseleave)="stopDrawing()"
+          (touchstart)="startDrawing($event)"
+          (touchmove)="draw($event)"
+          (touchend)="stopDrawing()"
+        ></canvas>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="clearSignature()">Effacer</button>
+          <button class="btn-primary" (click)="confirmSignature()">Confirmer la signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

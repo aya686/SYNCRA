@@ -1,0 +1,63 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Chat</h2>
+    <button class="btn-close" (click)="annuler()" title="Fermer">
+      ✕
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Messages Container -->
+  <div class="messages-container" id="messages-container">
+    <div *ngIf="loading" class="loading-message">
+      Chargement des messages...
+    </div>
+    
+    <div *ngIf="!loading && messages.length === 0" class="empty-state">
+      <p>Aucun message pour le moment. Soyez le premier à écrire !</p>
+    </div>
+
+    <div
+      *ngFor="let message of messages"
+      class="message"
+      [class.message-sent]="isMessageFromCurrentUser(message)"
+      [class.message-received]="!isMessageFromCurrentUser(message)"
+    >
+      <div class="message-content">
+        <div class="message-sender">
+          {{ message.expediteurRole === 'CLIENT' ? 'Client' : 'Freelancer' }}
+        </div>
+        <div class="message-text">
+          {{ message.contenu }}
+        </div>
+        <div class="message-time">
+          {{ message.dateEnvoi ? (message.dateEnvoi | date:'short') : 'Envoi...' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Input -->
+  <div class="message-input-container">
+    <textarea
+      class="message-input"
+      [(ngModel)]="newMessage"
+      (keydown)="onKeyPress($event)"
+      placeholder="Écrivez votre message ici..."
+      rows="3"
+    ></textarea>
+    <button
+      class="btn-send"
+      (click)="sendMessage()"
+      [disabled]="!newMessage.trim()"
+      title="Envoyer"
+    >
+      Envoyer
+    </button>
+  </div>
+</div>

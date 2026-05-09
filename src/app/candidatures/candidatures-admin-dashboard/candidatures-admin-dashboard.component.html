@@ -1,0 +1,199 @@
+<div class="admin-dashboard-container">
+  <div class="page-header">
+    <h1>Dashboard Candidatures</h1>
+    <p class="page-subtitle">Gérez toutes les candidatures aux offres</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.total}}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+    <div class="stat-card en-attente">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.enAttente}}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </div>
+    <div class="stat-card en-revision">
+      <div class="stat-icon">👁️</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.enRevision}}</div>
+        <div class="stat-label">En révision</div>
+      </div>
+    </div>
+    <div class="stat-card shortlist">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.shortlist}}</div>
+        <div class="stat-label">Shortlist</div>
+      </div>
+    </div>
+    <div class="stat-card acceptee">
+      <div class="stat-icon">✓</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.acceptee}}</div>
+        <div class="stat-label">Acceptées</div>
+      </div>
+    </div>
+    <div class="stat-card refusee">
+      <div class="stat-icon">✗</div>
+      <div class="stat-content">
+        <div class="stat-number">{{stats.refusee}}</div>
+        <div class="stat-label">Refusées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <select class="filter-select" [(ngModel)]="filterStatut">
+      <option [ngValue]="null">Tous les statuts</option>
+      <option [ngValue]="'EN_ATTENTE'">En attente</option>
+      <option [ngValue]="'EN_REVISION'">En révision</option>
+      <option [ngValue]="'SHORTLIST'">Shortlist</option>
+      <option [ngValue]="'ACCEPTEE'">Acceptée</option>
+      <option [ngValue]="'REFUSEE'">Refusée</option>
+    </select>
+    <button class="btn-reset" (click)="resetFilters()">
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-alert">
+    <div class="error-icon">⚠️</div>
+    <p>{{error}}</p>
+  </div>
+
+  <!-- Candidatures Table -->
+  <div *ngIf="!loading && !error" class="candidatures-table-container">
+    <table class="candidatures-table">
+      <thead>
+        <tr>
+          <th>Offre</th>
+          <th>Candidat ID</th>
+          <th>Tarif proposé</th>
+          <th>Score IA</th>
+          <th>Rapport IA</th>
+          <th>Statut</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let candidature of filteredCandidatures">
+          <td class="offre-cell">
+            <strong>{{candidature.offre?.titre}}</strong>
+          </td>
+          <td>{{candidature.candidatId}}</td>
+          <td>{{candidature.tarifPropose}} TND</td>
+          <td>
+            <span class="score-badge" [style.color]="candidature.scoreIa ? aiCvService.getScoreColor(candidature.scoreIa) : '#9ca3af'">
+              {{candidature.scoreIa ? candidature.scoreIa.toFixed(0) : 'N/A'}}
+            </span>
+            <span *ngIf="candidature.scoreIa" class="score-label" [style.color]="aiCvService.getScoreColor(candidature.scoreIa)">
+              {{aiCvService.getScoreLabel(candidature.scoreIa)}}
+            </span>
+          </td>
+          <td class="report-cell">
+            <div *ngIf="candidature.aiReport" class="ai-report-preview">
+              {{candidature.aiReport}}
+            </div>
+            <span *ngIf="!candidature.aiReport" class="no-report">N/A</span>
+          </td>
+          <td>
+            <span [class]="getStatutBadgeClass(candidature.statut)" class="statut-badge">
+              {{getStatutLabel(candidature.statut)}}
+            </span>
+          </td>
+          <td>{{candidature.dateSoumission | date:'dd/MM/yyyy'}}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-action btn-view-ia" 
+                      (click)="voirDetailsIA(candidature)"
+                      title="Voir analyse IA">
+                🤖
+              </button>
+              <button class="btn-action btn-shortlist" 
+                      (click)="shortlist(candidature.id!)"
+                      title="Mettre en shortlist">
+                ⭐
+              </button>
+              <button class="btn-action btn-accept" 
+                      (click)="accepter(candidature.id!)"
+                      title="Accepter">
+                ✓
+              </button>
+              <button class="btn-action btn-refuse" 
+                      (click)="refuser(candidature.id!)"
+                      title="Refuser">
+                ✗
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- No results -->
+    <div *ngIf="filteredCandidatures.length === 0" class="no-results">
+      <p>Aucune candidature trouvée.</p>
+    </div>
+  </div>
+
+  <!-- AI Details Modal -->
+  <div *ngIf="selectedCandidature" class="ai-modal-overlay" (click)="closeModal()">
+    <div class="ai-modal-content" (click)="$event.stopPropagation()">
+      <div class="ai-modal-header">
+        <h2>Analyse IA du CV</h2>
+        <button class="btn-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="ai-modal-body">
+        <div class="ai-section">
+          <h3>Score IA</h3>
+          <div class="ai-score-display">
+            <span class="ai-score-number" [style.color]="selectedCandidature.scoreIa ? aiCvService.getScoreColor(selectedCandidature.scoreIa) : '#9ca3af'">
+              {{selectedCandidature.scoreIa ? selectedCandidature.scoreIa.toFixed(0) : 'N/A'}}/100
+            </span>
+            <span *ngIf="selectedCandidature.scoreIa" class="ai-score-label" [style.color]="aiCvService.getScoreColor(selectedCandidature.scoreIa)">
+              {{aiCvService.getScoreLabel(selectedCandidature.scoreIa)}}
+            </span>
+          </div>
+        </div>
+
+        <div class="ai-section" *ngIf="selectedCandidature.cvResume">
+          <h3>Résumé du CV</h3>
+          <div class="ai-text-content">
+            {{selectedCandidature.cvResume}}
+          </div>
+        </div>
+
+        <div class="ai-section" *ngIf="selectedCandidature.aiReport">
+          <h3>Rapport IA</h3>
+          <div class="ai-text-content">
+            {{selectedCandidature.aiReport}}
+          </div>
+        </div>
+
+        <div *ngIf="!selectedCandidature.cvResume && !selectedCandidature.aiReport" class="no-ai-data">
+          <p>Aucune analyse IA disponible pour cette candidature.</p>
+        </div>
+      </div>
+      <div class="ai-modal-footer">
+        <button class="btn-primary" (click)="closeModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

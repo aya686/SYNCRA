@@ -1,0 +1,207 @@
+<div class="dashboard-investisseur-container">
+  <div class="container">
+    <h1>Mon Dashboard Investisseur</h1>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      <div class="alert alert-danger">{{ error }}</div>
+    </div>
+
+    <div class="dashboard-content" *ngIf="!loading">
+      <!-- Financial Summary -->
+      <section class="financial-summary">
+        <div class="row">
+          <div class="col-md-3 col-sm-6">
+            <div class="summary-card">
+              <div class="card-icon">💰</div>
+              <div class="card-value">{{ formatMontant(stats.totalInvesti) }}</div>
+              <div class="card-label">Total investi</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="summary-card">
+              <div class="card-icon">📊</div>
+              <div class="card-value">{{ stats.projetsEnCours }}</div>
+              <div class="card-label">Projets en cours</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="summary-card">
+              <div class="card-icon">📈</div>
+              <div class="card-value">{{ stats.roiMoyen }}%</div>
+              <div class="card-label">ROI moyen</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="summary-card">
+              <div class="card-icon">📝</div>
+              <div class="card-value">{{ stats.conventionsActives }}</div>
+              <div class="card-label">Conventions actives</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Conventions -->
+      <section class="active-conventions">
+        <h2>Mes conventions actives</h2>
+        <div class="conventions-grid">
+          <div class="convention-card" *ngFor="let convention of getConventionsActives()">
+            <div class="convention-header">
+              <h4>Convention #{{ convention.id }}</h4>
+              <span class="badge badge-success">✅ ACTIVE</span>
+            </div>
+            <div class="convention-details">
+              <div class="detail-row">
+                <span>Signée le :</span>
+                <strong>{{ formatDate(convention.dateSignature || '') }}</strong>
+              </div>
+              <div class="detail-row">
+                <span>Expiration :</span>
+                <strong>{{ formatDate(convention.dateFin || '') }}</strong>
+              </div>
+              <div class="detail-row">
+                <span>Montant :</span>
+                <strong>{{ formatMontant(convention.montant) }}</strong>
+              </div>
+              <div class="detail-row">
+                <span>Participation :</span>
+                <strong>{{ convention.pourcentageParticipation }}%</strong>
+              </div>
+            </div>
+            <div class="convention-actions">
+              <button class="btn btn-primary btn-sm">Télécharger PDF</button>
+            </div>
+          </div>
+          <div class="no-conventions" *ngIf="getConventionsActives().length === 0">
+            <p>Aucune convention active</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pending Investments -->
+      <section class="pending-investments">
+        <h2>Mises de fonds en attente</h2>
+        <div class="pending-list">
+          <div class="pending-item" *ngFor="let mise of getMisesFondsEnAttente()">
+            <div class="pending-info">
+              <h4>Proposition pour : Startup FinTech</h4>
+              <p>Montant proposé : {{ formatMontant(mise.montant) }}</p>
+              <p class="status">{{ getStatutMiseFondsLabel(mise.statut) }}</p>
+              <p>Soumise le : {{ formatDate(mise.dateSoumission || '') }}</p>
+            </div>
+
+            <!-- Analyse IA -->
+            <div class="ai-analysis" *ngIf="mise.id">
+              <div *ngIf="analysesInvestissement[mise.id]?.loading" class="ai-loading">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                <span>Analyse en cours...</span>
+              </div>
+              <div *ngIf="!analysesInvestissement[mise.id]?.loading && analysesInvestissement[mise.id]" class="ai-result">
+                <div class="ai-percentage" [class.high]="analysesInvestissement[mise.id]!.pourcentage >= 70"
+                     [class.medium]="analysesInvestissement[mise.id]!.pourcentage >= 40 && analysesInvestissement[mise.id]!.pourcentage < 70"
+                     [class.low]="analysesInvestissement[mise.id]!.pourcentage < 40">
+                  <span class="percentage-value">{{ analysesInvestissement[mise.id]!.pourcentage }}%</span>
+                  <span class="percentage-label">Probabilité d'acceptation</span>
+                </div>
+                <div class="ai-cause">
+                  <i class="ti ti-info-circle me-1"></i>
+                  {{ analysesInvestissement[mise.id]!.cause }}
+                </div>
+                <button *ngIf="analysesInvestissement[mise.id]!.cause === 'Analyse non effectuée'"
+                        class="btn btn-outline-primary btn-sm mt-2 w-100"
+                        (click)="analyserMiseFonds(mise)">
+                  <i class="ti ti-refresh me-1"></i>
+                  Relancer l'analyse IA
+                </button>
+              </div>
+            </div>
+
+            <div class="pending-actions">
+              <button class="btn btn-danger btn-sm" (click)="annulerMiseFonds(mise.id || 0)">Annuler</button>
+            </div>
+          </div>
+          <div class="no-pending" *ngIf="getMisesFondsEnAttente().length === 0">
+            <p>Aucune mise de fonds en attente</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Chatbot IA -->
+  <div class="chatbot-container" [class.open]="chatOpen">
+    <div class="chatbot-header" (click)="toggleChat()">
+      <div class="chatbot-title">
+        <span class="chatbot-icon">🤖</span>
+        <span>Assistant IA Investisseur</span>
+      </div>
+      <button class="chatbot-toggle">
+        <span *ngIf="chatOpen">▼</span>
+        <span *ngIf="!chatOpen">▲</span>
+      </button>
+    </div>
+
+    <div class="chatbot-body" *ngIf="chatOpen">
+      <div class="chatbot-messages" #messagesContainer>
+        <div class="chatbot-welcome" *ngIf="chatMessages.length === 0">
+          <div class="bot-message">
+            <p>👋 Bonjour ! Je suis votre assistant IA pour les investissements. Je peux vous aider à :</p>
+            <ul>
+              <li>Comprendre les projets d'investissement disponibles</li>
+              <li>Analyser vos investissements actuels</li>
+              <li>Évaluer les risques et opportunités</li>
+              <li>Répondre à vos questions sur les conventions</li>
+            </ul>
+            <p>Comment puis-je vous aider aujourd'hui ?</p>
+          </div>
+        </div>
+
+        <div class="message" *ngFor="let message of chatMessages" [class.user]="message.role === 'user'" [class.bot]="message.role === 'assistant'">
+          <div class="message-content">
+            <p [innerHTML]="message.content.replace(/\n/g, '<br>')"></p>
+          </div>
+        </div>
+
+        <div class="message bot loading" *ngIf="chatLoading">
+          <div class="message-content">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chatbot-error" *ngIf="chatError">
+          <div class="error-message">
+            ⚠️ {{ chatError }}
+          </div>
+        </div>
+      </div>
+
+      <div class="chatbot-input">
+        <textarea
+          [(ngModel)]="chatInput"
+          (keydown.enter)="sendMessage()"
+          placeholder="Posez une question sur vos investissements..."
+          rows="2"
+          [disabled]="chatLoading"
+        ></textarea>
+        <div class="chatbot-actions">
+          <button class="btn btn-clear" (click)="clearChat()" title="Effacer la conversation">
+            🗑️
+          </button>
+          <button class="btn btn-send" (click)="sendMessage()" [disabled]="!chatInput.trim() || chatLoading" title="Envoyer">
+            📤
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,196 @@
+<div class="detail-contrat-container">
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement du contrat...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Contract Detail -->
+  <div class="contract-detail" *ngIf="contrat && !loading">
+    <!-- Header -->
+    <div class="contract-header">
+      <div class="header-left">
+        <button class="btn-back" (click)="retour()">← Retour</button>
+        <div>
+          <h1>Contrat #{{ contrat.id }}</h1>
+          <p class="subtitle">{{ contrat.titre }}</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="badge {{ getStatutBadgeClass(contrat.statut) }}">
+          {{ getStatutLabel(contrat.statut) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Parties Prenantes -->
+    <div class="parties-section">
+      <div class="party-card client-card">
+        <h3>CLIENT</h3>
+        <div class="party-info">
+          <div class="party-name">Client #{{ contrat.clientId }}</div>
+          <div class="party-status">
+            <span class="status-icon">✅</span>
+            Signé le {{ formatDate(contrat.dateGeneration) }}
+          </div>
+        </div>
+      </div>
+      <div class="party-card prestataire-card">
+        <h3>PRESTATAIRE</h3>
+        <div class="party-info">
+          <div class="party-name">Prestataire #{{ contrat.prestataireId }}</div>
+          <div class="party-status">
+            <span class="status-icon">✅</span>
+            Signé le {{ formatDate(contrat.dateGeneration) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations Financières -->
+    <div class="financial-section">
+      <h3>Informations Financières</h3>
+      <div class="financial-grid">
+        <div class="financial-item">
+          <label>Montant total</label>
+          <div class="value">{{ contrat.montant }} TND</div>
+        </div>
+        <div class="financial-item">
+          <label>Modalité paiement</label>
+          <div class="value">{{ contrat.modalitePaiement || 'Non spécifié' }}</div>
+        </div>
+        <div class="financial-item">
+          <label>Date début</label>
+          <div class="value">{{ formatDate(contrat.dateDebut) }}</div>
+        </div>
+        <div class="financial-item">
+          <label>Date fin prévue</label>
+          <div class="value">{{ formatDate(contrat.dateFin) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clauses -->
+    <div class="clauses-section">
+      <h3>Les Clauses du Contrat</h3>
+      <div class="clauses-list" *ngIf="clauses.length > 0">
+        <div class="clause-card" *ngFor="let clause of clauses">
+          <div class="clause-header">
+            <h4>{{ clause.titre }}</h4>
+            <span class="clause-type" *ngIf="clause.typeClause">
+              {{ clause.typeClause }}
+            </span>
+          </div>
+          <p class="clause-content">{{ clause.contenu }}</p>
+        </div>
+      </div>
+      <div class="empty-clauses" *ngIf="clauses.length === 0">
+        <p>Aucune clause définie pour ce contrat.</p>
+      </div>
+    </div>
+
+    <!-- Historique des Signatures -->
+    <div class="history-section">
+      <h3>Historique des Signatures</h3>
+      <div class="history-timeline">
+        <div class="history-item">
+          <span class="history-icon">📝</span>
+          <div class="history-content">
+            <div class="history-title">Contrat généré automatiquement</div>
+            <div class="history-date">{{ formatDate(contrat.dateGeneration) }}</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <span class="history-icon">✍️</span>
+          <div class="history-content">
+            <div class="history-title">Client a signé électroniquement</div>
+            <div class="history-date">{{ formatDate(contrat.dateGeneration) }}</div>
+          </div>
+        </div>
+        <div class="history-item">
+          <span class="history-icon">✍️</span>
+          <div class="history-content">
+            <div class="history-title">Prestataire a signé électroniquement</div>
+            <div class="history-date">{{ formatDate(contrat.dateGeneration) }}</div>
+          </div>
+        </div>
+        <div class="history-item" *ngIf="contrat.statut === 'ACTIF'">
+          <span class="history-icon">✅</span>
+          <div class="history-content">
+            <div class="history-title">Contrat activé</div>
+            <div class="history-date">{{ formatDate(contrat.dateGeneration) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="actions-section">
+      <button 
+        class="btn-primary" 
+        *ngIf="canSigner()"
+        (click)="signerContrat()"
+      >
+        ✍️ Signer électroniquement
+      </button>
+      
+      <button 
+        class="btn-danger" 
+        *ngIf="contrat.statut === 'ACTIF'"
+        (click)="ouvrirLitige()"
+      >
+        ⚠️ Ouvrir un litige
+      </button>
+      
+      <button 
+        class="btn-warning"
+        *ngIf="isAdmin()"
+        (click)="resilierContrat()"
+      >
+        🚫 Résilier le contrat
+      </button>
+      
+      <button 
+        class="btn-secondary"
+        (click)="telechargerPDF()"
+      >
+        📥 Télécharger PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Signature Modal -->
+  <div class="signature-modal" *ngIf="showSignatureModal">
+    <div class="modal-overlay" (click)="closeSignatureModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Signature Électronique</h3>
+        <button class="close-btn" (click)="closeSignatureModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Signez dans la zone ci-dessous :</p>
+        <canvas
+          #signatureCanvas
+          class="signature-canvas"
+          (mousedown)="startDrawing($event)"
+          (mousemove)="draw($event)"
+          (mouseup)="stopDrawing()"
+          (mouseleave)="stopDrawing()"
+          (touchstart)="startDrawing($event)"
+          (touchmove)="draw($event)"
+          (touchend)="stopDrawing()"
+        ></canvas>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="clearSignature()">Effacer</button>
+          <button class="btn-primary" (click)="confirmSignature()">Confirmer la signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

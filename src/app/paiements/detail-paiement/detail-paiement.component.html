@@ -1,0 +1,155 @@
+<div class="detail-paiement-container">
+  <div class="header">
+    <button class="btn-back" (click)="retour()">← Retour</button>
+    <h1>Détail du Paiement</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && paiement">
+    <!-- Informations principales -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>{{ paiement.reference }}</h2>
+        <span [class]="getStatutClass(paiement.statut)">{{ getStatutLabel(paiement.statut) }}</span>
+      </div>
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Montant Total:</span>
+          <span class="value">{{ formatMontant(paiement.montantTotal) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Montant Payé:</span>
+          <span class="value">{{ formatMontant(paiement.montantPaye) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Montant Restant:</span>
+          <span class="value">{{ formatMontant(paiement.montantRestant) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Commission (5%):</span>
+          <span class="value">{{ formatMontant(paiement.montantCommission || 0) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Payeur ID:</span>
+          <span class="value">{{ paiement.payeurId }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Bénéficiaire ID:</span>
+          <span class="value">{{ paiement.beneficiaireId }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Date de Création:</span>
+          <span class="value">{{ formatDate(paiement.dateCreation!) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Date d'Échéance:</span>
+          <span class="value">{{ formatDate(paiement.dateEcheance!) }}</span>
+        </div>
+      </div>
+      <div class="card-footer" *ngIf="paiement.statut === 'EN_ATTENTE' || paiement.statut === 'PARTIELLEMENT_PAYE'">
+        <div class="payment-amount">
+          <label>Montant à payer:</label>
+          <input type="number" [(ngModel)]="montantAPayer" [max]="paiement.montantRestant" min="0">
+        </div>
+        <button class="btn btn-primary" (click)="initierPaiement()">
+          💳 Payer {{ formatMontant(montantAPayer) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="section" *ngIf="paiement.transactions && paiement.transactions.length > 0">
+      <h2>📊 Transactions</h2>
+      <div class="transactions-list">
+        <div class="transaction-item" *ngFor="let transaction of paiement.transactions">
+          <div class="transaction-header">
+            <span class="reference">{{ transaction.reference }}</span>
+            <span class="statut" [class]="transaction.statut === 'VALIDEE' ? 'valid' : 'pending'">
+              {{ transaction.statut }}
+            </span>
+          </div>
+          <div class="transaction-body">
+            <p class="montant">{{ formatMontant(transaction.montant) }}</p>
+            <p class="type">{{ transaction.typeTransaction }}</p>
+            <p class="date">{{ formatDate(transaction.dateTransaction) }}</p>
+          </div>
+          <div class="transaction-footer" *ngIf="transaction.statut === 'EN_COURS'">
+            <button class="btn btn-sm btn-success" (click)="validerTransaction(transaction.id!)">
+              ✅ Valider
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Factures -->
+    <div class="section" *ngIf="paiement.factures && paiement.factures.length > 0">
+      <h2>📄 Factures</h2>
+      <div class="factures-list">
+        <div class="facture-item" *ngFor="let facture of paiement.factures">
+          <div class="facture-header">
+            <span class="numero">{{ facture.numeroFacture }}</span>
+            <span class="statut">{{ facture.statut }}</span>
+          </div>
+          <div class="facture-body">
+            <p class="titre">{{ facture.titre }}</p>
+            <p class="montant">{{ formatMontant(facture.montantTtc) }}</p>
+            <p class="date">Émise le: {{ formatDate(facture.dateEmission) }}</p>
+          </div>
+          <div class="facture-footer">
+            <button class="btn btn-sm btn-primary" (click)="telechargerFacture(facture)">
+              📥 Télécharger PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Échéances -->
+    <div class="section" *ngIf="paiement.echeances && paiement.echeances.length > 0">
+      <h2>📅 Échéances</h2>
+      <div class="echeances-list">
+        <div class="echeance-item" *ngFor="let echeance of paiement.echeances">
+          <div class="echeance-header">
+            <span class="numero">Échéance #{{ echeance.numeroEcheance }}</span>
+            <span class="statut" [class]="echeance.statut === 'PAYEE' ? 'paid' : 'pending'">
+              {{ echeance.statut }}
+            </span>
+          </div>
+          <div class="echeance-body">
+            <p class="montant">{{ formatMontant(echeance.montant) }}</p>
+            <p class="date">Date: {{ formatDate(echeance.dateEcheance) }}</p>
+            <p class="percentage">{{ echeance.pourcentage }}%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Commissions -->
+    <div class="section" *ngIf="paiement.commissions && paiement.commissions.length > 0">
+      <h2>💰 Commissions</h2>
+      <div class="commissions-list">
+        <div class="commission-item" *ngFor="let commission of paiement.commissions">
+          <div class="commission-header">
+            <span class="type">{{ commission.typeCommission }}</span>
+            <span class="statut">{{ commission.statut }}</span>
+          </div>
+          <div class="commission-body">
+            <p class="montant">{{ formatMontant(commission.montantCommission) }}</p>
+            <p class="taux">Taux: {{ commission.taux }}%</p>
+            <p class="date">Calculée le: {{ formatDate(commission.dateCalcul!) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

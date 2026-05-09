@@ -1,0 +1,184 @@
+<div class="litiges-admin-dashboard">
+  <div class="page-header">
+    <h1>Gestion des Litiges</h1>
+    <p class="subtitle">Admin - Résolution des conflits</p>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total Litiges</div>
+      </div>
+    </div>
+    <div class="stat-card stat-en-cours">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.enCours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+    </div>
+    <div class="stat-card stat-resolus">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.resolus }}</div>
+        <div class="stat-label">Résolus</div>
+      </div>
+    </div>
+    <div class="stat-card stat-urgents">
+      <div class="stat-icon">🔴</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.urgents }}</div>
+        <div class="stat-label">Urgents</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <select class="filter-select" [(ngModel)]="filterStatut" (change)="onFilterChange()">
+      <option [value]="null">Tous les statuts</option>
+      <option value="OUVERT">Ouvert</option>
+      <option value="EN_COURS">En cours</option>
+      <option value="RESOLU">Résolu</option>
+      <option value="FERME">Fermé</option>
+    </select>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des litiges...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Litiges Table -->
+  <div class="litiges-table" *ngIf="!loading && !error">
+    <table *ngIf="filteredLitiges.length > 0">
+      <thead>
+        <tr>
+          <th>Contrat</th>
+          <th>Déclarant</th>
+          <th>Motif</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let litige of filteredLitiges">
+          <td class="contrat-cell">Contrat #{{ litige.contratId }}</td>
+          <td class="declarant-cell">Utilisateur #{{ litige.declarantId }}</td>
+          <td class="motif-cell">{{ litige.motif }}</td>
+          <td class="date-cell">{{ formatDate(litige.dateOuverture) }}</td>
+          <td class="statut-cell">
+            <span class="badge {{ getStatutBadgeClass(litige.statut) }}">
+              {{ getStatutLabel(litige.statut) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button 
+              class="btn-action btn-charge" 
+              *ngIf="litige.statut === 'OUVERT'"
+              (click)="prendreEnCharge(litige.id!)"
+              title="Prendre en charge"
+            >
+              👁️
+            </button>
+            <button 
+              class="btn-action btn-resolve" 
+              *ngIf="litige.statut === 'EN_COURS'"
+              (click)="openResolutionModal(litige)"
+              title="Résoudre"
+            >
+              ⚖️
+            </button>
+            <button 
+              class="btn-action btn-close" 
+              *ngIf="litige.statut === 'EN_COURS'"
+              (click)="fermerLitige(litige.id!)"
+              title="Fermer"
+            >
+              ❌
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredLitiges.length === 0">
+      <div class="empty-icon">🤝</div>
+      <h3>Aucun litige trouvé</h3>
+      <p>Aucun litige ne correspond à vos filtres ou aucun litige n'a été signalé.</p>
+    </div>
+  </div>
+
+  <!-- Resolution Modal -->
+  <div class="modal-overlay" *ngIf="showResolutionModal" (click)="closeResolutionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Résoudre le Litige #{{ selectedLitige?.id }}</h3>
+        <button class="btn-close" (click)="closeResolutionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="litige-info">
+          <div class="info-item">
+            <label>Contrat :</label>
+            <span>Contrat #{{ selectedLitige?.contratId }}</span>
+          </div>
+          <div class="info-item">
+            <label>Déclarant :</label>
+            <span>Utilisateur #{{ selectedLitige?.declarantId }}</span>
+          </div>
+          <div class="info-item">
+            <label>Motif :</label>
+            <span>{{ selectedLitige?.motif }}</span>
+          </div>
+          <div class="info-item">
+            <label>Description :</label>
+            <span>{{ selectedLitige?.description || 'Non spécifiée' }}</span>
+          </div>
+        </div>
+
+        <div class="resolution-form">
+          <h4>RÉSOUDRE LE LITIGE</h4>
+          <div class="form-group">
+            <label>Décision :</label>
+            <select [(ngModel)]="resolutionForm.decision">
+              <option value="">-- Choisir --</option>
+              <option value="EN_FAVEUR_CLIENT">En faveur du client</option>
+              <option value="EN_FAVEUR_PRESTATAIRE">En faveur du prestataire</option>
+              <option value="COMPROMIS">Compromis</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Commentaire admin :</label>
+            <textarea 
+              [(ngModel)]="resolutionForm.commentaire"
+              placeholder="Expliquez votre décision..."
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeResolutionModal()">Annuler</button>
+        <button 
+          class="btn-primary" 
+          [disabled]="!resolutionForm.decision"
+          (click)="resoudreLitige()"
+        >
+          Résoudre le litige
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

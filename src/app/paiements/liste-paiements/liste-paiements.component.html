@@ -1,0 +1,107 @@
+<div class="paiements-container">
+  <div class="header">
+    <h1>Mes Paiements</h1>
+    <p class="subtitle">Gérez tous vos paiements et factures</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Statistiques -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>Total Payé</h3>
+          <p>{{ formatMontant(totalPaye) }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>En Attente</h3>
+          <p>{{ getPaiementsEnAttente().length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>Payés</h3>
+          <p>{{ getPaiementsPayes().length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>Restant à Payer</h3>
+          <p>{{ formatMontant(totalRestant) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paiements en attente -->
+    <div class="section" *ngIf="getPaiementsEnAttente().length > 0">
+      <h2>⏳ Paiements en Attente</h2>
+      <div class="paiements-grid">
+        <div class="paiement-card" *ngFor="let paiement of getPaiementsEnAttente()">
+          <div class="card-header">
+            <h3>{{ paiement.reference }}</h3>
+            <span [class]="getStatutClass(paiement.statut)">{{ getStatutLabel(paiement.statut) }}</span>
+          </div>
+          <div class="card-body">
+            <p class="montant">{{ formatMontant(paiement.montantTotal) }}</p>
+            <p class="info">Payeur ID: {{ paiement.payeurId }}</p>
+            <p class="info">Bénéficiaire ID: {{ paiement.beneficiaireId }}</p>
+            <p class="info">Créé le: {{ formatDate(paiement.dateCreation!) }}</p>
+            <p class="info">Échéance: {{ formatDate(paiement.dateEcheance!) }}</p>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-primary" [routerLink]="['/paiements', paiement.id]">
+              Voir Détails
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paiements payés -->
+    <div class="section" *ngIf="getPaiementsPayes().length > 0">
+      <h2>✅ Paiements Payés</h2>
+      <div class="paiements-grid">
+        <div class="paiement-card" *ngFor="let paiement of getPaiementsPayes()">
+          <div class="card-header">
+            <h3>{{ paiement.reference }}</h3>
+            <span [class]="getStatutClass(paiement.statut)">{{ getStatutLabel(paiement.statut) }}</span>
+          </div>
+          <div class="card-body">
+            <p class="montant">{{ formatMontant(paiement.montantTotal) }}</p>
+            <p class="info">Payé le: {{ formatDate(paiement.datePaiementComplet!) }}</p>
+            <p class="info">Commission: {{ formatMontant(paiement.montantCommission || 0) }}</p>
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-primary" [routerLink]="['/paiements', paiement.id]">
+              Voir Facture
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aucun paiement -->
+    <div class="no-paiements" *ngIf="paiements.length === 0">
+      <div class="empty-state">
+        <div class="empty-icon">💳</div>
+        <h3>Aucun paiement</h3>
+        <p>Vous n'avez aucun paiement pour le moment.</p>
+      </div>
+    </div>
+  </div>
+</div>

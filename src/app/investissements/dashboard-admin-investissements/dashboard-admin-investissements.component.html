@@ -1,0 +1,235 @@
+<div class="dashboard-admin-investissements-container">
+  <div class="container">
+    <h1>Dashboard Admin - Investissements</h1>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      <div class="alert alert-danger">{{ error }}</div>
+    </div>
+
+    <div class="dashboard-content" *ngIf="!loading">
+      <!-- Statistics -->
+      <section class="statistics-section">
+        <div class="row">
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-number">{{ stats.totalInvestisseurs }}</div>
+              <div class="stat-label">Investisseurs</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-number">{{ stats.totalMisesFonds }}</div>
+              <div class="stat-label">Mises de fonds</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-number">{{ stats.totalConventions }}</div>
+              <div class="stat-label">Conventions</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-icon">💎</div>
+              <div class="stat-number">{{ formatMontant(stats.montantTotalInvesti) }}</div>
+              <div class="stat-label">Total investi</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabs -->
+      <section class="tabs-section">
+        <div class="tabs">
+          <button class="tab-button" [class.active]="activeTab === 'mises-fonds'" (click)="switchTab('mises-fonds')">
+            Mises de Fonds
+            <span class="badge" *ngIf="stats.misesFondsEnAttente > 0">{{ stats.misesFondsEnAttente }}</span>
+          </button>
+          <button class="tab-button" [class.active]="activeTab === 'conventions'" (click)="switchTab('conventions')">
+            Conventions
+          </button>
+          <button class="tab-button" [class.active]="activeTab === 'investisseurs'" (click)="switchTab('investisseurs')">
+            Investisseurs
+          </button>
+        </div>
+      </section>
+
+      <!-- Mises de Fonds Tab -->
+      <section class="tab-content" *ngIf="activeTab === 'mises-fonds'">
+        <div class="filters-bar">
+          <select class="form-select" [(ngModel)]="filters.statutMiseFonds">
+            <option value="">Tous les statuts</option>
+            <option value="EN_ATTENTE">En attente</option>
+            <option value="EN_REVISION">En révision</option>
+            <option value="VALIDEE">Validée</option>
+            <option value="REFUSEE">Refusée</option>
+            <option value="ANNULEE">Annulée</option>
+          </select>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Investisseur</th>
+                <th>Projet</th>
+                <th>Montant</th>
+                <th>Participation</th>
+                <th>Statut</th>
+                <th>Date soumission</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let mise of getFilteredMisesFonds()">
+                <td>{{ mise.id }}</td>
+                <td>{{ mise.investisseur?.nom || '-' }}</td>
+                <td>{{ mise.projetId }}</td>
+                <td>{{ formatMontant(mise.montant) }}</td>
+                <td>{{ mise.pourcentageParticipation }}%</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'badge-warning': mise.statut === 'EN_ATTENTE',
+                    'badge-info': mise.statut === 'EN_REVISION',
+                    'badge-success': mise.statut === 'VALIDEE',
+                    'badge-danger': mise.statut === 'REFUSEE',
+                    'badge-secondary': mise.statut === 'ANNULEE'
+                  }">
+                    {{ getStatutMiseFondsLabel(mise.statut) }}
+                  </span>
+                </td>
+                <td>{{ formatDate(mise.dateSoumission || '') }}</td>
+                <td>
+                  <button class="btn btn-success btn-sm" (click)="validerMiseFonds(mise.id || 0)" *ngIf="mise.statut === 'EN_ATTENTE' || mise.statut === 'EN_REVISION'">
+                    ✅ Valider
+                  </button>
+                  <button class="btn btn-danger btn-sm" (click)="refuserMiseFonds(mise.id || 0)" *ngIf="mise.statut === 'EN_ATTENTE' || mise.statut === 'EN_REVISION'">
+                    ❌ Refuser
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredMisesFonds().length === 0">
+                <td colspan="8" class="text-center">Aucune mise de fonds trouvée</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Conventions Tab -->
+      <section class="tab-content" *ngIf="activeTab === 'conventions'">
+        <div class="filters-bar">
+          <select class="form-select" [(ngModel)]="filters.statutConvention">
+            <option value="">Tous les statuts</option>
+            <option value="EN_COURS_SIGNATURE">En cours de signature</option>
+            <option value="ACTIVE">Active</option>
+            <option value="EXPIREE">Expirée</option>
+            <option value="RESILIEE">Résiliée</option>
+            <option value="SUSPENDUE">Suspendue</option>
+          </select>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Référence</th>
+                <th>Titre</th>
+                <th>Montant</th>
+                <th>Participation</th>
+                <th>Statut</th>
+                <th>Signature investisseur</th>
+                <th>Signature porteur</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let convention of getFilteredConventions()">
+                <td>{{ convention.id }}</td>
+                <td>{{ convention.reference }}</td>
+                <td>{{ convention.titre }}</td>
+                <td>{{ formatMontant(convention.montant) }}</td>
+                <td>{{ convention.pourcentageParticipation }}%</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'badge-warning': convention.statut === 'EN_COURS_SIGNATURE',
+                    'badge-success': convention.statut === 'ACTIVE',
+                    'badge-secondary': convention.statut === 'EXPIREE',
+                    'badge-danger': convention.statut === 'RESILIEE',
+                    'badge-info': convention.statut === 'SUSPENDUE'
+                  }">
+                    {{ getStatutConventionLabel(convention.statut) }}
+                  </span>
+                </td>
+                <td>{{ convention.signeInvestisseur ? '✅' : '⏳' }}</td>
+                <td>{{ convention.signePorteur ? '✅' : '⏳' }}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm" (click)="resilierConvention(convention.id || 0)" *ngIf="convention.statut === 'ACTIVE'">
+                    🚫 Résilier
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredConventions().length === 0">
+                <td colspan="9" class="text-center">Aucune convention trouvée</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Investisseurs Tab -->
+      <section class="tab-content" *ngIf="activeTab === 'investisseurs'">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Budget total</th>
+                <th>Profil vérifié</th>
+                <th>Date création</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let investisseur of investisseurs">
+                <td>{{ investisseur.id }}</td>
+                <td>{{ investisseur.nom }}</td>
+                <td>{{ investisseur.email }}</td>
+                <td>{{ investisseur.typeInvestisseur }}</td>
+                <td>{{ formatMontant(investisseur.budgetTotal || 0) }}</td>
+                <td>
+                  <span class="badge" [ngClass]="investisseur.profilVerifie ? 'badge-success' : 'badge-warning'">
+                    {{ investisseur.profilVerifie ? '✅ Vérifié' : '⏳ En attente' }}
+                  </span>
+                </td>
+                <td>{{ formatDate(investisseur.dateCreation || '') }}</td>
+                <td>
+                  <button class="btn btn-success btn-sm" (click)="verifierInvestisseur(investisseur.id || 0)" *ngIf="!investisseur.profilVerifie">
+                    ✅ Vérifier
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="investisseurs.length === 0">
+                <td colspan="8" class="text-center">Aucun investisseur trouvé</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

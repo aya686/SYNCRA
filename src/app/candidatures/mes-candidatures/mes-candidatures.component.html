@@ -1,0 +1,103 @@
+<div class="mes-candidatures-container">
+  <div class="page-header">
+    <h1>Mes Candidatures</h1>
+    <p class="page-subtitle">Suivez l'état de vos candidatures aux offres</p>
+  </div>
+
+  <!-- Chart Buttons -->
+  <div class="charts-bar">
+    <button class="btn-chart" (click)="toggleCharts()">
+      {{showCharts ? 'Masquer les graphiques' : 'Afficher les graphiques'}}
+    </button>
+    <div *ngIf="showCharts" class="chart-type-buttons">
+      <button class="btn-chart-type" [class.active]="chartType === 'histogram'" (click)="setChartType('histogram')">
+        Histogramme
+      </button>
+      <button class="btn-chart-type" [class.active]="chartType === 'pie'" (click)="setChartType('pie')">
+        Graphique circulaire
+      </button>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div *ngIf="showCharts" class="charts-section">
+    <div class="chart-container">
+      <canvas #histogramCanvas *ngIf="chartType === 'histogram'"></canvas>
+      <canvas #pieCanvas *ngIf="chartType === 'pie'"></canvas>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <select class="filter-select" [(ngModel)]="filterStatut" (change)="applyFilter()">
+      <option [ngValue]="null">Tous les statuts</option>
+      <option [ngValue]="'EN_ATTENTE'">En attente</option>
+      <option [ngValue]="'EN_REVISION'">En révision</option>
+      <option [ngValue]="'SHORTLIST'">Shortlist</option>
+      <option [ngValue]="'ACCEPTEE'">Acceptée</option>
+      <option [ngValue]="'REFUSEE'">Refusée</option>
+    </select>
+    <button class="btn-reset" (click)="resetFilter()">
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Chargement de vos candidatures...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-alert">
+    <div class="error-icon">⚠️</div>
+    <p>{{error}}</p>
+  </div>
+
+  <!-- Candidatures List -->
+  <div *ngIf="!loading && !error && candidatures.length > 0" class="candidatures-grid">
+    <div class="candidature-card"
+         *ngFor="let candidature of candidatures"
+         [class]="getStatutBadgeClass(candidature.statut)">
+      <div class="card-header">
+        <h3 class="offre-titre">{{candidature.offre?.titre}}</h3>
+        <span class="statut-badge">{{getStatutLabel(candidature.statut)}}</span>
+      </div>
+      
+      <div class="card-body">
+        <p class="offre-description">{{candidature.offre?.description | slice:0:150}}...</p>
+        
+        <div class="card-details">
+          <div class="detail-item">
+            <span class="detail-label">Tarif proposé:</span>
+            <span class="detail-value">{{candidature.tarifPropose}} TND</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Score IA:</span>
+            <span class="detail-value score" [class.score-high]="candidature.scoreIa && candidature.scoreIa > 70">
+              {{candidature.scoreIa ? candidature.scoreIa.toFixed(1) : 'N/A'}}/100
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value">{{candidature.dateSoumission | date:'dd/MM/yyyy'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-primary" (click)="voirDetail(candidature.id)">
+          Voir détails
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No candidatures -->
+  <div *ngIf="!loading && !error && candidatures.length === 0" class="no-candidatures">
+    <div class="no-candidatures-icon">📭</div>
+    <h3>Aucune candidature</h3>
+    <p>Vous n'avez pas encore postulé à des offres.</p>
+    <a routerLink="/offres/marketplace" class="btn-link">Voir les offres disponibles</a>
+  </div>
+</div>

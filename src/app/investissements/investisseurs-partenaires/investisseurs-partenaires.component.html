@@ -1,0 +1,500 @@
+<div class="investisseurs-partenaires-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Investissez dans les meilleurs projets tunisiens</h1>
+        <p>Découvrez des opportunités uniques et financez l'innovation locale</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg">Devenir Investisseur</button>
+          <button class="btn btn-outline-light btn-lg">Voir les projets</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics Section -->
+  <section class="statistics-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">{{ stats.projetsOuverts }}</div>
+            <div class="stat-label">Projets ouverts</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-number">{{ stats.financesCetteAnnee }}</div>
+            <div class="stat-label">Financés cette année</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ stats.investisseursActifs }}</div>
+            <div class="stat-label">Investisseurs actifs</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card">
+            <div class="stat-icon">💎</div>
+            <div class="stat-number">{{ formatMontant(stats.totalInvesti) }}</div>
+            <div class="stat-label">Total investi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters Section -->
+  <section class="filters-section">
+    <div class="container">
+      <div class="filters-container">
+        <div class="filter-group">
+          <input type="text" class="form-control" placeholder="Rechercher un projet..." [(ngModel)]="filters.recherche">
+        </div>
+        <div class="filter-group">
+          <select class="form-select" [(ngModel)]="filters.secteur">
+            <option value="">Secteur</option>
+            <option value="tech">Tech / E-commerce</option>
+            <option value="sante">Santé</option>
+            <option value="education">Éducation</option>
+            <option value="agriculture">Agriculture</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select class="form-select" [(ngModel)]="filters.montantMin">
+            <option value="">Montant min</option>
+            <option value="50000">50 000 TND</option>
+            <option value="100000">100 000 TND</option>
+            <option value="200000">200 000 TND</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select class="form-select" [(ngModel)]="filters.montantMax">
+            <option value="">Montant max</option>
+            <option value="100000">100 000 TND</option>
+            <option value="200000">200 000 TND</option>
+            <option value="500000">500 000 TND</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select class="form-select" [(ngModel)]="filters.statut">
+            <option value="">Statut</option>
+            <option value="ouvert">Ouvert</option>
+            <option value="en_cours">En cours</option>
+            <option value="ferme">Fermé</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Grid Section -->
+  <section class="projects-section">
+    <div class="container">
+      <h2 class="section-title">Projets ouverts à l'investissement</h2>
+      
+      <div class="projects-grid" *ngIf="!loading">
+        <!-- Project Card 1 -->
+        <div class="project-card">
+          <div class="project-badge">Tech / E-commerce</div>
+          <h3 class="project-title">Plateforme e-commerce alimentaire</h3>
+          <p class="project-porteur">Porteur : StartupTN</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>150 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>60 000 TND (40%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 40%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 30%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>3</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>30/06/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐ (85/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/1">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Plateforme e-commerce alimentaire">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 2 -->
+        <div class="project-card">
+          <div class="project-badge">Tech / E-commerce</div>
+          <h3 class="project-title">Application livraison</h3>
+          <p class="project-porteur">Porteur : TechStartup</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>100 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>85 000 TND (85%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 85%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 20%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>5</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>15/05/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐⭐ (92/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/2">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Application livraison">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 3 -->
+        <div class="project-card">
+          <div class="project-badge">Éducation</div>
+          <h3 class="project-title">Plateforme e-learning</h3>
+          <p class="project-porteur">Porteur : EduTech</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>200 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>50 000 TND (25%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 25%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 40%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>2</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>30/09/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐ (78/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/3">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Plateforme e-learning">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 4 -->
+        <div class="project-card">
+          <div class="project-badge">Santé</div>
+          <h3 class="project-title">Application télémédecine</h3>
+          <p class="project-porteur">Porteur : HealthTech TN</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>250 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>120 000 TND (48%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 48%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 35%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>4</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>15/08/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐⭐ (88/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/4">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Application télémédecine">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 5 -->
+        <div class="project-card">
+          <div class="project-badge">Agriculture</div>
+          <h3 class="project-title">Plateforme agriculture intelligente</h3>
+          <p class="project-porteur">Porteur : AgriSmart</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>180 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>90 000 TND (50%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 50%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 25%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>3</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>30/10/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐ (82/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/5">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Plateforme agriculture intelligente">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 6 -->
+        <div class="project-card">
+          <div class="project-badge">Tech / E-commerce</div>
+          <h3 class="project-title">Marketplace artisanat tunisien</h3>
+          <p class="project-porteur">Porteur : CraftTN</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>120 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>45 000 TND (37.5%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 37.5%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 30%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>2</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>20/07/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐ (80/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/6">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Marketplace artisanat tunisien">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 7 -->
+        <div class="project-card">
+          <div class="project-badge">Santé</div>
+          <h3 class="project-title">Plateforme gestion cliniques</h3>
+          <p class="project-porteur">Porteur : MediConnect</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>300 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>150 000 TND (50%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 50%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 40%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>5</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>31/12/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐⭐ (90/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/7">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Plateforme gestion cliniques">Négocier</button>
+          </div>
+        </div>
+
+        <!-- Project Card 8 -->
+        <div class="project-card">
+          <div class="project-badge">Éducation</div>
+          <h3 class="project-title">Application apprentissage langues</h3>
+          <p class="project-porteur">Porteur : LinguaTech</p>
+          
+          <div class="project-details">
+            <div class="detail-row">
+              <span>Montant recherché :</span>
+              <strong>90 000 TND</strong>
+            </div>
+            <div class="detail-row">
+              <span>Déjà financé :</span>
+              <strong>70 000 TND (77.8%)</strong>
+            </div>
+            <div class="progress-bar">
+              <div class="progress" style="width: 77.8%"></div>
+            </div>
+            <div class="detail-row">
+              <span>Participation dispo :</span>
+              <strong>jusqu'à 15%</strong>
+            </div>
+            <div class="detail-row">
+              <span>Nombre investisseurs :</span>
+              <strong>6</strong>
+            </div>
+            <div class="detail-row">
+              <span>Deadline :</span>
+              <strong>10/06/2026</strong>
+            </div>
+          </div>
+          
+          <div class="project-ai-score">
+            <span class="score-label">Score viabilité IA :</span>
+            <span class="score-value">⭐⭐⭐⭐⭐ (94/100)</span>
+          </div>
+          
+          <div class="project-actions">
+            <button class="btn btn-primary" routerLink="/investissements/soumettre-mise-fonds/8">Investir maintenant</button>
+            <button class="btn btn-secondary" routerLink="/investissements/formulaire-negociation/Application apprentissage langues">Négocier</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-spinner" *ngIf="loading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        <div class="alert alert-danger">{{ error }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners Section -->
+  <section class="partners-section">
+    <div class="container">
+      <h2 class="section-title">Nos partenaires institutionnels</h2>
+      
+      <div class="partners-table">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Partenaire</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Depuis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let partenaire of partenaires">
+              <td>
+                <div class="partner-name">
+                  <div class="partner-logo" *ngIf="partenaire.logoUrl">
+                    <img [src]="partenaire.logoUrl" [alt]="partenaire.nom">
+                  </div>
+                  <strong>{{ partenaire.nom }}</strong>
+                </div>
+              </td>
+              <td>{{ getTypePartenaireLabel(partenaire.typePartenaire) }}</td>
+              <td>
+                <span class="badge" [ngClass]="getStatutClass(partenaire.actif)">
+                  {{ getStatutLabel(partenaire.actif) }}
+                </span>
+              </td>
+              <td>{{ formatDate(partenaire.dateDebut || partenaire.dateCreation) }}</td>
+            </tr>
+            <tr *ngIf="partenaires.length === 0 && !loading">
+              <td colspan="4" class="text-center">Aucun partenaire trouvé</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

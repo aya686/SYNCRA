@@ -1,0 +1,89 @@
+<div class="negociation-container">
+  <div class="container">
+    <h1>Négociation</h1>
+
+    <div class="negociation-header">
+      <div class="negociation-info">
+        <h2>Négociation #{{ negociationId }}</h2>
+        <span class="badge" [ngClass]="getStatutClass(negociation.statut)">{{ getStatutLabel(negociation.statut) }}</span>
+      </div>
+      <div class="negociation-actions" *ngIf="!isNegociationTerminee()">
+        <button class="btn btn-success" (click)="accepterAccord()">✅ Accepter l'accord</button>
+        <button class="btn btn-danger" (click)="refuserAccord()">❌ Refuser</button>
+        <button class="btn btn-secondary" (click)="annulerNegociation()">🚫 Annuler</button>
+      </div>
+    </div>
+
+    <!-- Current Terms -->
+    <div class="current-terms" *ngIf="negociation.statut === StatutNegociation.EN_COURS">
+      <h3>Termes actuels de la négociation</h3>
+      <div class="terms-grid">
+        <div class="term-card">
+          <div class="term-label">Montant proposé</div>
+          <div class="term-value">{{ negociation.montantPropose }} TND</div>
+        </div>
+        <div class="term-card">
+          <div class="term-label">Participation</div>
+          <div class="term-value">{{ negociation.pourcentagePropose }}%</div>
+        </div>
+        <div class="term-card">
+          <div class="term-label">Durée</div>
+          <div class="term-value">{{ negociation.dureeProposeeMois }} mois</div>
+        </div>
+        <div class="term-card">
+          <div class="term-label">Clause de rachat</div>
+          <div class="term-value">{{ negociation.clauseRachatNegociee ? '✅ Oui' : '❌ Non' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Terms (if accepted) -->
+    <div class="final-terms" *ngIf="negociation.statut === StatutNegociation.ACCEPTEE">
+      <h3>✅ Termes finaux acceptés</h3>
+      <div class="terms-grid">
+        <div class="term-card success">
+          <div class="term-label">Montant final</div>
+          <div class="term-value">{{ negociation.montantFinal }} TND</div>
+        </div>
+        <div class="term-card success">
+          <div class="term-label">Participation finale</div>
+          <div class="term-value">{{ negociation.pourcentageFinal }}%</div>
+        </div>
+        <div class="term-card success">
+          <div class="term-label">Durée finale</div>
+          <div class="term-value">{{ negociation.dureeFinaleMois }} mois</div>
+        </div>
+        <div class="term-card success">
+          <div class="term-label">Clause de rachat</div>
+          <div class="term-value">{{ negociation.clauseRachatNegociee ? '✅ Oui' : '❌ Non' }}</div>
+        </div>
+      </div>
+      <div class="success-message">
+        <p>Une convention sera générée automatiquement. Vous pouvez la consulter dans la section "Conventions Actives".</p>
+        <button class="btn btn-primary" routerLink="/investissements/conventions-actives">Voir mes conventions</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-section">
+      <h3>Échanges</h3>
+      <div class="messages-list">
+        <div class="message" *ngFor="let message of messages" [ngClass]="getMessageClass(message.roleExpediteur)">
+          <div class="message-header">
+            <span class="message-role">{{ getRoleLabel(message.roleExpediteur) }}</span>
+            <span class="message-date">{{ formatDate(message.dateEnvoi) }}</span>
+          </div>
+          <div class="message-content">{{ message.contenu }}</div>
+        </div>
+      </div>
+
+      <!-- New Message Input -->
+      <div class="message-input" *ngIf="!isNegociationTerminee()">
+        <textarea class="form-control" [(ngModel)]="newMessage" placeholder="Écrivez votre message..." rows="3"></textarea>
+        <button class="btn btn-primary" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

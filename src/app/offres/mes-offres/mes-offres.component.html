@@ -1,0 +1,97 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-0">Mes Offres Publiées</h2>
+          <p class="text-muted mb-0">Gérez les offres que vous avez publiées</p>
+        </div>
+        <button class="btn btn-primary" routerLink="/offres/creer">
+          <i class="ti ti-plus me-2"></i>Créer une offre
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label class="form-label">Filtrer par statut</label>
+      <select class="form-select" [(ngModel)]="selectedStatut" (change)="filterByStatut()">
+        <option value="">Tous les statuts</option>
+        <option *ngFor="let statut of statuts" [ngValue]="statut">{{getStatutLabel(statut)}}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{error}}
+  </div>
+
+  <!-- Table des offres -->
+  <div *ngIf="!error" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Budget</th>
+              <th>Statut</th>
+              <th>Candidatures</th>
+              <th>Deadline</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let offre of getFilteredOffres()">
+              <td>
+                <strong>{{offre.titre}}</strong>
+              </td>
+              <td><span class="badge bg-primary">{{getCategorieNom(offre)}}</span></td>
+              <td>{{formatBudget(offre.budgetMin, offre.budgetMax)}}</td>
+              <td><span [class]="getStatutBadgeClass(offre.statut)">{{getStatutLabel(offre.statut)}}</span></td>
+              <td>
+                <span class="badge bg-info">{{getCandidaturesText(offre.nombreCandidatures)}}</span>
+              </td>
+              <td>{{offre.deadline | date:'dd/MM/yyyy'}}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-primary" (click)="voirDetail(offre.id)" title="Voir détail">
+                    <i class="ti ti-eye"></i>
+                  </button>
+                  <button class="btn btn-outline-secondary" (click)="modifierOffre(offre)" title="Modifier"
+                          [disabled]="offre.statut !== 'BROUILLON'">
+                    <i class="ti ti-edit"></i>
+                  </button>
+                  <button class="btn btn-outline-warning" (click)="cloturerOffre(offre)" title="Clôturer"
+                          [disabled]="offre.statut !== 'ACTIVE'">
+                    <i class="ti ti-lock"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="supprimerOffre(offre)" title="Supprimer"
+                          [disabled]="offre.statut !== 'BROUILLON'">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Aucune offre -->
+      <div *ngIf="getFilteredOffres().length === 0" class="text-center py-5">
+        <i class="ti ti-inbox text-muted" style="font-size: 3rem;"></i>
+        <p class="mt-3 text-muted">
+          {{offres.length === 0 ? 'Vous n\'avez pas encore publié d\'offre.' : 'Aucune offre ne correspond au filtre.'}}
+        </p>
+        <button class="btn btn-primary" routerLink="/offres/creer">
+          <i class="ti ti-plus me-2"></i>Créer ma première offre
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

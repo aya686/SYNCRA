@@ -1,0 +1,153 @@
+<div class="postuler-container">
+  <div class="postuler-card">
+    <div class="card-header">
+      <h1>Postuler à l'offre</h1>
+      <a routerLink="/offres/detail/{{offreId}}" class="btn-back">
+        ← Retour
+      </a>
+    </div>
+
+    <!-- Offre Info -->
+    <div *ngIf="offre" class="offre-info">
+      <h2>{{offre.titre}}</h2>
+      <p class="offre-budget">Budget: {{offre.budgetMin}} - {{offre.budgetMax || 'N/A'}} TND</p>
+    </div>
+
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-alert">
+      <div class="error-icon">⚠️</div>
+      <p>{{error}}</p>
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" class="candidature-form">
+      <div class="form-group">
+        <label for="lettreMotivation">Lettre de motivation *</label>
+        <textarea 
+          id="lettreMotivation" 
+          [(ngModel)]="candidature.lettreMotivation" 
+          name="lettreMotivation"
+          rows="8"
+          placeholder="Expliquez pourquoi vous êtes le meilleur candidat pour cette offre..."
+          required>
+        </textarea>
+        <small class="form-hint">Décrivez vos compétences, votre expérience et votre motivation.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="portfolioUrl">Lien vers votre portfolio (optionnel)</label>
+        <input 
+          type="url" 
+          id="portfolioUrl" 
+          [(ngModel)]="candidature.portfolioUrl" 
+          name="portfolioUrl"
+          placeholder="https://votre-portfolio.com">
+      </div>
+
+      <!-- CV Upload Section -->
+      <div class="form-group">
+        <label>CV (PDF, DOC, DOCX - Max 5MB)</label>
+        
+        <!-- Drag and Drop Area -->
+        <div 
+          class="cv-upload-area"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)">
+          
+          <div *ngIf="!cvFileName" class="upload-placeholder">
+            <div class="upload-icon">📄</div>
+            <p>Glissez votre CV ici ou</p>
+            <label class="btn-upload">
+              <input 
+                type="file" 
+                (change)="onFileSelected($event)"
+                accept=".pdf,.doc,.docx"
+                style="display: none;">
+              Parcourir les fichiers
+            </label>
+          </div>
+          
+          <div *ngIf="cvFileName" class="file-selected">
+            <div class="file-icon">📎</div>
+            <div class="file-info">
+              <p class="file-name">{{cvFileName}}</p>
+              <p class="file-size" *ngIf="cvFile">{{(cvFile.size / 1024).toFixed(1)}} KB</p>
+            </div>
+            <button type="button" class="btn-remove" (click)="removeCV()">
+              ✕
+            </button>
+          </div>
+        </div>
+        <small class="form-hint">Formats acceptés: PDF, DOC, DOCX. Taille maximale: 5MB</small>
+      </div>
+
+      <!-- AI Analysis Section -->
+      <div *ngIf="aiAnalysisLoading || cvResume" class="ai-analysis-section">
+        <div class="ai-header">
+          <span class="ai-icon">🤖</span>
+          <h3>Analyse IA du CV</h3>
+        </div>
+
+        <div *ngIf="aiAnalysisLoading" class="ai-loading">
+          <div class="spinner"></div>
+          <p>Analyse de votre CV en cours...</p>
+        </div>
+
+        <div *ngIf="cvResume && !aiAnalysisLoading" class="ai-results">
+          <!-- Score -->
+          <div class="ai-score-card">
+            <div class="score-circle" [style.color]="aiCvService.getScoreColor(aiScore)">
+              <span class="score-value">{{aiScore}}</span>
+              <span class="score-max">/100</span>
+            </div>
+            <div class="score-info">
+              <span class="score-label" [style.color]="aiCvService.getScoreColor(aiScore)">
+                {{aiCvService.getScoreLabel(aiScore)}}
+              </span>
+              <span class="score-hint">Score de compatibilité avec l'offre</span>
+            </div>
+          </div>
+
+          <!-- CV Resume -->
+          <div class="ai-resume-card">
+            <h4>Résumé du CV</h4>
+            <p>{{cvResume}}</p>
+          </div>
+
+          <!-- AI Report -->
+          <div class="ai-report-card">
+            <h4>Rapport IA</h4>
+            <p>{{aiReport}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tarifPropose">Tarif proposé (TND) *</label>
+        <input 
+          type="number" 
+          id="tarifPropose" 
+          [(ngModel)]="candidature.tarifPropose" 
+          name="tarifPropose"
+          min="0"
+          step="100"
+          placeholder="Ex: 5000"
+          required>
+        <small class="form-hint" *ngIf="offre">Budget de l'offre: {{offre.budgetMin}} - {{offre.budgetMax || 'N/A'}} TND</small>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="annuler()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-small"></span>
+          {{loading ? 'Envoi en cours...' : 'Soumettre ma candidature'}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

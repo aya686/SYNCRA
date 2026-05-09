@@ -1,0 +1,104 @@
+<div class="conventions-actives-container">
+  <div class="container">
+    <h1>Mes Conventions Actives</h1>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      <div class="alert alert-danger">{{ error }}</div>
+    </div>
+
+    <div class="conventions-content" *ngIf="!loading">
+      <div class="conventions-grid" *ngIf="conventions.length > 0">
+        <div class="convention-card" *ngFor="let convention of conventions">
+          <div class="convention-header">
+            <div class="convention-id">
+              <span class="label">Convention #</span>
+              <span class="value">{{ convention.id }}</span>
+            </div>
+            <span class="badge badge-success">✅ {{ getStatutLabel(convention.statut) }}</span>
+          </div>
+
+          <div class="convention-title">
+            <h3>{{ convention.titre }}</h3>
+            <p class="reference">Réf: {{ convention.reference }}</p>
+          </div>
+
+          <div class="convention-details">
+            <div class="detail-item">
+              <span class="icon">💰</span>
+              <div class="detail-content">
+                <span class="label">Montant</span>
+                <span class="value">{{ formatMontant(convention.montant) }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="icon">📊</span>
+              <div class="detail-content">
+                <span class="label">Participation</span>
+                <span class="value">{{ convention.pourcentageParticipation }}%</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="icon">⏱️</span>
+              <div class="detail-content">
+                <span class="label">Durée</span>
+                <span class="value">{{ convention.dureeMois }} mois</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <span class="icon">📝</span>
+              <div class="detail-content">
+                <span class="label">Type</span>
+                <span class="value">{{ getTypeConventionLabel(convention.typeConvention) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="convention-dates">
+            <div class="date-item">
+              <span class="date-label">Signée le :</span>
+              <span class="date-value">{{ formatDate(convention.dateSignature || '') }}</span>
+            </div>
+            <div class="date-item">
+              <span class="date-label">Expiration :</span>
+              <span class="date-value">{{ formatDate(convention.dateFin || '') }}</span>
+            </div>
+          </div>
+
+          <div class="convention-signatures">
+            <div class="signature-item">
+              <span class="signature-label">Investisseur</span>
+              <span class="signature-status" [class.signed]="convention.signeInvestisseur">
+                {{ convention.signeInvestisseur ? '✅ Signé' : '⏳ En attente' }}
+              </span>
+            </div>
+            <div class="signature-item">
+              <span class="signature-label">Porteur</span>
+              <span class="signature-status" [class.signed]="convention.signePorteur">
+                {{ convention.signePorteur ? '✅ Signé' : '⏳ En attente' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="convention-actions">
+            <button class="btn btn-primary btn-sm" (click)="telechargerPDF(convention)">📥 Télécharger PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-conventions" *ngIf="conventions.length === 0">
+        <div class="empty-state">
+          <div class="empty-icon">📄</div>
+          <h3>Aucune convention active</h3>
+          <p>Vous n'avez pas encore de conventions actives. Vos conventions apparaîtront ici une fois qu'elles seront signées par les deux parties.</p>
+          <button class="btn btn-primary" routerLink="/investissements/investisseurs-partenaires">Découvrir les projets</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

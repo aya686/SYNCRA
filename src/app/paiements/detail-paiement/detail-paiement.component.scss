@@ -1,0 +1,229 @@
+.detail-paiement-container {
+  padding: 2rem;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .btn-back {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+
+      .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    }
+
+    .card-body {
+      padding: 1.5rem;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          color: #666;
+          font-weight: 500;
+        }
+
+        .value {
+          color: #333;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .card-footer {
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+
+      .payment-amount {
+        flex: 1;
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: #666;
+          font-weight: 500;
+        }
+
+        input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+        }
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .section {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .transactions-list,
+  .factures-list,
+  .echeances-list,
+  .commissions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .transaction-item,
+    .facture-item,
+    .echeance-item,
+    .commission-item {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+
+      .transaction-header,
+      .facture-header,
+      .echeance-header,
+      .commission-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        .reference,
+        .numero {
+          font-weight: 600;
+          color: #333;
+        }
+
+        .statut {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 500;
+
+          &.valid,
+          &.paid {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.pending {
+            background: #fff3cd;
+            color: #856404;
+          }
+        }
+
+        .type {
+          color: #666;
+          font-size: 0.9rem;
+        }
+      }
+
+      .transaction-body,
+      .facture-body,
+      .echeance-body,
+      .commission-body {
+        .montant {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #0a6ebd;
+          margin: 0.5rem 0;
+        }
+
+        .titre,
+        .type,
+        .taux,
+        .percentage {
+          color: #666;
+          margin: 0.25rem 0;
+        }
+
+        .date {
+          color: #999;
+          font-size: 0.9rem;
+          margin: 0.25rem 0;
+        }
+      }
+
+      .transaction-footer,
+      .facture-footer {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+}

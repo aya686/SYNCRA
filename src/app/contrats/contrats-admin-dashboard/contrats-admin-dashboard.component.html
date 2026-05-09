@@ -1,0 +1,141 @@
+<div class="contrats-admin-dashboard">
+  <div class="page-header">
+    <h1>Dashboard Admin - Contrats</h1>
+    <p class="subtitle">Gérez tous les contrats et leurs signatures</p>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total Contrats</div>
+      </div>
+    </div>
+    <div class="stat-card stat-none">
+      <div class="stat-icon">⭕</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.sansSignature }}</div>
+        <div class="stat-label">Sans signature</div>
+      </div>
+    </div>
+    <div class="stat-card stat-client">
+      <div class="stat-icon">👤</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.signatureClient }}</div>
+        <div class="stat-label">Client signé</div>
+      </div>
+    </div>
+    <div class="stat-card stat-freelancer">
+      <div class="stat-icon">💼</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.signatureFreelancer }}</div>
+        <div class="stat-label">Freelancer signé</div>
+      </div>
+    </div>
+    <div class="stat-card stat-both">
+      <div class="stat-icon">✍️✍️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stats.doubleSignature }}</div>
+        <div class="stat-label">Double signature</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Rechercher par titre..."
+      [(ngModel)]="searchTitre"
+      (input)="onFilterChange()"
+    >
+    
+    <select class="filter-select" [(ngModel)]="filterStatut" (change)="onFilterChange()">
+      <option [value]="null">Tous les statuts</option>
+      <option value="BROUILLON">Brouillon</option>
+      <option value="EN_ATTENTE">En attente</option>
+      <option value="ACTIF">Actif</option>
+      <option value="TERMINE">Terminé</option>
+      <option value="RESILIE">Résilié</option>
+      <option value="LITIGE">Litige</option>
+    </select>
+    
+    <select class="filter-select" [(ngModel)]="filterSignature" (change)="onFilterChange()">
+      <option [value]="null">Toutes les signatures</option>
+      <option value="none">Sans signature</option>
+      <option value="client">Client signé</option>
+      <option value="freelancer">Freelancer signé</option>
+      <option value="both">Double signature</option>
+    </select>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des contrats...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <span class="error-icon">⚠️</span>
+    {{ error }}
+  </div>
+
+  <!-- Contracts Table -->
+  <div class="contracts-table" *ngIf="!loading && !error">
+    <table *ngIf="filteredContrats.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Client</th>
+          <th>Freelancer</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Signatures</th>
+          <th>Date création</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contrat of filteredContrats">
+          <td class="id-cell">#{{ contrat.id }}</td>
+          <td class="titre-cell">{{ contrat.titre }}</td>
+          <td class="user-cell">Client #{{ contrat.clientId }}</td>
+          <td class="user-cell">Freelancer #{{ contrat.prestataireId }}</td>
+          <td class="montant-cell">{{ contrat.montant }} TND</td>
+          <td class="statut-cell">
+            <span class="badge {{ getStatutBadgeClass(contrat.statut) }}">
+              {{ getStatutLabel(contrat.statut) }}
+            </span>
+          </td>
+          <td class="signature-cell">
+            <span class="badge {{ getSignatureBadgeClass(getSignatureStatus(contrat)) }}">
+              {{ getSignatureLabel(getSignatureStatus(contrat)) }}
+            </span>
+          </td>
+          <td class="date-cell">{{ formatDate(contrat.dateGeneration) }}</td>
+          <td class="actions-cell">
+            <button 
+              class="btn-action btn-download" 
+              (click)="telechargerPDF(contrat)"
+              title="Télécharger PDF avec signatures"
+            >
+              📥 PDF
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredContrats.length === 0">
+      <div class="empty-icon">📄</div>
+      <h3>Aucun contrat trouvé</h3>
+      <p>Aucun contrat ne correspond à vos filtres.</p>
+    </div>
+  </div>
+</div>
