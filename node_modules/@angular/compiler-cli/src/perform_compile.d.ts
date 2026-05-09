@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../src/ngtsc/file_system';
@@ -30,7 +30,7 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: ReadonlyArray<ts.Diagnostic> | undefined): number;
-export declare function performCompilation<CbEmitRes extends ts.EmitResult = ts.EmitResult>({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles }: {
+export declare function performCompilation<CbEmitRes extends ts.EmitResult = ts.EmitResult>({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles, }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
