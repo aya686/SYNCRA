@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-roles-selection',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './roles-selection.component.html',
   styleUrls: ['./roles-selection.component.scss']

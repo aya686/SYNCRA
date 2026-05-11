@@ -7,10 +7,15 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule, DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+// ❌ SUPPRIMER ces imports car ils ne sont plus nécessaires
+// import { CommonModule, DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-event-generator',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe, DatePipe, TitleCasePipe],
+   standalone: true,  // ← SUPPRIMER cette ligne
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe, DatePipe, TitleCasePipe], // ← SUPPRIMER cette ligne
   templateUrl: './event-generator.component.html',
   styleUrls: ['./event-generator.component.scss']
 })

@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-freelancer-home',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './freelancer-home.component.html',
   styleUrls: ['./freelancer-home.component.scss']

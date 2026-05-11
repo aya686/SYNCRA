@@ -10,7 +10,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-detail-contrat',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './detail-contrat.component.html',
   styleUrls: ['./detail-contrat.component.scss']

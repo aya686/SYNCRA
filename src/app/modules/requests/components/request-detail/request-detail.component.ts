@@ -7,7 +7,6 @@ import { ServiceRequest, RequestStatus, RequestType } from '../../../../models/s
 
 @Component({
   selector: 'app-request-detail',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

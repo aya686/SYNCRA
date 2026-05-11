@@ -28,7 +28,6 @@ interface NotifToast { id: number; message: string; type: 'success'|'warning'|'d
 
 @Component({
   selector: 'app-seuils',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './seuils.component.html',
   styleUrls: ['./seuils.component.scss']

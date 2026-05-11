@@ -1,9 +1,10 @@
+// src/app/layouts/public-layout/public-layout.component.ts
 import { Component, HostListener, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+// SUPPRIMER ces imports car ils ne sont plus nécessaires dans le composant
+ import { CommonModule } from '@angular/common';
+ import { RouterModule } from '@angular/router';
 import { SimpleAuthService } from '../../modules/auth/services/simple-auth.service';
 import { FavoritesService } from '../../modules/shared/services/favorites.service';
-
 @Component({
   selector: 'app-public-layout',
   standalone: true,

@@ -7,7 +7,6 @@ import { MLService } from '../../../../core/services/ml.service';
   selector: 'app-demand-forecast',
   templateUrl: './demand-forecast.component.html',
   styleUrls: ['./demand-forecast.component.scss'],
-  standalone: true,
   imports: [CommonModule, FormsModule],
   providers: [DecimalPipe]
 })

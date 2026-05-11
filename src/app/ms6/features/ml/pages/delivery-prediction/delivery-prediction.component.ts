@@ -7,7 +7,6 @@ import { MLService } from '../../../../core/services/ml.service';
   selector: 'app-delivery-prediction',
   templateUrl: './delivery-prediction.component.html',
   styleUrls: ['./delivery-prediction.component.scss'],
-  standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class DeliveryPredictionComponent {

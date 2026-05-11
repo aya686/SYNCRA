@@ -6,7 +6,6 @@ import { OffreService } from '../../services/offre.service';
 
 @Component({
   selector: 'app-detail-offre',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './detail-offre.component.html',
   styleUrls: ['./detail-offre.component.scss']

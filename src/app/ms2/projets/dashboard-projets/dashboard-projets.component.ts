@@ -18,7 +18,6 @@ interface ProjetCard {
 
 @Component({
   selector: 'app-dashboard-projets',
-  standalone: true,
   imports: [CommonModule, RouterModule, Ms2NavbarComponent],
   templateUrl: './dashboard-projets.component.html',
   styleUrls: ['./dashboard-projets.component.scss']

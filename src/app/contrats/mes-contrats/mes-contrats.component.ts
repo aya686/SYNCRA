@@ -8,7 +8,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-mes-contrats',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './mes-contrats.component.html',
   styleUrls: ['./mes-contrats.component.scss']

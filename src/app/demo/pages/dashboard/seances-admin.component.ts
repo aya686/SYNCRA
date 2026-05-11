@@ -34,7 +34,6 @@ interface SeanceStats {
 
 @Component({
   selector: 'app-seances-admin',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SharedModule],
   templateUrl: './seances-admin.component.html',
   styleUrls: ['./seances-admin.component.scss']

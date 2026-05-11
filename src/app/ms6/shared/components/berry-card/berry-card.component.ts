@@ -12,7 +12,6 @@ export interface CardAction {
 
 @Component({
   selector: 'app-berry-card',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
     <div class="berry-card" [class.archived]="archived">

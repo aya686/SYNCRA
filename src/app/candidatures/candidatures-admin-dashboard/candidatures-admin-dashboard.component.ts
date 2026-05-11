@@ -9,7 +9,6 @@ import { ContratService } from '../../services/contrat.service';
 
 @Component({
   selector: 'app-candidatures-admin-dashboard',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './candidatures-admin-dashboard.component.html',
   styleUrls: ['./candidatures-admin-dashboard.component.scss']

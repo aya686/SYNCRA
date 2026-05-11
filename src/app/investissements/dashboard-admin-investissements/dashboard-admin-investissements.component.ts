@@ -9,7 +9,6 @@ import { Investisseur, MiseFonds, Convention, StatutMiseFonds, StatutConvention 
 
 @Component({
   selector: 'app-dashboard-admin-investissements',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dashboard-admin-investissements.component.html',
   styleUrl: './dashboard-admin-investissements.component.scss'

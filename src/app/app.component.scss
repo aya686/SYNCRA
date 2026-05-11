@@ -1,0 +1,674 @@
+////////////////////////////////////////////
+// src/app/app.component.scss
+// VERSION CORRIGÉE - NAVBAR CENTRÉE + NOTIFICATION VISIBLE
+////////////////////////////////////////////
+
+// Importer les variables
+@import '../scss/settings/theme-variables';
+
+// Variables de secours
+$primary-color: #0d6efd !default;
+$primary-rgb: 10, 110, 189 !default;
+$text-muted: #6c757d !default;
+$transition-base: 0.2s ease-in-out !default;
+
+// Variables navbar
+$header-background: #ffffff !default;
+$header-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !default;
+$brand-color: #0a6ebd !default;
+$sidebar-color: #2b4263 !default;
+$sidebar-active-color: #0a6ebd !default;
+$border-color: #e2e8f0 !default;
+$body-bg: #f8fafc !default;
+$header-height: 68px !default;
+
+// ============================================================
+// STYLES GLOBAUX
+// ============================================================
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: #0d1f33;
+  background: #ffffff;
+}
+
+// ============================================================
+// NAVBAR PRINCIPALE - FOND SOLIDE
+// ============================================================
+
+.syncra-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  height: $header-height;
+  background: $header-background;
+  box-shadow: $header-shadow;
+  border-bottom: 1px solid $border-color;
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.scrolled {
+    background: $header-background;
+    box-shadow: 0 4px 12px rgba(186, 96, 96, 0.08);
+  }
+
+  &.hidden {
+    transform: translateY(-100%);
+  }
+
+  .nav-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 768px) {
+      padding: 0 20px;
+    }
+  }
+}
+
+// ============================================================
+// BRAND / LOGO
+// ============================================================
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  .brand-icon-wrap {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #e9f0ef, #93c2d6);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(10, 110, 189, 0.2);
+    transition: all 0.2s ease;
+
+    .brand-logo {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+  }
+
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #0a6ebd, #00c2d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: opacity 0.2s;
+  }
+}
+
+// ============================================================
+// NAV LINKS - CENTRÉS
+// ============================================================
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0 20px;
+
+  @media (max-width: 1024px) {
+    gap: 4px;
+    margin: 0 10px;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: $sidebar-color;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+
+  i, .bi {
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+  }
+
+  &:hover {
+    color: $sidebar-active-color;
+    background: rgba(10, 110, 189, 0.06);
+
+    i {
+      transform: translateY(-1px);
+    }
+  }
+
+  &.active {
+    color: $sidebar-active-color;
+    background: rgba(10, 110, 189, 0.1);
+    font-weight: 600;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: calc(100% - 20px);
+    height: 2.5px;
+    background: linear-gradient(90deg, #0a6ebd, #00c2d4);
+    border-radius: 2px;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &.active::after {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  @media (max-width: 1100px) {
+    padding: 8px 10px;
+    
+    span {
+      display: none;
+    }
+    
+    i, .bi {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+  }
+}
+
+// ============================================================
+// RIGHT SECTION (Notifications + CTA)
+// ============================================================
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+// ============================================================
+// CART BADGE
+// ============================================================
+
+.cart-link {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, #dc3545, #b02a37);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 50%;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+  animation: cartPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes cartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+// ============================================================
+// LOYALTY BADGE (Fidélité)
+// ============================================================
+
+.loyalty-link {
+  position: relative;
+
+  i.bi-star-fill {
+    color: #d97706 !important;
+    animation: starPulse 2.5s ease-in-out infinite;
+  }
+}
+
+.loyalty-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+  animation: loyaltyGlow 2s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+@keyframes loyaltyGlow {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(217, 119, 6, 0.7);
+  }
+}
+
+// ============================================================
+// NOTIFICATION BELL - CLAIRE ET VISIBLE
+// ============================================================
+
+:host ::ng-deep app-notification-bell {
+  display: inline-flex;
+  
+  .notification-container {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .notification-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: rgba(10, 110, 189, 0.08);
+    border: 1px solid $border-color;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(10, 110, 189, 0.15);
+      border-color: $sidebar-active-color;
+    }
+
+    .bell-icon {
+      font-size: 1.2rem;
+      color: $sidebar-color;  // Couleur foncée, pas blanc
+      transition: all 0.2s ease;
+    }
+
+    &:hover .bell-icon {
+      color: $sidebar-active-color;
+      transform: rotate(8deg) scale(1.05);
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 1.5px solid white;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -2px;
+      right: 6px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.55rem;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 10px;
+      min-width: 16px;
+      text-align: center;
+    }
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 340px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border: 1px solid $border-color;
+    z-index: 1001;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+  }
+}
+
+@keyframes blink {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+// ============================================================
+// CTA BUTTON (Nouvelle demande)
+// ============================================================
+
+.btn-purchase {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0a6ebd, #0856a0);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+
+  i, svg {
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #1588d8, #0a6ebd);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 110, 189, 0.3);
+  }
+
+  @media (max-width: 1024px) {
+    padding: 8px 12px;
+    
+    span {
+      display: none;
+    }
+    
+    i, svg {
+      margin: 0;
+    }
+  }
+}
+
+// ============================================================
+// MOBILE TOGGLE BUTTON
+// ============================================================
+
+.nav-mobile-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+
+  span {
+    width: 22px;
+    height: 2px;
+    background: #0d1f33;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+
+  &:hover span {
+    background: #0a6ebd;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+}
+
+// ============================================================
+// MAIN CONTENT
+// ============================================================
+
+main {
+  min-height: calc(100vh - #{$header-height} - 100px);
+  background-color: $body-bg;
+  padding: calc(#{$header-height} + 1.5rem) 1.5rem 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: calc(#{$header-height} + 1rem) 1rem 1rem;
+  }
+}
+
+// ============================================================
+// FOOTER
+// ============================================================
+
+.syncra-footer {
+  background: linear-gradient(160deg, #071a2f 0%, #0a2a4a 100%);
+  padding: 60px 40px 32px;
+  margin-top: auto;
+
+  @media (max-width: 768px) {
+    padding: 40px 20px 24px;
+  }
+
+  .footer-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 60px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .brand-hex {
+      font-size: 32px;
+      color: #00c2d4;
+    }
+
+    .brand-info {
+      h3 {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: 3px;
+        color: white;
+        margin: 0;
+      }
+      p {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 4px 0 0;
+      }
+    }
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .link-group {
+      h4 {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 16px;
+      }
+
+      a {
+        display: block;
+        font-size: 0.8125rem;
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+        padding: 6px 0;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #00c2d4;
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding-top: 28px;
+    text-align: center;
+
+    p {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.3);
+      margin: 0;
+    }
+  }
+}
+
+// ============================================================
+// ANIMATIONS
+// ============================================================
+
+router-outlet + * {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================================
+// CURSOR GLOW & PARTICLES (optionnel)
+// ============================================================
+
+.cursor-glow {
+  display: none;
+}
+
+.particle-canvas {
+  display: none;
+}
+
+// ============================================================
+// RESPONSIVE
+// ============================================================
+
+@media (max-width: 1200px) {
+  .nav-link span:not(i) {
+    display: none;
+  }
+  
+  .nav-link i, .nav-link .bi {
+    margin-right: 0;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 2px;
+    margin: 0 5px;
+  }
+  
+  .nav-link {
+    padding: 8px 10px;
+  }
+  
+  .btn-purchase span {
+    display: none;
+  }
+  
+  .btn-purchase {
+    padding: 8px 12px;
+  }
+}

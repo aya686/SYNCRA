@@ -18,7 +18,6 @@ interface SessionCard {
 
 @Component({
   selector: 'app-session-travail',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, Ms2NavbarComponent],
   templateUrl: './session-travail.component.html',
   styleUrls: ['./session-travail.component.scss']

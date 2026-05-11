@@ -445,7 +445,6 @@ import { NotificationService } from '../../../core';
     }
 
   `],
-  standalone: true,
   imports: [CommonModule]
 })
 export class ClientProduitDetailComponent implements OnInit {

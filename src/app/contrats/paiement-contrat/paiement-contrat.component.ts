@@ -7,7 +7,6 @@ import { Contrat } from '../../models/contrat.model';
 
 @Component({
   selector: 'app-paiement-contrat',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './paiement-contrat.component.html',
   styleUrls: ['./paiement-contrat.component.scss']

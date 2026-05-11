@@ -6,7 +6,6 @@ import { SendgridService } from '../../services/sendgrid.service';
 
 @Component({
   selector: 'app-formulaire-negociation',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './formulaire-negociation.component.html',
   styleUrl: './formulaire-negociation.component.scss'

@@ -27,7 +27,6 @@ interface RessourceForm {
 
 @Component({
   selector: 'app-ressources-admin',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SharedModule],
   templateUrl: './ressources-admin.component.html',
   styleUrls: ['./ressources-admin.component.scss']

@@ -32,7 +32,6 @@ interface OngletDef {
 
 @Component({
   selector: 'app-detail-projet',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, Ms2NavbarComponent],
   templateUrl: './detail-projet.component.html',
   styleUrls: ['./detail-projet.component.scss']

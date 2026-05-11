@@ -8,7 +8,7 @@ import { AdminService, Machine } from '../../../../../services/admin.service';
 
 @Component({
   selector: 'admin-machines',
-  standalone: true,
+ standalone: true,
   imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './admin-machines.component.html',
   styleUrls: ['./admin-machines.component.scss']

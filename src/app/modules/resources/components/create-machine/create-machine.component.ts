@@ -8,7 +8,6 @@ import { MachineService, Machine } from '../../../../services/machine.service';
 
 @Component({
   selector: 'app-create-machine',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

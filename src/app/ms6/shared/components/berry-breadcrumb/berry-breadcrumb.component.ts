@@ -10,7 +10,6 @@ export interface BreadcrumbItem {
 
 @Component({
   selector: 'app-berry-breadcrumb',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
     <nav class="berry-breadcrumb" aria-label="breadcrumb">

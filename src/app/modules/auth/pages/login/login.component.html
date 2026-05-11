@@ -40,16 +40,15 @@
         <!-- Login Form -->
         <form (ngSubmit)="onSubmit()" class="login-form">
           <div class="form-group">
-            <label>Email address / Username</label>
-            <input 
-              type="number" 
-              class="form-control"
-              [(ngModel)]="userId" 
-              name="userId"
-              placeholder="Enter your Email"
-              autofocus>
-          </div>
-
+  <label>User ID</label>
+  <input 
+    type="text"
+    class="form-control"
+    [(ngModel)]="userId" 
+    name="userId"
+    placeholder="Entrez 1 (admin), 2 (formateur) ou 3 (participant)"
+    autofocus>
+</div>
           <div class="form-group">
             <label>Password</label>
             <input 
@@ -59,7 +58,12 @@
               value=""
             >
           </div>
-
+<div class="quick-login">
+  <p>Connexion rapide :</p>
+  <button type="button" (click)="quickLogin(1)">👑 Admin</button>
+  <button type="button" (click)="quickLogin(2)">🎓 Formateur</button>
+  <button type="button" (click)="quickLogin(3)">👤 Participant</button>
+</div>
           <div class="form-options">
             <label class="checkbox-label">
               <input type="checkbox" checked> Remember me

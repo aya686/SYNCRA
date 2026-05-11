@@ -43,7 +43,6 @@ interface AlerteStats {
 
 @Component({
   selector: 'app-alertes-burnout',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './alertes-burnout.component.html',
   styleUrls: ['./alertes-burnout.component.scss']

@@ -11,7 +11,6 @@ import { ServiceEntity } from '../../../../models/service.model';
 
 @Component({
   selector: 'app-create-request',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

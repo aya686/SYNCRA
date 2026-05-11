@@ -13,7 +13,6 @@ import { BerryBreadcrumbComponent, BreadcrumbItem } from '../../../shared/compon
 
 @Component({
   selector: 'app-produit-list',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

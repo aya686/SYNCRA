@@ -25,7 +25,6 @@ interface NotifToast {
 
 @Component({
   selector: 'app-programme',
-  standalone: true,
   imports: [CommonModule, RouterModule, DatePipe, SlicePipe],
   templateUrl: './programme.component.html',
   styleUrls: ['./programme.component.scss']

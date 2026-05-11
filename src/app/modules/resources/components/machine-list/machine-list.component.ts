@@ -9,7 +9,6 @@ import { CartService } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-machine-list',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

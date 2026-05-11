@@ -6,7 +6,6 @@ import { NotificationService, AppNotification } from '../../../../services/notif
 
 @Component({
   selector: 'app-notification-bell',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './notification-bell.component.html',
   styleUrls: ['./notification-bell.component.scss']

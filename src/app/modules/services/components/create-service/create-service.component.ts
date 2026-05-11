@@ -8,7 +8,6 @@ import { ServiceService, CreateServiceRequest, ServiceEntity } from '../../../..
 
 @Component({
   selector: 'app-create-service',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

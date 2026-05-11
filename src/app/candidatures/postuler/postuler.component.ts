@@ -9,7 +9,6 @@ import { AiCvService } from '../../services/ai-cv.service';
 
 @Component({
   selector: 'app-postuler',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './postuler.component.html',
   styleUrls: ['./postuler.component.scss']

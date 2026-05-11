@@ -7,7 +7,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-conventions-actives',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './conventions-actives.component.html',
   styleUrl: './conventions-actives.component.scss'

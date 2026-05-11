@@ -7,7 +7,6 @@ import { ContratService } from '../../services/contrat.service';
 
 @Component({
   selector: 'app-creer-contrat',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './creer-contrat.component.html',
   styleUrls: ['./creer-contrat.component.scss']

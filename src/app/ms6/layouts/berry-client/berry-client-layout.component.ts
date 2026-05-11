@@ -12,7 +12,6 @@ export interface NavItem {
 
 @Component({
   selector: 'app-berry-client-layout',
-  standalone: true,
   imports: [CommonModule, RouterModule, BerryFooterComponent],
   template: `
     <div class="berry-client-layout">

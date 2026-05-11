@@ -6,7 +6,6 @@ import { Negociation, MessageNegociation, StatutNegociation, RoleExpediteur } fr
 
 @Component({
   selector: 'app-negociation',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './negociation.component.html',
   styleUrl: './negociation.component.scss'

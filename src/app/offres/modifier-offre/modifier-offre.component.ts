@@ -10,7 +10,6 @@ import { CategorieService } from '../../services/categorie.service';
 
 @Component({
   selector: 'app-modifier-offre',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './modifier-offre.component.html',
   styleUrls: ['./modifier-offre.component.scss']

@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-pricing-simple',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="container py-4">

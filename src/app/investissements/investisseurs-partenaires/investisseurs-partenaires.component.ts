@@ -7,7 +7,6 @@ import { Partenaire, TypePartenaire } from '../../models/investissement.model';
 
 @Component({
   selector: 'app-investisseurs-partenaires',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './investisseurs-partenaires.component.html',
   styleUrl: './investisseurs-partenaires.component.scss'

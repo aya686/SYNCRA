@@ -51,7 +51,6 @@ interface DossierSante {
 
 @Component({
   selector: 'app-dossier-sante',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dossier-sante.component.html',
   styleUrls: ['./dossier-sante.component.scss']

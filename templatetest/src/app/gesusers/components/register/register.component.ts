@@ -32,6 +32,6 @@ export class RegisterComponent {
     
     localStorage.setItem('selectedRoles', JSON.stringify([...this.selectedRoles]));
     // ✅ CORRECTION : Utiliser la route définie dans app-routing.module.ts
-    this.router.navigate(['/gesusers/register/details']);
+    this.router.navigate(['/users/register/details']);
   }
 }

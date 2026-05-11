@@ -48,7 +48,6 @@ interface RdvNotifData {
 
 @Component({
   selector: 'app-seances',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './seances.component.html',
   styleUrls: ['./seances.component.scss']

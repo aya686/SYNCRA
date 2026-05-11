@@ -48,7 +48,6 @@ interface WeeklyLoad {
 
 @Component({
   selector: 'app-dashboard-bienetre',
-  standalone: true,
   imports: [RouterModule, CommonModule, DatePipe, DecimalPipe, HttpClientModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

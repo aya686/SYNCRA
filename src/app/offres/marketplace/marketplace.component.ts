@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-marketplace',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './marketplace.component.html',
   styleUrls: ['./marketplace.component.scss']

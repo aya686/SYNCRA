@@ -9,7 +9,7 @@ import { Order } from '../../../../../services/order.service';
 
 @Component({
   selector: 'app-admin-orders',
-  standalone: true,
+ standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-orders.component.html',
   styleUrls: ['./admin-orders.component.scss']

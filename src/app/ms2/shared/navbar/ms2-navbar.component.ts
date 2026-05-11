@@ -5,7 +5,6 @@ import { AlerteService } from '../../services/alerte.service';
 
 @Component({
   selector: 'app-ms2-navbar',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './ms2-navbar.component.html',
   styleUrls: ['./ms2-navbar.component.scss']

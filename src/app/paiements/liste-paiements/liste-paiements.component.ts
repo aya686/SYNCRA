@@ -6,7 +6,6 @@ import { Paiement, StatutPaiement } from '../../models/paiement.model';
 
 @Component({
   selector: 'app-liste-paiements',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './liste-paiements.component.html',
   styleUrls: ['./liste-paiements.component.scss']

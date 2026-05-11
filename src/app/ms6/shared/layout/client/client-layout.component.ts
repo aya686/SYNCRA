@@ -3,7 +3,6 @@ import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-client-layout',
-  standalone: true,
   imports: [RouterModule],
   templateUrl: './client-layout.component.html',
   styleUrls: ['./client-layout.component.scss']

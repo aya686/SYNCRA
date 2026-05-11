@@ -9,7 +9,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // ← Ajo
 
 @Component({
   selector: 'app-create-projet',
-  standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, Ms2NavbarComponent],
   templateUrl: './create-projet.component.html',
   styleUrls: ['./create-projet.component.scss']

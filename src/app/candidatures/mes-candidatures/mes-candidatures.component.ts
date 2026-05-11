@@ -8,7 +8,6 @@ import { Chart, ChartConfiguration, ChartType, ChartData } from 'chart.js/auto';
 
 @Component({
   selector: 'app-mes-candidatures',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './mes-candidatures.component.html',
   styleUrls: ['./mes-candidatures.component.scss']

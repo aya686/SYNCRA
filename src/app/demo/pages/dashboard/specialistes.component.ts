@@ -36,7 +36,6 @@ interface Stats {
 
 @Component({
   selector: 'app-specialistes',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SharedModule],
   templateUrl: './specialistes.component.html',
   styleUrls: ['./specialistes.component.scss']

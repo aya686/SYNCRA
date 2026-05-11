@@ -9,7 +9,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-contrats-admin-dashboard',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './contrats-admin-dashboard.component.html',
   styleUrls: ['./contrats-admin-dashboard.component.scss']

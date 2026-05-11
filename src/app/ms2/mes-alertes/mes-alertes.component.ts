@@ -16,7 +16,6 @@ interface AlerteCard {
 
 @Component({
   selector: 'app-mes-alertes',
-  standalone: true,
   imports: [CommonModule, RouterModule, Ms2NavbarComponent],
   templateUrl: './mes-alertes.component.html',
   styleUrls: ['./mes-alertes.component.scss']

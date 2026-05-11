@@ -29,7 +29,6 @@ export interface SubFilter {
 }
 @Component({
   selector: 'app-marketplace',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './marketplace.component.html',
   styleUrls: ['./marketplace.component.scss']

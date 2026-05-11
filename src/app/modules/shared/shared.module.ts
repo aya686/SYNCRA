@@ -14,23 +14,23 @@ import { UserTypeModalComponent } from './components/user-type-modal/user-type-m
     UserTypeModalComponent
   ],
   imports: [
-    CommonModule,
+    CommonModule,       // ← CommonModule inclut déjà DatePipe et DecimalPipe
     FormsModule,
     ReactiveFormsModule,
-    RouterModule,
-    DatePipe,
+    RouterModule
+  ],
+  providers: [
+    DatePipe,           // ← ici pour injection dans les services/composants
     DecimalPipe
   ],
   exports: [
-    CommonModule,
+    CommonModule,       // ← exporte CommonModule = exporte DatePipe, DecimalPipe, NgIf, NgFor...
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    DatePipe,
-    DecimalPipe,
     JitsiMeetComponent,
     SecretCodeModalComponent,
     UserTypeModalComponent
   ]
 })
-export class SharedModule { }
+export class SharedModule {}

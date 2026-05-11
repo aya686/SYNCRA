@@ -5,7 +5,6 @@ import { RouteService, RouteSummary, RouteResponse, RouteLivraison, PointLivrais
 
 @Component({
   selector: 'app-route-list',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './route-list.component.html',
   styleUrl: './route-list.component.css'

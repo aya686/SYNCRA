@@ -3,7 +3,7 @@
     <div class="auth-form">
       <div class="card mt-5">
         <div class="card-body">
-          <form (ngSubmit)="onSubmit($event)">
+          <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
             <a href="javascript:" class="d-flex justify-content-center mt-3">
               <img src="assets/images/logo-dark.svg" alt="logo" />
             </a>
@@ -27,19 +27,20 @@
               <div class="col-md-6">
                 <div class="form-floating mb-3">
                   <input
-                    type="email"
+                    type="text"
                     class="form-control"
-                    id="floatingInput"
+                    id="firstName"
                     placeholder="Enter Your First Name"
-                    [field]="registerForm.firstName"
-                    [class.is-invalid]="submitted() && registerForm.firstName().errors().length > 0"
+                    name="firstName"
+                    [(ngModel)]="registerModel.firstName"
+                    #firstName="ngModel"
+                    required
+                    [class.is-invalid]="submitted() && firstName.invalid"
                   />
-                  <label for="floatingInput">First Name</label>
-                  @if (submitted() && registerForm.firstName().errors().length > 0) {
+                  <label for="firstName">First Name</label>
+                  @if (submitted() && firstName.invalid && firstName.errors?.['required']) {
                     <div class="invalid-feedback">
-                      @for (error of registerForm.firstName().errors(); track error.kind) {
-                        <div>{{ error.message }}</div>
-                      }
+                      First Name is required
                     </div>
                   }
                 </div>
@@ -47,19 +48,20 @@
               <div class="col-md-6">
                 <div class="form-floating mb-3">
                   <input
-                    type="email"
+                    type="text"
                     class="form-control"
-                    id="floatingInput"
+                    id="lastName"
                     placeholder="Enter Your Last Name"
-                    [field]="registerForm.lastName"
-                    [class.is-invalid]="submitted() && registerForm.lastName().errors().length > 0"
+                    name="lastName"
+                    [(ngModel)]="registerModel.lastName"
+                    #lastName="ngModel"
+                    required
+                    [class.is-invalid]="submitted() && lastName.invalid"
                   />
-                  <label for="floatingInput">Last Name</label>
-                  @if (submitted() && registerForm.lastName().errors().length > 0) {
+                  <label for="lastName">Last Name</label>
+                  @if (submitted() && lastName.invalid && lastName.errors?.['required']) {
                     <div class="invalid-feedback">
-                      @for (error of registerForm.lastName().errors(); track error.kind) {
-                        <div>{{ error.message }}</div>
-                      }
+                      Last Name is required
                     </div>
                   }
                 </div>
@@ -69,16 +71,23 @@
               <input
                 type="email"
                 class="form-control"
-                id="floatingInput"
-                [class.is-invalid]="submitted() && registerForm.email().invalid()"
+                id="email"
                 placeholder="Email Address"
-                [field]="registerForm.email"
+                name="email"
+                [(ngModel)]="registerModel.email"
+                #email="ngModel"
+                required
+                email
+                [class.is-invalid]="submitted() && email.invalid"
               />
-              <label for="floatingInput">Email address / Username</label>
-              @if (submitted() && registerForm.email().invalid()) {
+              <label for="email">Email address / Username</label>
+              @if (submitted() && email.invalid) {
                 <div class="invalid-feedback">
-                  @for (error of registerForm.email().errors(); track error.kind) {
-                    <div>{{ error.message }}</div>
+                  @if (email.errors?.['required']) {
+                    <div>Email is required</div>
+                  }
+                  @if (email.errors?.['email']) {
+                    <div>Enter a valid email address</div>
                   }
                 </div>
               }
@@ -88,15 +97,22 @@
                 type="password"
                 id="password"
                 class="form-control"
-                [field]="registerForm.password"
-                [class.is-invalid]="submitted() && registerForm.password().errors().length > 0"
+                name="password"
+                [(ngModel)]="registerModel.password"
+                #password="ngModel"
+                required
+                minlength="8"
+                [class.is-invalid]="submitted() && password.invalid"
                 placeholder="Password (min. 8 characters)"
               />
               <label for="password">Password</label>
-              @if (submitted() && registerForm.password().errors().length > 0) {
+              @if (submitted() && password.invalid) {
                 <div class="invalid-feedback">
-                  @for (error of registerForm.password().errors(); track error.kind) {
-                    <div>{{ error.message }}</div>
+                  @if (password.errors?.['required']) {
+                    <div>Password is required</div>
+                  }
+                  @if (password.errors?.['minlength']) {
+                    <div>Password must be at least 8 characters</div>
                   }
                 </div>
               }

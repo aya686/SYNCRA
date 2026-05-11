@@ -1,3 +1,103 @@
-<router-outlet>
-  <app-spinner />
-</router-outlet>
+<app-spinner></app-spinner>
+
+<!-- NAVBAR SYNCRA — uniquement pages Aya -->
+<ng-container *ngIf="showAyaNav">
+  <canvas class="particle-canvas" #particleCanvas></canvas>
+  <div class="cursor-glow" #cursorGlow></div>
+
+  <nav class="syncra-nav" [class.hidden]="!navbarVisible">
+    <div class="nav-container">
+      <a class="brand" routerLink="/marketplace">
+        <div class="brand-icon-wrap">
+          <img src="assets/images/logo.png" (error)="onImageError()" class="brand-logo">
+        </div>
+        <span class="brand-name">SYNCRA</span>
+      </a>
+      <div class="nav-links">
+        <a routerLink="/machines" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-tools"></i><span>Machines</span>
+        </a>
+        <a routerLink="/services" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-briefcase"></i><span>Services</span>
+        </a>
+        <a routerLink="/requests" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-envelope-paper"></i><span>Demandes</span>
+        </a>
+        <a routerLink="/cart" routerLinkActive="active" class="nav-link cart-link">
+          <i class="bi bi-cart"></i><span>Panier</span>
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </a>
+        <a routerLink="/orders" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-bag"></i><span>Commandes</span>
+        </a>
+        <a routerLink="/loyalty" routerLinkActive="active" class="nav-link loyalty-link">
+          <i class="bi bi-star-fill"></i>
+          <span>Fidélité</span>
+          <span class="loyalty-badge" *ngIf="loyaltyPoints > 0">{{ loyaltyPoints }}</span>
+        </a>
+        <a routerLink="/machines/recommendation" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-cpu"></i><span>Recommandation</span>
+        </a>
+<a routerLink="/admin-shop" routerLinkActive="active" class="nav-link">
+  <i class="bi bi-shield-lock"></i><span>Admin</span>
+</a>
+      </div>
+      <div class="nav-right">
+        <app-notification-bell></app-notification-bell>
+      </div>
+      <button class="nav-mobile-toggle">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<!-- MAIN -->
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<!-- FOOTER SYNCRA — uniquement pages Aya -->
+<ng-container *ngIf="showAyaNav">
+  <footer class="syncra-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="brand-hex">⬡</div>
+        <div class="footer-info">
+          <h3>SYNCRA</h3>
+          <p>Plateforme Écosystème Intelligent</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="link-group">
+          <h4>Plateforme</h4>
+          <a routerLink="/machines">Machines</a>
+          <a routerLink="/services">Services</a>
+          <a routerLink="/requests">Demandes</a>
+          <a routerLink="/cart">Panier</a>
+        </div>
+        <div class="link-group">
+          <h4>Mon compte</h4>
+          <a routerLink="/orders">Mes commandes</a>
+          <a routerLink="/loyalty">⭐ Fidélité</a>
+        </div>
+        <div class="link-group">
+          <h4>Ressources</h4>
+          <a href="#">Documentation</a>
+          <a href="#">Support</a>
+          <a href="#">API</a>
+        </div>
+        <div class="link-group">
+          <h4>Légal</h4>
+          <a href="#">Confidentialité</a>
+          <a href="#">Conditions</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 SYNCRA — Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+</ng-container>

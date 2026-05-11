@@ -9,7 +9,6 @@ import { ServiceService, ServiceEntity } from '../../../../services/service.serv
 
 @Component({
   selector: 'app-service-list',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

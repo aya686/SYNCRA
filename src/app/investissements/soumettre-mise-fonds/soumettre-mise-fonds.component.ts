@@ -7,7 +7,6 @@ import { MiseFonds, TypeInvestissement, StatutMiseFonds } from '../../models/inv
 
 @Component({
   selector: 'app-soumettre-mise-fonds',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './soumettre-mise-fonds.component.html',
   styleUrl: './soumettre-mise-fonds.component.scss'

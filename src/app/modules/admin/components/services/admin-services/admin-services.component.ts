@@ -10,7 +10,7 @@ import { ServiceEntity } from '../../../../../services/service.service';
 
 @Component({
   selector: 'app-admin-services',
-  standalone: true,
+   standalone: true,
   imports: [CommonModule, FormsModule, DatePipe, RouterModule],
   templateUrl: './admin-services.component.html',
   styleUrls: ['./admin-services.component.scss']

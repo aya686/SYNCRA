@@ -24,7 +24,6 @@ interface Specialiste {
 
 @Component({
   selector: 'app-alertes-admin',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SharedModule],
   templateUrl: './alertes-admin.component.html',
   styleUrls: ['./alertes-admin.component.scss']

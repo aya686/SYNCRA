@@ -14,19 +14,19 @@
     <nav class="sidebar-nav">
       <ul>
         <li>
-          <a routerLink="/admin/dashboard" routerLinkActive="active">
+          <a routerLink="/gesusers/dashboard" routerLinkActive="active">
             <i class="ti ti-dashboard"></i>
             <span *ngIf="!isSidebarCollapsed">Dashboard</span>
           </a>
         </li>
         <li>
-          <a routerLink="/admin/users" routerLinkActive="active">
+          <a routerLink="/gesusers/list" routerLinkActive="active">
             <i class="ti ti-users"></i>
             <span *ngIf="!isSidebarCollapsed">Utilisateurs</span>
           </a>
         </li>
         <li>
-          <a routerLink="/admin/security" routerLinkActive="active">
+          <a routerLink="/gesusers/security" routerLinkActive="active">
             <i class="ti ti-shield"></i>
             <span *ngIf="!isSidebarCollapsed">Sécurité</span>
           </a>
@@ -35,7 +35,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a routerLink="/my-login" (click)="logout()">
+      <a routerLink="/users/login" (click)="logout()">
         <i class="ti ti-logout"></i>
         <span *ngIf="!isSidebarCollapsed">Déconnexion</span>
       </a>

@@ -8,7 +8,6 @@ import { Ms2NavbarComponent } from '../shared/navbar/ms2-navbar.component';
 
 @Component({
   selector: 'app-mes-idees',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule, Ms2NavbarComponent],
   templateUrl: './mes-idees.component.html',
   styleUrls: ['./mes-idees.component.scss']

@@ -7,7 +7,6 @@ import { AdminService, ServiceRequest } from '../../../../../services/admin.serv
 
 @Component({
   selector: 'app-admin-requests',
-  standalone: true,
   imports: [CommonModule, FormsModule, DecimalPipe],
   templateUrl: './admin-requests.component.html',
   styleUrls: ['./admin-requests.component.scss']

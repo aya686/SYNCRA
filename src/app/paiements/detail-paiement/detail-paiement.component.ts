@@ -8,7 +8,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-detail-paiement',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './detail-paiement.component.html',
   styleUrls: ['./detail-paiement.component.scss']

@@ -29,7 +29,7 @@ export class EventDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private eventService: EventService,
     private notificationService: NotificationService,
     private dataCollector: DataCollectorService,

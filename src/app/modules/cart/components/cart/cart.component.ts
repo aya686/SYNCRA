@@ -10,7 +10,6 @@ import { CartService, Cart, CartItem, DeliveryInfo, PromoValidation, CheckoutRes
 
 @Component({
   selector: 'app-cart',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']

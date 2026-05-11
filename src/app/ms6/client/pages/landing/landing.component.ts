@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-client-landing',
-  standalone: true,
   imports: [RouterModule, CommonModule],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']

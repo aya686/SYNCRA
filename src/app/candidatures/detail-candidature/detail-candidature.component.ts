@@ -7,7 +7,6 @@ import { EvaluationService } from '../../services/evaluation.service';
 
 @Component({
   selector: 'app-detail-candidature',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './detail-candidature.component.html',
   styleUrls: ['./detail-candidature.component.scss']

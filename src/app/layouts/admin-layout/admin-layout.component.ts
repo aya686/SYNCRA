@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin-layout',
@@ -13,8 +13,5 @@ export class AdminLayoutComponent {
   isSidebarCollapsed = false;
   navScrolled = false;
   mobileMenuOpen = false;
-
-  toggleSidebar(): void {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-  }
+  toggleSidebar(): void { this.isSidebarCollapsed = !this.isSidebarCollapsed; }
 }

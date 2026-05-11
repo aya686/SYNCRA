@@ -7,7 +7,6 @@ import { MLService } from '../../core/services/ml.service';
   selector: 'app-ml-dashboard',
   templateUrl: './ml-dashboard.component.html',
   styleUrls: ['./ml-dashboard.component.scss'],
-  standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class MlDashboardComponent implements OnInit {

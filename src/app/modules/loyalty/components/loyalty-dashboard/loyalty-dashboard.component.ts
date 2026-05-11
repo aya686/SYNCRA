@@ -8,7 +8,6 @@ import { LoyaltyService, LoyaltyAccount, TopItem } from '../../../../services/lo
 
 @Component({
   selector: 'app-loyalty-dashboard',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DecimalPipe, DatePipe],
   templateUrl: './loyalty-dashboard.component.html',
   styleUrls: ['./loyalty-dashboard.component.scss']

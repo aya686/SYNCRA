@@ -7,7 +7,6 @@ import { MLService } from '../../../../core/services/ml.service';
   selector: 'app-recommendation',
   templateUrl: './recommendation.component.html',
   styleUrls: ['./recommendation.component.scss'],
-  standalone: true,
   imports: [CommonModule, FormsModule]
 })
 export class RecommendationComponent {

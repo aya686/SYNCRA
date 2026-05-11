@@ -7,7 +7,6 @@ import { LitigeService } from '../../services/litige.service';
 
 @Component({
   selector: 'app-litiges-admin-dashboard',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './litiges-admin-dashboard.component.html',
   styleUrls: ['./litiges-admin-dashboard.component.scss']

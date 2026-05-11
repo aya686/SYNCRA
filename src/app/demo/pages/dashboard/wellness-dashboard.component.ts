@@ -39,7 +39,6 @@ interface PrevisionAdmin {
 
 @Component({
   selector: 'app-wellness-dashboard',
-  standalone: true,
   imports: [CommonModule, RouterModule, SharedModule],
   templateUrl: './wellness-dashboard.component.html',
   styleUrls: ['./wellness-dashboard.component.scss']

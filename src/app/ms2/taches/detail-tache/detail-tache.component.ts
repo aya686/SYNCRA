@@ -13,7 +13,6 @@ import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-detail-tache',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, Ms2NavbarComponent],
   templateUrl: './detail-tache.component.html',
   styleUrls: ['./detail-tache.component.scss']

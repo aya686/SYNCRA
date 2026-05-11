@@ -31,7 +31,6 @@ interface ProgrammeModele {
 
 @Component({
   selector: 'app-programmes-admin',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SharedModule],
   templateUrl: './programmes-admin.component.html',
   styleUrls: ['./programmes-admin.component.scss']

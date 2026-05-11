@@ -13,7 +13,6 @@ interface NotifToast { id: number; message: string; type: 'success' | 'warning' 
 
 @Component({
   selector: 'app-bibliotheque',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, SlicePipe, DecimalPipe],
   templateUrl: './bibliotheque.component.html',
   styleUrls: ['./bibliotheque.component.scss']

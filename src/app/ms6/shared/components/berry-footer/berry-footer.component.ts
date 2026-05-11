@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-berry-footer',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
     <footer class="berry-footer" [class.compact]="compact">

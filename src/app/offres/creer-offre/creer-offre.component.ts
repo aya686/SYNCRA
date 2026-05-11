@@ -11,7 +11,6 @@ import { IaService } from '../../services/ia.service';
 
 @Component({
   selector: 'app-creer-offre',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './creer-offre.component.html',
   styleUrls: ['./creer-offre.component.scss']

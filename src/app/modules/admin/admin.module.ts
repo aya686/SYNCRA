@@ -1,3 +1,4 @@
+// src/app/modules/admin/admin.module.ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -21,6 +22,7 @@ import { EventGeneratorComponent } from './components/event-generator.component'
     RouterModule,
     AdminRoutingModule,
     NgbModule,
+    // Standalone components
     DashboardComponent,
     AdminMachinesComponent,
     AdminServicesComponent,
@@ -28,7 +30,6 @@ import { EventGeneratorComponent } from './components/event-generator.component'
     AdminRequestsComponent,
     EventGeneratorComponent
   ],
-  exports: [
-  ]
+  exports: []
 })
-export class AdminModule { }
+export class AdminModule {}

@@ -6,7 +6,6 @@ import { RouterModule, Router, RouterOutlet } from '@angular/router';
   selector: 'app-ml-layout',
   templateUrl: './ml-layout.component.html',
   styleUrls: ['./ml-layout.component.scss'],
-  standalone: true,
   imports: [CommonModule, RouterModule, RouterOutlet]
 })
 export class MlLayoutComponent {

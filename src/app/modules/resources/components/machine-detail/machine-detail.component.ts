@@ -11,7 +11,6 @@ import { ReviewService, Review, CreateReviewRequest } from '../../../../services
 
 @Component({
   selector: 'app-machine-detail',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

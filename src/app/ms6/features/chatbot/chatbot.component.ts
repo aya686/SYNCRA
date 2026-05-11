@@ -34,7 +34,6 @@ interface ChatbotResponse {
 
 @Component({
   selector: 'app-chatbot',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="chatbot-container">

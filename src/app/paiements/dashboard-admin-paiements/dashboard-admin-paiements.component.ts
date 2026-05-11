@@ -6,7 +6,6 @@ import { Paiement, StatutPaiement } from '../../models/paiement.model';
 
 @Component({
   selector: 'app-dashboard-admin-paiements',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard-admin-paiements.component.html',
   styleUrls: ['./dashboard-admin-paiements.component.scss']

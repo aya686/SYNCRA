@@ -18,7 +18,6 @@ export interface AdminNavItem {
 
 @Component({
   selector: 'app-berry-admin-layout',
-  standalone: true,
   imports: [CommonModule, RouterModule, BerryFooterComponent],
   template: `
     <div class="berry-admin-layout">

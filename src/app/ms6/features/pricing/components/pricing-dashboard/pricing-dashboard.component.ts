@@ -10,7 +10,6 @@ import { PricingService,
 
 @Component({
   selector: 'app-pricing-dashboard',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pricing-dashboard.component.html',
   styleUrls: ['./pricing-dashboard.component.css']

@@ -19,7 +19,6 @@ interface Colonne {
 
 @Component({
   selector: 'app-kanban',
-  standalone: true,
   imports: [CommonModule, RouterModule, DragDropModule, Ms2NavbarComponent],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.scss']

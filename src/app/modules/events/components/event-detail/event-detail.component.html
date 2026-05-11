@@ -1,8 +1,8 @@
 <div class="event-detail-container" *ngIf="event">
   <div class="detail-header">
-    <button class="back-btn" routerLink="/admin/events">← Retour</button>
+<button class="back-btn" (click)="router.navigate(['/admin/events'])">← Retour</button>
     <div class="header-actions">
-      <button class="btn-primary" [routerLink]="['/admin/events', event.id, 'edit']">Modifier</button>
+<button class="btn-primary" (click)="router.navigate(['/admin/events', event.id, 'edit'])">Modifier</button>
       <button class="btn-danger" (click)="deleteEvent()">Supprimer</button>
     </div>
   </div>

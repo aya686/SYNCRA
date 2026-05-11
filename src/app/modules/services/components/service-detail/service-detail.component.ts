@@ -10,7 +10,6 @@ import { ReviewListComponent } from '../../../reviews/components/review-list/rev
 
 @Component({
   selector: 'app-service-detail',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

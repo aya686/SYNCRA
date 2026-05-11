@@ -11,7 +11,6 @@ import { Investisseur, MiseFonds, Convention, StatutMiseFonds, StatutConvention,
 
 @Component({
   selector: 'app-dashboard-investisseur',
-  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './dashboard-investisseur.component.html',
   styleUrl: './dashboard-investisseur.component.scss'

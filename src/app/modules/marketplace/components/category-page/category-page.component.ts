@@ -43,7 +43,6 @@ export interface SpecificFilter {
 
 @Component({
   selector: 'app-category-page',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
   templateUrl: './category-page.component.html',
   styleUrls: ['./category-page.component.scss']

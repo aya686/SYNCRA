@@ -13,7 +13,6 @@ import { CartService } from '../../../../services/cart.service';
 
 @Component({
   selector: 'app-recommendation-panel',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

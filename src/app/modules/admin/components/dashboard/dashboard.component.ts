@@ -7,7 +7,7 @@ import { AdminService, DashboardStats } from '../../../../services/admin.service
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
+ standalone: true,
   imports: [CommonModule, DecimalPipe, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

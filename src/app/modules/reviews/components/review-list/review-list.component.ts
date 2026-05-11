@@ -7,7 +7,6 @@ import { ReviewFormComponent } from '../review-form/review-form.component';
 
 @Component({
   selector: 'app-review-list',
-  standalone: true,
   imports: [
     CommonModule,
     DecimalPipe,

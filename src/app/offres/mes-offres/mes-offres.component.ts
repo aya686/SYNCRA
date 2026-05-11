@@ -7,7 +7,6 @@ import { OffreService } from '../../services/offre.service';
 
 @Component({
   selector: 'app-mes-offres',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './mes-offres.component.html',
   styleUrls: ['./mes-offres.component.scss']

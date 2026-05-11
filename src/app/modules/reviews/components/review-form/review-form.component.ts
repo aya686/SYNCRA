@@ -7,7 +7,6 @@ import { ReviewService, CreateReviewRequest } from '../../../../services/review.
 
 @Component({
   selector: 'app-review-form',
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule

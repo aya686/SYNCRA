@@ -9,7 +9,6 @@ import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-contrats-freelancer',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './contrats-freelancer.component.html',
   styleUrls: ['./contrats-freelancer.component.scss']

@@ -11,7 +11,6 @@ export interface TableColumn {
 
 @Component({
   selector: 'app-berry-table',
-  standalone: true,
   imports: [CommonModule],
   template: `
     <div class="berry-table-container">
