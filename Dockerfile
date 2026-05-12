@@ -6,6 +6,6 @@ COPY . .
 RUN node node_modules/@angular/cli/bin/ng.js build --configuration=production
 
 FROM nginx:alpine
-COPY --from=build /app/dist/SYNCRA/browser /usr/share/nginx/html
+COPY --from=build /app/dist/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
