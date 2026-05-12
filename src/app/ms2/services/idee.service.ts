@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Idee } from '../models/idee.model';
 import { Projet } from '../models/projet.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class IdeeService {
-  private base = '/api/idees';
+  private base = `${environment.projetsApi}/idees`;
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Idee[]> {

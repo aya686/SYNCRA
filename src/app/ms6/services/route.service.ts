@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+ import { environment } from 'src/environments/environment';
 
 export interface RouteRequest {
   routeName: string;
@@ -174,7 +175,7 @@ export interface DailyStats {
   providedIn: 'root'
 })
 export class RouteService {
-  private apiUrl = 'http://localhost:8086/ms6/api/routes';
+  private apiUrl = `${environment.hichemApi}/routes`;
 
   constructor(private http: HttpClient) {}
 

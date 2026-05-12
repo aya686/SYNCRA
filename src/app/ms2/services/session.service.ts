@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SessionTravail } from '../models/session.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
-  private base = '/api/sessions';
+  private base = `${environment.projetsApi}/sessions`;
   constructor(private http: HttpClient) {}
 
   getByTache(tacheId: number): Observable<SessionTravail[]> {

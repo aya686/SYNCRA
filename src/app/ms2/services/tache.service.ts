@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tache, StatutTache, SousTache } from '../models/tache.model';
- 
+ import { environment } from 'src/environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class TacheService {
-  private base = '/api/taches';
+  private base = `${environment.projetsApi}/taches`;
   constructor(private http: HttpClient) {}
  
   getByProjet(projetId: number): Observable<Tache[]> {

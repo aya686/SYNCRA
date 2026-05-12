@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Avancement } from '../models/avancement.model';
- 
+ import { environment } from 'src/environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class AvancementService {
-  private base = '/api/projets';
+  private base = `${environment.projetsApi}/projets`;
   constructor(private http: HttpClient) {}
  
   getByProjet(projetId: number): Observable<Avancement> {

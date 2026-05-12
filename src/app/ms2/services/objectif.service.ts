@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Objectif } from '../models/objectif.model';
+ import { environment } from 'src/environments/environment';
  
 @Injectable({ providedIn: 'root' })
 export class ObjectifService {
-  private base = '/api/objectifs';
+  private base = `${environment.projetsApi}/objectifs`;
   constructor(private http: HttpClient) {}
  
   getByProjet(projetId: number): Observable<Objectif[]> {
