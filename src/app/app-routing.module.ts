@@ -24,13 +24,13 @@ import { HeatmapComponent } from './modules/reporting/components/heatmap/heatmap
 import { EventGeneratorComponent } from './modules/admin/components/event-generator.component';
 
 // ── GES USERS ──
-import { UserListComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/user-list/user-list.component';
-import { RegisterComponent as GesRegisterComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/register/register.component';
-import { RegisterDetailsComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/register/details/register-details.component';
-import { ProfileComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/profile/profile.component';
-import { LoginComponent as GesLoginComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/login/login.component';
-import { AdminDashboardComponent as GesAdminDashboardComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/admin-dashboard/admin-dashboard.component';
-import { AdminLayoutComponent as GesAdminLayoutComponent } from '../../../SYNCRA/templatetest/src/app/gesusers/components/admin-layout/admin-layout.component';
+import { UserListComponent } from './templatetest/src/app/gesusers/components/user-list/user-list.component';
+import { RegisterComponent as GesRegisterComponent } from './templatetest/src/app/gesusers/components/register/register.component';
+import { RegisterDetailsComponent } from './templatetest/src/app/gesusers/components/register/details/register-details.component';
+import { ProfileComponent } from './templatetest/src/app/gesusers/components/profile/profile.component';
+import { LoginComponent as GesLoginComponent } from './templatetest/src/app/gesusers/components/login/login.component';
+import { AdminDashboardComponent as GesAdminDashboardComponent } from './templatetest/src/app/gesusers/components/admin-dashboard/admin-dashboard.component';
+import { AdminLayoutComponent as GesAdminLayoutComponent } from './templatetest/src/app/gesusers/components/admin-layout/admin-layout.component';
 
 // MS6 Client Components
 import { ClientBoutiqueListComponent } from './ms6/client/pages/boutiques/client-boutique-list.component';
