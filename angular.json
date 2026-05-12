@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "allowedCommonJsDependencies": ["apexcharts"],
+            "allowedCommonJsDependencies": ["apexcharts", "safe-buffer", "buffer"],
             "outputPath": {
               "base": "dist"
             },
