@@ -189,7 +189,8 @@ export class NeuralNetworkService {
     inputTensor.dispose();
     outputTensor.dispose();
     
-    return Array.from(probabilities).map(p => Math.min(0.95, Math.max(0.05, p)));
+    return Array.from(probabilities).map((p: unknown) => Math.min(0.95, Math.max(0.05, p as number)));
+
   }
   
   async saveModel(): Promise<void> {
